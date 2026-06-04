@@ -96,7 +96,7 @@ access point for cartridge upload \citep{prg32hardware,prg32repo}.}
 
 \begin{prgwarn}
 The default audio pins overlap the reference display wiring, and many ESP32\nobreakdash-C6
-boards wire their onboard RGB LED to GPIO8---the same pin used here for the
+boards wire their onboard RGB LED to GPIO8: the same pin used here for the
 display's data/command line. If you add the optional MAX98357A audio or enable the
 onboard LED, reassign the conflicting pins in \fname{main/prg32\_config.h} or
 \code{menuconfig} before flashing, or the firmware will skip the feature to protect
@@ -119,7 +119,7 @@ bridges them: a small helper board (an ESP32\nobreakdash-S3, an RP2040 with USB-
 or a PC-side serial helper) reads the USB controller and forwards button presses
 to the ESP32\nobreakdash-C6 over a simple serial packet \citep{prg32repo}. Because that packet
 feeds the same input bitmask your games already read, no game code changes to gain
-controller support---a clean example of an abstraction boundary doing its job.
+controller support: a clean example of an abstraction boundary doing its job.
 
 \section{From breadboard to board}
 

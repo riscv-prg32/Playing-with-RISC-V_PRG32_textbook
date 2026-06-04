@@ -86,33 +86,7 @@ Chapter~\ref{ch:asm1}. The routine reads input, tests LEFT and RIGHT, and update
 the position. This mirrors the platform's ASCII Pong update almost line for line
 \citep{prg32repo}.
 
-\begin{lstlisting}[style=asm,caption={A full \code{update}: read input, move on LEFT/RIGHT, store the result. Compare with the platform's \code{pong\_ascii\_update}.}]
-.section .data
-game_x:  .word 20           # object position, in text columns
-
-.section .text
-game_update:
-    addi sp, sp, -16
-    sw   ra, 12(sp)
-
-    call prg32_input_read
-    mv   t0, a0             # t0 = button bitmask
-
-    la   t1, game_x
-    lw   t2, 0(t1)          # t2 = current x (a value)
-
-    andi t3, t0, 1          # test LEFT (bit 0)
-    beqz t3, 1f
-    addi t2, t2, -1         # move left
-1:  andi t3, t0, 2          # test RIGHT (bit 1)
-    beqz t3, 2f
-    addi t2, t2, 1          # move right
-2:  sw   t2, 0(t1)          # store the new x
-
-    lw   ra, 12(sp)
-    addi sp, sp, 16
-    ret
-\end{lstlisting}
+\input{examples/ch04/read_input.tex}
 
 Trace it once by hand. Suppose \code{game\_x} holds \code{20} and the player
 holds RIGHT. The input read returns a mask with bit~1 set. The LEFT test

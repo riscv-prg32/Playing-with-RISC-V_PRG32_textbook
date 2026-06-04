@@ -36,18 +36,7 @@ with your game's prefix. The framework calls \code{<prefix>\_init} once and then
 \code{<prefix>\_update} and \code{<prefix>\_draw} once per frame, exactly as in the
 assembly track \citep{prg32tutorialc}. To use the framework you include one header.
 
-\begin{lstlisting}[style=c,caption={The smallest C game. Three functions that do nothing yet: the C counterpart of the assembly skeleton in Chapter~\ref{ch:asm1}.}]
-#include "prg32.h"
-
-void pong_c_init(void) {
-}
-
-void pong_c_update(void) {
-}
-
-void pong_c_draw(void) {
-}
-\end{lstlisting}
+\input{examples/ch07/smallest_c_game.tex}
 
 The single \code{\#include "prg32.h"} gives you every framework function and every
 named constant: the button bits, the colours and the screen dimensions that you

@@ -66,22 +66,7 @@ nothing but return. In \riscv assembly, ``return'' is the instruction \code{ret}
 and ``do nothing else'' is simply not writing anything else. We name our game
 \code{hello} and give every symbol that prefix.
 
-\begin{lstlisting}[style=asm,caption={The smallest \prg assembly game: three functions that return immediately. Build it, confirm it runs, then add to it.}]
-.option norelax
-.section .text
-.global hello_init
-.global hello_update
-.global hello_draw
-
-hello_init:
-    ret                 # return to the framework
-
-hello_update:
-    ret
-
-hello_draw:
-    ret
-\end{lstlisting}
+\input{examples/ch03/smallest_program_asm.tex}
 
 A few details deserve explanation. The directive \code{.option norelax} tells the
 assembler not to apply an optimisation that can interfere with the way \prg
@@ -123,21 +108,7 @@ single most important habit in \riscv assembly.
 
 Here is the pattern, which you will repeat in nearly every function:
 
-\begin{lstlisting}[style=asm,caption={The stack-frame idiom. Save \reg{ra}, do work that may call C, restore \reg{ra}, return.}]
-hello_init:
-    addi sp, sp, -16        # make a 16-byte frame (keeps sp 16-aligned)
-    sw   ra, 12(sp)         # save the return address into the frame
-    call prg32_console_clear   # clear the text console (a C helper)
-    la   a0, title          # put address of the string in a0 (1st argument)
-    call prg32_console_write   # print it
-    lw   ra, 12(sp)         # restore the return address
-    addi sp, sp, 16         # tear down the frame
-    ret                     # now ret goes to the right place
-
-.section .rodata
-title:
-    .asciz "HELLO PRG32\n"   # a zero-terminated string
-\end{lstlisting}
+\input{examples/ch03/stack-frame.tex}
 
 Read this slowly, because it contains five distinct ideas. The \code{addi sp, sp,
 -16} subtracts sixteen from the stack pointer, reserving sixteen bytes; we use a
@@ -185,12 +156,7 @@ crux of understanding memory. First you load the \emph{address} of the label int
 a register with \code{la}. Then you load the \emph{value} at that address with
 \code{lw}, or store a new value with \code{sw}.
 
-\begin{lstlisting}[style=asm,caption={The load--modify--store cycle: read a value from memory, change it in a register, write it back.}]
-    la t0, hello_x         # t0 = ADDRESS of hello_x
-    lw t1, 0(t0)           # t1 = VALUE stored at that address
-    addi t1, t1, 1         # change the value (in the register)
-    sw t1, 0(t0)           # write the new value back to memory
-\end{lstlisting}
+\input{examples/ch03/load_modify_store.tex}
 
 \begin{prgconcept}
 A label such as \code{hello\_x} names a \emph{location} in memory. \code{la t0,
@@ -216,42 +182,7 @@ that prints a title, an \code{update} that advances a counter each frame, and a
 deliberately close to the platform's own ASCII Pong skeleton
 \citep{prg32tutorialascii}.
 
-\begin{lstlisting}[style=asm,caption={A complete, minimal ASCII game. It runs identically on QEMU and the ESP32\nobreakdash-C6.}]
-.option norelax
-.section .data
-hello_score:  .word 0
-
-.section .rodata
-title:  .asciz "HELLO PRG32\n"
-
-.section .text
-.global hello_init
-.global hello_update
-.global hello_draw
-
-hello_init:
-    addi sp, sp, -16
-    sw   ra, 12(sp)
-    call prg32_console_clear
-    la   a0, title
-    call prg32_console_write
-    li   a0, 440            # 440 Hz: a short, pleasant beep on start
-    li   a1, 60             # 60 ms duration
-    call prg32_audio_beep   # silent on QEMU, audible on the board
-    lw   ra, 12(sp)
-    addi sp, sp, 16
-    ret
-
-hello_update:
-    la   t0, hello_score
-    lw   t1, 0(t0)
-    addi t1, t1, 1          # count one tick per frame
-    sw   t1, 0(t0)
-    ret
-
-hello_draw:
-    ret
-\end{lstlisting}
+\input{examples/ch03/minimal_ascii_game.tex}
 
 \begin{prgtargets}
 \textbf{Both targets.} On QEMU you will see the title on the serial monitor; the
