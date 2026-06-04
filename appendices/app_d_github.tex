@@ -29,10 +29,11 @@ they turn ``I think I broke something'' into ``let me see exactly what I changed
 You obtain \prg by \emph{cloning} its repository, which downloads the full project
 and its history \citep{prg32repo}.
 
-\begin{lstlisting}[style=bash,caption={Cloning the platform repository.}]
-git clone https://github.com/riscv-prg32/PRG32.git
-cd PRG32
-\end{lstlisting}
+\lstinputlisting[
+    style=bash,
+    caption={%\fname{clone\_repo.sh} \protect\
+       Cloning the platform repository.}
+]{scripts/app_d_github/clone_repo.sh}
 
 To incorporate later updates from the upstream project without losing your own
 work, you fetch and merge changes; for coursework, however, the cleaner path is to
@@ -44,11 +45,11 @@ Three commands cover the great majority of daily use: \code{status} to see what 
 changed, \code{add} to stage the changes you want to keep, and \code{commit} to
 record them with a message.
 
-\begin{lstlisting}[style=bash,caption={The everyday Git cycle: inspect, stage, commit.}]
-git status                         # what has changed?
-git add examples/games/mygame/     # stage the files to keep
-git commit -m "Add boundary clamp to mygame paddle"
-\end{lstlisting}
+\lstinputlisting[
+    style=bash,
+    caption={%\fname{git\_cycle.sh} \protect\
+       The everyday Git cycle: inspect, stage, commit.}
+]{scripts/app_d_github/git_cycle.sh}
 
 \begin{prgwarn}
 Write commit messages that your future self will understand: ``Add boundary clamp
@@ -64,13 +65,11 @@ firmware embedding of Chapter~\ref{ch:ccap}, or a large refactor of your game, m
 a branch. If the experiment fails, you discard the branch and your main line is
 untouched; if it succeeds, you merge it back.
 
-\begin{lstlisting}[style=bash,caption={Working on a branch, then merging or discarding.}]
-git switch -c experiment-embed-game   # create and switch to a branch
-# ... make changes, commit them ...
-git switch main                        # return to the safe main line
-git merge experiment-embed-game        # keep the experiment, OR
-git branch -D experiment-embed-game    # discard it entirely
-\end{lstlisting}
+\lstinputlisting[
+    style=bash,
+    caption={%\fname{branch\_workflow.sh} \protect\
+       Working on a branch, then merging or discarding.}
+]{scripts/app_d_github/branch_workflow.sh}
 
 \begin{prgconcept}
 A branch lets you try something that might break your project, in isolation. The
@@ -85,10 +84,11 @@ state in one command: exactly the ``restore afterwards'' the tutorial requires
 When an edit breaks a working game, Git shows you precisely what changed since your
 last commit, and can undo it.
 
-\begin{lstlisting}[style=bash,caption={Seeing and undoing uncommitted changes.}]
-git diff                               # show every uncommitted change
-git restore examples/games/mygame/game.S   # discard changes to one file
-\end{lstlisting}
+\lstinputlisting[
+    style=bash,
+    caption={%\fname{undo\_changes.sh} \protect\
+       Seeing and undoing uncommitted changes.}
+]{scripts/app_d_github/undo_changes.sh}
 
 The discipline that makes this powerful is committing often: after each working
 step of the incremental method this book teaches. If you commit after every
@@ -101,10 +101,11 @@ For submission you push your commits to your own GitHub repository, then share i
 link or open a pull request as your course directs. You create an empty repository
 on GitHub, connect it as a remote, and push.
 
-\begin{lstlisting}[style=bash,caption={Publishing your work to your own GitHub repository.}]
-git remote add origin https://github.com/<your-user>/<your-repo>.git
-git push -u origin main
-\end{lstlisting}
+\lstinputlisting[
+    style=bash,
+    caption={%\fname{publish\_repo.sh} \protect\
+       Publishing your work to your own GitHub repository.}
+]{scripts/app_d_github/publish_repo.sh}
 
 \begin{prgaside}
 The \prg repository models the conventions you are learning: a \fname{README} that

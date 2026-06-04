@@ -61,6 +61,16 @@ provide and the framework calls \citep{prg32teaching}. Every example in this
 book, in either language, exports the same three entry points, distinguished only
 by a prefix that names the game:
 
+\lstinputlisting[
+    style=asm,
+    caption={%
+        \fname{input\_read.S} \protect\\
+        A full \code{update}: read input, move on LEFT/RIGHT, store the result. 
+        Compare with the platform's \code{pong\_ascii\_update}%
+    }
+]{examples/ch04/input_read.S}
+
+
 \begin{lstlisting}[style=plain,caption={The universal shape of a \prg game. The prefix changes; the structure never does.}]
 <prefix>_init     -- runs once when the game (cartridge) is selected
 <prefix>_update   -- runs once per frame; changes game state
@@ -273,18 +283,43 @@ directory and a configuration profile; the source does not change at all
 For the \textbf{physical ESP32\nobreakdash-C6 board}, the build uses a directory named
 \fname{build-esp32c6} and the board configuration profile:
 
-\begin{lstlisting}[style=bash,caption={Building and flashing for the physical board (abbreviated; see Appendix~\ref{app:env}).}]
-idf.py -B build-esp32c6 -D SDKCONFIG_DEFAULTS=sdkconfig.defaults set-target esp32c6
-idf.py -B build-esp32c6 -D SDKCONFIG_DEFAULTS=sdkconfig.defaults flash monitor
-\end{lstlisting}
+\lstinputlisting[
+    style=bash,
+    caption={%
+        \fname{building\_and\_flashing\_esp32c6.sh} \protect\\
+        Building and flashing for the physical board (abbreviated; see Appendix~\ref{app:env}).%
+    }
+]{scripts/ch02/building_and_flashing_esp32c6.sh}
 
 For the \textbf{QEMU emulator}, the build uses \fname{build-qemu} and the QEMU
-profile, and targets the ESP32\nobreakdash-C3 emulator:
+profile, and targets the ESP32\nobreakdash-C3 emulator.
 
-\begin{lstlisting}[style=bash,caption={Building and running for the desktop emulator.}]
-idf.py -B build-qemu -D SDKCONFIG_DEFAULTS=sdkconfig.defaults.qemu set-target esp32c3
-idf.py -B build-qemu -D SDKCONFIG_DEFAULTS=sdkconfig.defaults.qemu qemu --graphics monitor
-\end{lstlisting}
+On Windows:
+
+\lstinputlisting[
+    style=bash,
+    caption={%
+        \fname{building\_and\_flashing\_qemu\_windows.ps1} \protect\\
+        Building and flashing for the physical board (abbreviated; see Appendix~\ref{app:env}).%
+    }
+]{scripts/ch02/building_and_flashing_qemu_windows.ps1}
+
+\lstinputlisting[
+    style=bash,
+    caption={%
+        Building and running for the Windows desktop emulator.%
+    }
+]{scripts/ch02/building_and_flashing_qemu_windows.ps1}
+
+On Linux or MacOS:
+
+\lstinputlisting[
+    style=bash,
+    caption={%
+        \fname{building\_and\_flashing\_qemu\_shell.sh} \protect\\
+        Building and running for Linux or MacOS.%
+    }
+]{scripts/ch02/building_and_flashing_qemu_shell.sh}
 
 \begin{prgwarn}
 Keep the two build directories strictly separate. Flashing a \fname{build-qemu}

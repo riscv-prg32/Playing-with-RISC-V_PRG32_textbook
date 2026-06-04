@@ -1,9 +1,17 @@
-\begin{lstlisting}[style=asm,caption={A full \code{update}: read input, move on LEFT/RIGHT, store the result. Compare with the platform's \code{pong\_ascii\_update}.}]
+.option norelax
+
 .section .data
 game_x:  .word 20           # object position, in text columns
 
 .section .text
-game_update:
+.global input_read_init
+.global input_read_update
+.global input_read_draw
+
+input_read_init:
+    ret                     
+
+input_read_update:
     addi sp, sp, -16
     sw   ra, 12(sp)
 
@@ -24,4 +32,6 @@ game_update:
     lw   ra, 12(sp)
     addi sp, sp, 16
     ret
-\end{lstlisting}
+
+input_read_draw:
+    ret          

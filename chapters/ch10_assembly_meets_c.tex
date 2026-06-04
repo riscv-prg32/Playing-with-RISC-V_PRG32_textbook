@@ -14,27 +14,21 @@ Consider the single most common operation in any of our games: move an object le
 when the left button is pressed. In C it is three lines you could read aloud as
 English.
 
-\begin{lstlisting}[style=c,caption={Move left, in C. Read input, test the bit, change the position.}]
-uint32_t input = prg32_input_read();
-if (input & PRG32_BTN_LEFT) {
-    paddle_x -= 3;
-}
-\end{lstlisting}
+\lstinputlisting[
+    style=c,
+    caption={%\fname{move\_left\_c.c} \protect\
+       Move left, in C. Read input, test the bit, change the position.}
+]{examples/ch10/move_left_c.c}
 
 In assembly it is the same idea spelled out in the machine's own terms: call,
 copy the result, mask the bit, branch if clear, subtract, and because
 \code{paddle\_x} lives in memory, load before and store after.
 
-\begin{lstlisting}[style=asm,caption={Move left, in assembly. The same logic, with every step the C compiler would have generated made explicit.}]
-    call prg32_input_read     # input bitmask in a0
-    mv   t0, a0               # keep our copy
-    la   t1, paddle_x
-    lw   t2, 0(t1)            # load paddle_x from memory
-    andi t3, t0, 1            # isolate the LEFT bit
-    beqz t3, 1f               # if LEFT is clear, skip
-    addi t2, t2, -3           # paddle_x -= 3
-1:  sw   t2, 0(t1)            # store paddle_x back
-\end{lstlisting}
+\lstinputlisting[
+    style=asm,
+    caption={%\fname{move\_left\_asm.S} \protect\
+       Move left, in assembly. The same logic, with every step the C compiler would have generated made explicit.}
+]{examples/ch10/move_left_asm.S}
 
 Line up the two listings and the correspondence is exact. The C \code{if (input \&
 PRG32\_BTN\_LEFT)} becomes \code{andi} followed by \code{beqz}. The C \code{paddle\_x

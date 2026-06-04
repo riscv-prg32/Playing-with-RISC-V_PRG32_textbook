@@ -37,16 +37,13 @@ Following the platform's own first-game rhythm, we start with a \code{draw} that
 clears the screen to black and does nothing else, confirm it runs, then add a
 single rectangle \citep{prg32tutorialgraphic}.
 
-\begin{lstlisting}[style=asm,caption={A \code{draw} that clears the frame. Build this first and confirm a black screen before drawing anything on it.}]
-game_draw:
-    addi sp, sp, -16
-    sw   ra, 12(sp)
-    li   a0, 0                 # RGB565 black
-    call prg32_gfx_clear       # fill the 320x200 viewport
-    lw   ra, 12(sp)
-    addi sp, sp, 16
-    ret
-\end{lstlisting}
+\lstinputlisting[
+    style=asm,
+    caption={%
+        \fname{game\_draw.S} \protect\\
+       A \code{draw} that clears the frame. Build this first and confirm a black screen before drawing anything on it.%
+    }
+]{examples/ch05/game_draw.S}
 
 \begin{prgcheck}
 Build this for QEMU and confirm the virtual screen shows solid black with no
@@ -60,15 +57,13 @@ a position read from \code{.data}. The platform's graphics Pong places the paddl
 at $y=188$, a 64-by-8 white bar: wide enough to be easy to see in the emulator
 \citep{prg32repo}.
 
-\begin{lstlisting}[style=asm,caption={Drawing the paddle from a stored position. The five arguments fill \reg{a0}--\reg{a4} in order.}]
-    la   t0, paddle_x          # address of the paddle position
-    lw   a0, 0(t0)             # a0 = x  (a value read from memory)
-    li   a1, 188               # a1 = y  (near the bottom)
-    li   a2, 64                # a2 = width
-    li   a3, 8                 # a3 = height
-    li   a4, 65535             # a4 = white (RGB565 0xffff)
-    call prg32_gfx_rect        # draw the paddle
-\end{lstlisting}
+\lstinputlisting[
+    style=asm,
+    caption={%
+        \fname{paddle\_draw.S} \protect\\
+       Drawing the paddle from a stored position. The five arguments fill \reg{a0}--\reg{a4} in order.%
+    }
+]{examples/ch05/paddle_draw.S}
 
 \begin{prgwarn}
 The order of the loads matters because each \code{li} into \reg{a0}--\reg{a4}
@@ -88,28 +83,13 @@ Each frame, the velocity is added to the position; when the ball reaches an edge
 the velocity is negated so it travels back the other way. This is the heart of
 the platform's graphics Pong update \citep{prg32repo}.
 
-\begin{lstlisting}[style=asm,caption={Autonomous ball motion on the x axis with edge bounce. The same pattern, repeated for y, gives full 2-D motion.}]
-.section .data
-ball_x:  .word 156
-ball_dx: .word 2               # +2 means moving right
-
-.section .text
-    la   t1, ball_x
-    lw   t2, 0(t1)             # t2 = ball x
-    la   t3, ball_dx
-    lw   t4, 0(t3)             # t4 = ball dx (velocity)
-    add  t2, t2, t4           # x = x + dx
-    bltz t2, 1f                # hit the left edge?
-    li   t5, 312               # 320 - ball width (8)
-    ble  t2, t5, 2f            # still in range on the right?
-    mv   t2, t5                # clamp to right edge
-    neg  t4, t4                # reverse direction
-    j    2f
-1:  li   t2, 0                 # clamp to left edge
-    neg  t4, t4                # reverse direction
-2:  sw   t2, 0(t1)            # store new x
-    sw   t4, 0(t3)            # store (possibly reversed) dx
-\end{lstlisting}
+\lstinputlisting[
+    style=asm,
+    caption={%
+        \fname{ball\_motion.S} \protect\\
+       Autonomous ball motion on the x axis with edge bounce. The same pattern, repeated for y, gives full 2-D motion.%
+    }
+]{examples/ch05/ball_motion.S}
 
 \begin{prgconcept}
 \textbf{Velocity} is just a number added to position each frame. A \emph{bounce}
@@ -135,25 +115,13 @@ takes the position and size of two rectangles and returns non-zero when they
 overlap \citep{prg32tutorialgraphic}. In assembly the eight arguments fill
 \reg{a0} through \reg{a7}.
 
-\begin{lstlisting}[style=asm,caption={Testing ball-versus-paddle overlap. A non-zero result in \reg{a0} means they touched this frame.}]
-    la   t0, ball_x
-    lw   a0, 0(t0)            # ball x
-    la   t0, ball_y
-    lw   a1, 0(t0)            # ball y
-    li   a2, 8                # ball width
-    li   a3, 8                # ball height
-    la   t0, paddle_x
-    lw   a4, 0(t0)            # paddle x
-    li   a5, 188              # paddle y
-    li   a6, 64               # paddle width
-    li   a7, 8                # paddle height
-    call prg32_sprite_hitbox  # a0 = non-zero if overlapping
-    beqz a0, 3f               # no overlap: skip the bounce
-    la   t0, ball_dy          # overlap: make the ball go up
-    li   t1, -1
-    sw   t1, 0(t0)
-3:
-\end{lstlisting}
+\lstinputlisting[
+    style=asm,
+    caption={%
+        \fname{collision\_testing.S} \protect\\
+       Testing ball-versus-paddle overlap. A non-zero result in \reg{a0} means they touched this frame.%
+    }
+]{examples/ch05/collision_testing.S}
 
 \begin{prgconcept}
 Two rectangles overlap when they intersect on \emph{both} axes at once: the $x$
@@ -172,7 +140,13 @@ and beeps once; the \code{update} moves the paddle from input, advances and
 bounces the ball, and applies collision; the \code{draw} clears the frame and
 renders the paddle and ball.
 
-\input{examples/ch05/complete_draw.tex}
+\lstinputlisting[
+    style=asm,
+    caption={%
+        \fname{ball\_game.S} \protect\\
+       The \code{draw} of the complete game. Compare it line for line with \code{pong\_graphics\_draw} in the repository.%
+    }
+]{examples/ch05/ball_game.S}
 
 \begin{prgtargets}
 \textbf{Both targets.} Develop and watch this on the QEMU virtual screen, where

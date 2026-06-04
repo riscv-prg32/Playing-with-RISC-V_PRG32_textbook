@@ -1,4 +1,3 @@
-\begin{lstlisting}[style=asm,caption={A complete, minimal ASCII game.}]
 .option norelax
 .section .data
 hello_score:  .word 0
@@ -33,4 +32,3 @@ hello_update:
 
 hello_draw:
     ret
-\end{lstlisting}

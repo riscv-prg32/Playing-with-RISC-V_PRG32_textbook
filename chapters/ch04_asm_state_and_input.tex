@@ -47,10 +47,13 @@ bitmask. In assembly you obtain it by calling \code{prg32\_input\_read}; the
 result arrives, by convention, in \reg{a0}. The very first thing to do is copy it
 somewhere safe, because the next \code{call} you make would overwrite \reg{a0}.
 
-\begin{lstlisting}[style=asm,caption={Read the input bitmask and keep it. The copy to a temporary is essential, because later calls reuse \reg{a0}.}]
-    call prg32_input_read    # button bitmask returned in a0
-    mv   t0, a0              # keep our own copy in t0 before anything else
-\end{lstlisting}
+\lstinputlisting[
+    style=asm,
+    caption={%
+        \fname{get\_input.S} \protect\\
+        Read the input bitmask and keep it. The copy to a temporary is essential, because later calls reuse \reg{a0}.%    
+    }
+]{examples/ch04/get_input.S}
 
 \begin{prgwarn}
 Copy the input mask out of \reg{a0} immediately. \reg{a0} is the argument and
@@ -64,12 +67,13 @@ To test a single button you isolate its bit with \code{andi}, the
 Table~\ref{tab:buttons}. The result is non-zero exactly when that button is
 pressed.
 
-\begin{lstlisting}[style=asm,caption={Testing one button. \code{andi} keeps only the chosen bit; \code{beqz} skips the body when that bit is clear.}]
-    andi t3, t0, 1          # PRG32_BTN_LEFT is bit 0 (value 1)
-    beqz t3, 1f             # if the LEFT bit is clear, skip the move
-    addi t1, t1, -1         # LEFT is pressed: move the object left
-1:
-\end{lstlisting}
+\lstinputlisting[
+    style=asm,
+    caption={%
+        \fname{button\_test.S} \protect\\
+        Testing one button. \code{andi} keeps only the chosen bit; \code{beqz} skips the body when that bit is clear.%    
+    }
+]{examples/ch04/button_test.S}
 
 \begin{prgconcept}
 \code{andi t3, t0, 1} computes the bitwise AND of the input mask with the
@@ -86,7 +90,14 @@ Chapter~\ref{ch:asm1}. The routine reads input, tests LEFT and RIGHT, and update
 the position. This mirrors the platform's ASCII Pong update almost line for line
 \citep{prg32repo}.
 
-\input{examples/ch04/read_input.tex}
+\lstinputlisting[
+    style=asm,
+    caption={%
+        \fname{examples/ch04/input\_read.S} \protect\\
+        A full \code{update}: read input, move on LEFT/RIGHT, store the result. 
+        Compare with the platform's \code{pong\_ascii\_update}%
+    }
+]{examples/ch04/input_read.S}
 
 Trace it once by hand. Suppose \code{game\_x} holds \code{20} and the player
 holds RIGHT. The input read returns a mask with bit~1 set. The LEFT test
@@ -105,15 +116,13 @@ into the legal range. For the 40-column ASCII console the legal range is 0 to 39
 for the 320-pixel graphics viewport it will be 0 to a value that accounts for the
 object's width. The logic is identical either way.
 
-\begin{lstlisting}[style=asm,caption={Clamping x to the range [0, 39]. Negative values snap to 0; values past the edge snap to the maximum.}]
-    bltz t2, 3f             # if x < 0, clamp to the left edge
-    li   t3, 39             # maximum column
-    ble  t2, t3, 4f         # if x <= 39, it is already in range
-    mv   t2, t3             # otherwise clamp to the right edge
-    j    4f
-3:  li   t2, 0              # left clamp
-4:  sw   t2, 0(t1)          # store the bounded x
-\end{lstlisting}
+\lstinputlisting[
+    style=asm,
+    caption={%
+        \fname{x\_clamping.S} \protect\\
+        Clamping x to the range [0, 39]. Negative values snap to 0; values past the edge snap to the maximum.% %
+    }
+]{examples/ch04/x_clamping.S}
 
 \begin{prgconcept}
 A \textbf{boundary clamp} keeps a value inside a legal range: if it went below the

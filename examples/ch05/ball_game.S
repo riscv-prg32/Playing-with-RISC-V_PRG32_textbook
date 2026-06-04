@@ -1,4 +1,3 @@
-\begin{lstlisting}[style=asm,caption={The \code{draw} of the complete game. Compare it line for line with \code{pong\_graphics\_draw} in the repository.}]
 game_draw:
     addi sp, sp, -16
     sw   ra, 12(sp)
@@ -25,4 +24,3 @@ game_draw:
     lw   ra, 12(sp)
     addi sp, sp, 16
     ret
-\end{lstlisting}

@@ -16,15 +16,11 @@ paddle position, Breakout needs a position, or simply a present/absent flag, for
 each of many bricks, and writing a separate variable for each would be absurd. An
 array lets you store them together and reach any one by its index.
 
-\begin{lstlisting}[style=c,caption={An array of brick flags. Index $i$ holds whether brick $i$ is still present.}]
-static uint8_t bricks[10];   /* bricks[i] == 1 means brick i is intact */
-
-static void reset_bricks(void) {
-    for (int i = 0; i < 10; ++i) {
-        bricks[i] = 1;       /* every brick starts present */
-    }
-}
-\end{lstlisting}
+\lstinputlisting[
+    style=c,
+    caption={%\fname{brick\_flags.c} \protect\
+       An array of brick flags. Index $i$ holds whether brick $i$ is still present.}
+]{examples/ch08/brick_flags.c}
 
 \begin{prgconcept}
 An array stores many values of one type in a numbered sequence; \code{bricks[i]}
@@ -38,11 +34,11 @@ patch of ground, a coin or a hazard, is stored as an array of eight bytes, one p
 row, where each bit is a pixel. The platformer example defines its tiles exactly
 this way \citep{prg32repo}.
 
-\begin{lstlisting}[style=c,caption={An 8-by-8 tile as an array of eight bytes. Each byte is one row; each bit is one pixel. This is the platformer's coin tile.}]
-static const uint8_t tile_coin[8] = {
-    0x18, 0x3c, 0x66, 0x5a, 0x5a, 0x66, 0x3c, 0x18,
-};
-\end{lstlisting}
+\lstinputlisting[
+    style=c,
+    caption={%\fname{coin\_tile.c} \protect\
+       An 8-by-8 tile as an array of eight bytes. Each byte is one row; each bit is one pixel. This is the platformer's coin tile.}
+]{examples/ch08/coin_tile.c}
 
 \begin{prgaside}
 Reading the bits of \code{tile\_coin} as ones and zeros, top to bottom, sketches a
@@ -62,19 +58,11 @@ named value, so the whole character is one thing you can pass around. The framew
 defines such a struct for platform-game characters, \code{prg32\_platform\_actor\_t}
 \citep{prg32repo}.
 
-\begin{lstlisting}[style=c,caption={The framework's actor struct (from \texttt{prg32.h}). Position, velocity, size, and state, grouped into one value.}]
-typedef struct {
-    int x;          /* position */
-    int y;
-    int vx;         /* velocity */
-    int vy;
-    uint16_t w;     /* size */
-    uint16_t h;
-    uint16_t state; /* collision/status flags */
-    uint8_t layer;
-    uint8_t reserved;
-} prg32_platform_actor_t;
-\end{lstlisting}
+\lstinputlisting[
+    style=c,
+    caption={%\fname{platform\_actor\_struct.c} \protect\
+       The framework's actor struct (from \texttt{prg32.h}). Position, velocity, size, and state, grouped into one value.}
+]{examples/ch08/platform_actor_struct.c}
 
 \begin{prgconcept}
 A struct groups related values into one named type. With
@@ -93,14 +81,11 @@ identifiers at grid coordinates with \code{prg32\_playfield\_put} \citep{prg32re
 The platformer example builds its landscape with small helpers that draw runs and
 columns of tiles: ordinary loops over the grid.
 
-\begin{lstlisting}[style=c,caption={Filling a run of ground tiles with a loop. The platformer uses helpers like this to lay out its world.}]
-static void put_run(uint8_t layer, uint8_t x0, uint8_t x1,
-                    uint8_t y, uint8_t tile) {
-    for (uint8_t x = x0; x <= x1 && x < PRG32_PLAYFIELD_COLS; ++x) {
-        prg32_playfield_put(layer, x, y, tile);
-    }
-}
-\end{lstlisting}
+\lstinputlisting[
+    style=c,
+    caption={%\fname{put\_run.c} \protect\
+       Filling a run of ground tiles with a loop. The platformer uses helpers like this to lay out its world.}
+]{examples/ch08/put_run.c}
 
 \begin{prgconcept}
 A tile map represents a large world compactly: instead of remembering every pixel,
@@ -118,11 +103,11 @@ the physics helpers know how a character should interact with it. You declare, f
 instance, that tile~2 is solid, and from then on a character cannot walk through
 it \citep{prg32repo}.
 
-\begin{lstlisting}[style=c,caption={Giving tiles behaviour. Marking a tile solid makes the physics helper treat it as ground or wall.}]
-prg32_platform_tile_flags(2, PRG32_TILE_FLAG_SOLID);    /* ground is solid */
-prg32_platform_tile_flags(5, PRG32_TILE_FLAG_HAZARD);   /* spikes hurt */
-prg32_platform_tile_flags(6, PRG32_TILE_FLAG_COLLECT);  /* coins collect */
-\end{lstlisting}
+\lstinputlisting[
+    style=c,
+    caption={%\fname{tile\_flags.c} \protect\
+       Giving tiles behaviour. Marking a tile solid makes the physics helper treat it as ground or wall.}
+]{examples/ch08/tile_flags.c}
 
 \section{Putting it together: an actor in a world}
 
@@ -132,25 +117,11 @@ reads the input, applies gravity, moves the actor, and resolves collisions again
 the solid tiles, updating the struct's \code{state} flags so your code can react
 to what happened \citep{prg32repo,prg32tutorialc}.
 
-\begin{lstlisting}[style=c,caption={One frame of platform physics. The helper does the movement and collision; your code reads the resulting state.}]
-static prg32_platform_actor_t player;
-
-void platformer_c_init(void) {
-    fill_world();                                    /* build the tile map */
-    prg32_platform_tile_flags(2, PRG32_TILE_FLAG_SOLID);
-    prg32_platform_actor_init(&player, 1, 32, 120, 8, 8);
-}
-
-void platformer_c_update(void) {
-    uint32_t input = prg32_input_read();
-    /* move_speed, jump_speed, gravity, max_fall */
-    uint16_t state = prg32_platform_actor_step(&player, input, 2, -7, 1, 5);
-    if (state & PRG32_PLATFORM_HAZARD) {
-        prg32_audio_beep(120, 60);                   /* hit a hazard */
-    }
-    prg32_platform_camera_follow(&player, 64, 48);   /* scroll the world */
-}
-\end{lstlisting}
+\lstinputlisting[
+    style=c,
+    caption={%\fname{platform\_physics.c} \protect\
+       One frame of platform physics. The helper does the movement and collision; your code reads the resulting state.}
+]{examples/ch08/platform_physics.c}
 
 Notice the economy. A single call advances the whole character: the joystick moves
 it, gravity pulls it down, the solid tiles stop it, and the returned \code{state}

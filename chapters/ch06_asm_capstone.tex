@@ -75,14 +75,13 @@ cartridge. The tool needs your source file, the firmware ELF so it can resolve
 the framework symbols your game calls, the entry-point prefix that names your
 three functions, a human-readable name, and an output path \citep{prg32tutorial}.
 
-\begin{lstlisting}[style=bash,caption={Building an assembly cartridge against the board firmware. The \texttt{--entry-prefix} must match your \texttt{<prefix>\_init/update/draw} symbols.}]
-python3 tools/prg32_game.py build \
-  examples/games/pong/graphics/game.S \
-  --firmware-elf build-esp32c6/PRG32.elf \
-  --entry-prefix pong_graphics \
-  --name pong \
-  --out build-esp32c6/pong.prg32
-\end{lstlisting}
+\lstinputlisting[
+    style=bash,
+    caption={%
+        \fname{cartridge\_build.sh} \protect\\
+       Building an assembly cartridge against the board firmware. The \texttt{--entry-prefix} must match your \texttt{<prefix>\_init/update/draw} symbols.%
+    }
+]{scripts/ch06/cartridge_build.sh}
 
 \begin{prgconcept}
 A cartridge bundles your three compiled functions with a small header that the
@@ -101,24 +100,33 @@ On the \textbf{physical board}, the resident firmware starts its own Wi-Fi acces
 point named \code{PRG32}. You connect your computer to that network and upload the
 cartridge over HTTP; the firmware stores it and runs it, no reflashing required.
 
-\begin{lstlisting}[style=bash,caption={Uploading a cartridge to the board over its Wi-Fi access point.}]
-python3 tools/prg32_game.py upload build-esp32c6/pong.prg32 --url http://192.168.4.1
-\end{lstlisting}
+\lstinputlisting[
+    style=bash,
+    caption={%
+        \fname{cartridge\_upload.sh} \protect\\
+       Uploading a cartridge to the board over its Wi-Fi access point.%
+    }
+]{scripts/ch06/cartridge_upload.sh}
 
 On \textbf{QEMU}, there is no Wi-Fi to upload over, so you build the cartridge
 against the QEMU firmware ELF and stage it directly into the emulator's flash
 image. If the flash image does not yet exist, run QEMU once so ESP-IDF creates it,
 quit, then stage \citep{prg32qemu}.
 
-\begin{lstlisting}[style=bash,caption={Building and staging a cartridge for the emulator. Note the QEMU firmware ELF and the \texttt{upload-qemu} subcommand.}]
-python3 tools/prg32_game.py build \
-  examples/games/pong/graphics/game.S \
-  --firmware-elf build-qemu/PRG32.elf \
-  --entry-prefix pong_graphics \
-  --name pong \
-  --out build-qemu/pong.prg32
-python3 tools/prg32_game.py upload-qemu build-qemu/pong.prg32 --flash build-qemu/flash_image.bin
-\end{lstlisting}
+
+
+
+\lstinputlisting[
+    style=bash,
+    caption={%
+        \fname{build\_and\_stage\_pong\_qemu.sh} \protect\\
+       Building and staging a cartridge for the emulator. Note the QEMU firmware ELF and the \texttt{upload-qemu} subcommand.%
+    }
+]{scripts/ch06/build_and_stage_pong_qemu.sh}
+
+
+
+
 
 \begin{prgtargets}
 \textbf{Both targets.} The cartridge format is identical; what changes is the

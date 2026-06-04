@@ -36,7 +36,7 @@ with your game's prefix. The framework calls \code{<prefix>\_init} once and then
 \code{<prefix>\_update} and \code{<prefix>\_draw} once per frame, exactly as in the
 assembly track \citep{prg32tutorialc}. To use the framework you include one header.
 
-\input{examples/ch07/smallest_c_game.tex}
+\lstinputlisting[style=c,caption={\fname{examples/ch07/hello\_world\_c.c} The smallest C game. Three functions that do nothing yet: the C counterpart of the assembly skeleton in Chapter~\ref{ch:asm1}.}]{examples/ch07/hello_world_c.c}
 
 The single \code{\#include "prg32.h"} gives you every framework function and every
 named constant: the button bits, the colours and the screen dimensions that you
@@ -57,29 +57,21 @@ section; in C it means variables declared outside the functions, at file scope,
 so they keep their values from one frame to the next. The platform's C Pong
 declares its paddle and ball state exactly this way \citep{prg32repo}.
 
-\begin{lstlisting}[style=c,caption={Game state as file-scope variables. Declared outside the functions, they persist across frames. \texttt{static} keeps them private to this file.}]
-#include "prg32.h"
-
-static int paddle_x;
-static int ball_x;
-static int ball_y;
-static int ball_dx;       /* horizontal velocity */
-static int ball_dy;       /* vertical velocity   */
-\end{lstlisting}
+\lstinputlisting[
+    style=c,
+    caption={%\fname{pong\_c\_state.c} \protect\
+       Game state as file-scope variables. Declared outside the functions, they persist across frames. \texttt{static} keeps them private to this file.}
+]{examples/ch07/pong_c_state.c}
 
 The \code{init} function sets their starting values. This is where a game decides
 where things begin: the paddle centred, the ball near the middle, the velocities
 small.
 
-\begin{lstlisting}[style=c,caption={Initialising state in \code{init}. This runs once, before the first frame.}]
-void pong_c_init(void) {
-    paddle_x = 128;
-    ball_x = 156;
-    ball_y = 96;
-    ball_dx = 2;
-    ball_dy = 1;
-}
-\end{lstlisting}
+\lstinputlisting[
+    style=c,
+    caption={%\fname{pong\_c\_init.c} \protect\
+       Initialising state in \code{init}. This runs once, before the first frame.}
+]{examples/ch07/pong_c_init.c}
 
 \begin{prgconcept}
 File-scope variables in C play the role that labelled words in \code{.data} play
@@ -95,19 +87,11 @@ Input works just as it did in Chapter~\ref{ch:platform}: one call returns a
 bitmask, and you test a button with bitwise AND against a named constant. In C the
 call returns a value you store in a variable, and the test is an \code{if}.
 
-\begin{lstlisting}[style=c,caption={Reading input and moving the paddle. Note the bitwise \texttt{\&}, not \texttt{==}, exactly as warned in Chapter~\ref{ch:platform}.}]
-void pong_c_update(void) {
-    uint32_t input = prg32_input_read();
-    if (input & PRG32_BTN_LEFT) {
-        paddle_x -= 3;
-    }
-    if (input & PRG32_BTN_RIGHT) {
-        paddle_x += 3;
-    }
-    if (paddle_x < 0)   { paddle_x = 0; }
-    if (paddle_x > 256) { paddle_x = 256; }   /* 320 - 64-wide paddle */
-}
-\end{lstlisting}
+\lstinputlisting[
+    style=c,
+    caption={%\fname{pong\_c\_update.c} \protect\
+       Reading input and moving the paddle. Note the bitwise \texttt{\&}, not \texttt{==}, exactly as warned in Chapter~\ref{ch:platform}.}
+]{examples/ch07/pong_c_update.c}
 
 \begin{prgwarn}
 Use \code{input \& PRG32\_BTN\_LEFT}, with a single ampersand for bitwise AND, not
@@ -129,16 +113,11 @@ The ball moves by adding its velocity to its position each frame and bounces by
 negating its velocity at the edges: the same rule as in
 Chapter~\ref{ch:asm3}, now in three lines of C \citep{prg32repo}.
 
-\begin{lstlisting}[style=c,caption={Ball motion and edge bounce. Adding velocity moves the ball; negating it at the boundary turns it around.}]
-    ball_x += ball_dx;
-    ball_y += ball_dy;
-    if (ball_x < 0 || ball_x > 312) {   /* 320 - 8-wide ball */
-        ball_dx = -ball_dx;             /* bounce horizontally */
-    }
-    if (ball_y < 0 || ball_y > 192) {
-        ball_dy = -ball_dy;             /* bounce vertically */
-    }
-\end{lstlisting}
+\lstinputlisting[
+    style=c,
+    caption={%\fname{pong\_c\_ball\_motion.c} \protect\
+       Ball motion and edge bounce. Adding velocity moves the ball; negating it at the boundary turns it around.}
+]{examples/ch07/pong_c_ball_motion.c}
 
 \section{Collision: one call, one decision}
 
@@ -147,12 +126,11 @@ overlap. \code{prg32\_sprite\_hitbox} takes the position and size of two
 rectangles and returns non-zero when they touch, so collision is a single call
 inside an \code{if} \citep{prg32repo}.
 
-\begin{lstlisting}[style=c,caption={Bouncing the ball off the paddle. The hitbox test returns non-zero on overlap.}]
-    if (prg32_sprite_hitbox(ball_x, ball_y, 8, 8,
-                            paddle_x, 188, 64, 8)) {
-        ball_dy = -1;        /* send the ball back upward */
-    }
-\end{lstlisting}
+\lstinputlisting[
+    style=c,
+    caption={%\fname{pong\_c\_paddle\_collision.c} \protect\
+       Bouncing the ball off the paddle. The hitbox test returns non-zero on overlap.}
+]{examples/ch07/pong_c_paddle_collision.c}
 
 \begin{prgconcept}
 Collision detection in C is one function call and one \code{if}. The framework
@@ -170,14 +148,11 @@ variables but does not change them; all logic stays in \code{update}. This is th
 phase separation from Chapter~\ref{ch:platform}, and C makes it easy to honour
 \citep{prg32tutorialc}.
 
-\begin{lstlisting}[style=c,caption={Rendering the frame. \code{draw} only reads state and puts pixels; it changes nothing.}]
-void pong_c_draw(void) {
-    prg32_gfx_clear(PRG32_COLOR_BLACK);
-    prg32_gfx_rect(paddle_x, 188, 64, 8, PRG32_COLOR_WHITE);
-    prg32_gfx_rect(ball_x, ball_y, 8, 8, PRG32_COLOR_YELLOW);
-    prg32_gfx_text8(8, 96, "PONG C", PRG32_COLOR_GREEN, PRG32_COLOR_BLACK);
-}
-\end{lstlisting}
+\lstinputlisting[
+    style=c,
+    caption={%\fname{pong\_c\_draw.c} \protect\
+       Rendering the frame. \code{draw} only reads state and puts pixels; it changes nothing.}
+]{examples/ch07/pong_c_draw.c}
 
 \begin{prgtargets}
 \textbf{Both targets.} This complete C Pong runs unchanged on QEMU and the

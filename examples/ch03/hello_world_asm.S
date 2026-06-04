@@ -1,4 +1,3 @@
-\begin{lstlisting}[style=asm,caption={The smallest \prg assembly game: three functions that return immediately. Build it, confirm it runs, then add to it.}]
 .option norelax
 .section .text
 .global hello_init
@@ -13,4 +12,3 @@ hello_update:
 
 hello_draw:
     ret
-\end{lstlisting}

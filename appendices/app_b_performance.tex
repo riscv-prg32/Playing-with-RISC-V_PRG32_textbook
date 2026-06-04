@@ -68,33 +68,30 @@ version, the target (ESP32\nobreakdash-C6 hardware or ESP32\nobreakdash-C3 QEMU)
 the metrics configuration, and the cartridge build command, so the experiment can
 be reconstructed \citep{prg32scimeasure}.
 
-\begin{lstlisting}[style=bash,caption={Recording the software state for reproducibility.}]
-git rev-parse HEAD          # the exact source revision
-git diff > experiment.patch # any local changes, saved as a patch
-\end{lstlisting}
+\lstinputlisting[
+    style=bash,
+    caption={%\fname{record\_state.sh} \protect\
+       Recording the software state for reproducibility.}
+]{scripts/app_b_performance/record_state.sh}
 
 \paragraph{Build with metrics enabled.} A checked-in configuration profile turns
 on metrics without disturbing the normal board defaults; you combine the two
 profiles in one build \citep{prg32metrics}.
 
-\begin{lstlisting}[style=bash,caption={Building the board firmware with metrics enabled, using both configuration profiles.}]
-idf.py -B build-esp32c6-metrics \
-  -D SDKCONFIG_DEFAULTS="sdkconfig.defaults;sdkconfig.defaults.metrics" \
-  set-target esp32c6
-idf.py -B build-esp32c6-metrics \
-  -D SDKCONFIG_DEFAULTS="sdkconfig.defaults;sdkconfig.defaults.metrics" \
-  build
-\end{lstlisting}
+\lstinputlisting[
+    style=bash,
+    caption={%\fname{build\_metrics.sh} \protect\
+       Building the board firmware with metrics enabled, using both configuration profiles.}
+]{scripts/app_b_performance/build_metrics.sh}
 
 \paragraph{Run the metrics server.} A small Flask and SQLite server collects the
 uploaded samples \citep{prg32metrics}.
 
-\begin{lstlisting}[style=bash,caption={Starting the local metrics server.}]
-python3 -m venv .venv
-. .venv/bin/activate
-python3 -m pip install -r tools/prg32_metrics_server/requirements.txt
-python3 tools/prg32_metrics_server/app.py --host 0.0.0.0 --port 8080
-\end{lstlisting}
+\lstinputlisting[
+    style=bash,
+    caption={%\fname{start\_metrics\_server.sh} \protect\
+       Starting the local metrics server.}
+]{scripts/app_b_performance/start_metrics_server.sh}
 
 Point \code{CONFIG\_PRG32\_METRICS\_SERVER\_URL} at the computer's address that the
 board or QEMU can reach, then run your cartridge; the firmware uploads samples in
@@ -125,11 +122,11 @@ For a written report there is an export helper that produces, from one run, a CS
 file, a Markdown report, a small \LaTeX{} table you can paste into a document, and,
 when \code{matplotlib} is installed, PNG plots \citep{prg32metrics}.
 
-\begin{lstlisting}[style=bash,caption={Exporting a run into report-ready artefacts.}]
-python3 tools/prg32_metrics_server/export_run.py <run_id> \
-  --db tools/prg32_metrics_server/metrics.db \
-  --out metrics_export/<run_id>
-\end{lstlisting}
+\lstinputlisting[
+    style=bash,
+    caption={%\fname{export\_run.sh} \protect\
+       Exporting a run into report-ready artefacts.}
+]{scripts/app_b_performance/export_run.sh}
 
 \section{A complete profiling exercise}
 

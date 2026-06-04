@@ -31,21 +31,20 @@ setup error, and the fix is always the same: re-run the export step
 The platform's macOS path, tested on Apple Silicon, installs the prerequisites with
 Homebrew and then ESP-IDF \citep{prg32repo}.
 
-\begin{lstlisting}[style=bash,caption={macOS setup with Homebrew and ESP-IDF.}]
-brew install git cmake ninja dfu-util ccache libusb python
-cd $HOME
-git clone -b v5.3 --recursive https://github.com/espressif/esp-idf.git
-cd esp-idf
-./install.sh esp32c3,esp32c6
-. ./export.sh
-\end{lstlisting}
+\lstinputlisting[
+    style=bash,
+    caption={%\fname{macos\_setup.sh} \protect\
+       macOS setup with Homebrew and ESP-IDF.}
+]{scripts/app_f_environment/macos_setup.sh}
 
 A convenient habit is an alias so a single word activates ESP-IDF in any shell
 \citep{prg32repo}.
 
-\begin{lstlisting}[style=bash,caption={A quality-of-life alias for activating ESP-IDF.}]
-alias get_idf=". $HOME/esp-idf/export.sh"
-\end{lstlisting}
+\lstinputlisting[
+    style=bash,
+    caption={%\fname{alias\_activate\_idf.sh} \protect\
+       A quality-of-life alias for activating ESP-IDF.}
+]{scripts/app_f_environment/alias_activate_idf.sh}
 
 \section{Linux}
 
@@ -53,25 +52,21 @@ On Debian or Ubuntu, install the build prerequisites with the system package
 manager, then ESP-IDF as above \citep{prg32repo}. Other distributions use their own
 package names for the equivalent libraries.
 
-\begin{lstlisting}[style=bash,caption={Linux (Debian/Ubuntu) prerequisites, then ESP-IDF.}]
-sudo apt update
-sudo apt install -y git wget flex bison gperf python3 python3-venv \
-  python3-pip cmake ninja-build ccache libffi-dev libssl-dev \
-  dfu-util libusb-1.0-0
-cd $HOME
-git clone -b v5.3 --recursive https://github.com/espressif/esp-idf.git
-cd esp-idf
-./install.sh esp32c3,esp32c6
-. ./export.sh
-\end{lstlisting}
+\lstinputlisting[
+    style=bash,
+    caption={%\fname{linux\_prereqs.sh} \protect\
+       Linux (Debian/Ubuntu) prerequisites, then ESP-IDF.}
+]{scripts/app_f_environment/linux_prereqs.sh}
 
 To flash a real board, your user must be allowed to use the serial port. Add
 yourself to the \code{dialout} group, then log out and back in
 \citep{prg32repo}.
 
-\begin{lstlisting}[style=bash,caption={Granting serial-port access on Linux.}]
-sudo usermod -aG dialout "$USER"   # then log out and back in
-\end{lstlisting}
+\lstinputlisting[
+    style=bash,
+    caption={%\fname{linux\_serial\_access.sh} \protect\
+       Granting serial-port access on Linux.}
+]{scripts/app_f_environment/linux_serial_access.sh}
 
 \begin{prgaside}
 ESP32\nobreakdash-C6 boards usually appear as \fname{/dev/ttyACM0}, while USB-bridge boards may
@@ -88,13 +83,11 @@ PlatformIO and Microsoft C/C++ and Python extensions \citep{prg32repo}. There is
 also a standalone path using the official ESP-IDF Tools Installer, after which you
 work from the ``ESP-IDF PowerShell'' shortcut it creates.
 
-\begin{lstlisting}[style=bash,caption={Windows standalone path, run from the ESP-IDF PowerShell shortcut.}]
-cd $HOME\Documents
-git clone https://github.com/riscv-prg32/PRG32.git
-cd PRG32
-idf.py -B build-esp32c6 -D SDKCONFIG_DEFAULTS=sdkconfig.defaults set-target esp32c6
-idf.py -B build-esp32c6 -D SDKCONFIG_DEFAULTS=sdkconfig.defaults build
-\end{lstlisting}
+\lstinputlisting[
+    style=bash,
+    caption={%\fname{windows\_setup.sh} \protect\
+       Windows standalone path, run from the ESP-IDF PowerShell shortcut.}
+]{scripts/app_f_environment/windows_setup.sh}
 
 \begin{prgwarn}
 On Windows, use the ESP-IDF PowerShell or ESP-IDF Command Prompt, not a plain
@@ -109,18 +102,20 @@ Serial Monitor, other ESP-IDF monitors, and so on) \citep{prg32repo}.
 To run on the desktop, install Espressif's \riscv QEMU after ESP-IDF, then
 re-activate ESP-IDF so the new tool is on the path \citep{prg32qemu}.
 
-\begin{lstlisting}[style=bash,caption={Installing the RISC-V QEMU tool and re-activating ESP-IDF.}]
-python $IDF_PATH/tools/idf_tools.py install qemu-riscv32
-. $IDF_PATH/export.sh
-\end{lstlisting}
+\lstinputlisting[
+    style=bash,
+    caption={%\fname{install\_qemu.sh} \protect\
+       Installing the RISC-V QEMU tool and re-activating ESP-IDF.}
+]{scripts/app_f_environment/install_qemu.sh}
 
 Linux and macOS hosts also need a few native libraries for the QEMU display window
 \citep{prg32qemu}.
 
-\begin{lstlisting}[style=bash,caption={QEMU window libraries on Linux (top) and macOS (bottom).}]
-sudo apt-get install -y libgcrypt20 libglib2.0-0 libpixman-1-0 libsdl2-2.0-0 libslirp0
-brew install libgcrypt glib pixman sdl2 libslirp
-\end{lstlisting}
+\lstinputlisting[
+    style=bash,
+    caption={%\fname{qemu\_window\_libs.sh} \protect\
+       QEMU window libraries on Linux (top) and macOS (bottom).}
+]{scripts/app_f_environment/qemu_window_libs.sh}
 
 \section{The build commands, both targets}
 
@@ -128,15 +123,17 @@ With ESP-IDF active, the same two pairs of commands appear throughout the book.
 Keep the two build directories strictly separate, as warned in
 Chapter~\ref{ch:platform} \citep{prg32qemu}.
 
-\begin{lstlisting}[style=bash,caption={Building and flashing for the physical ESP32\nobreakdash-C6 board.}]
-idf.py -B build-esp32c6 -D SDKCONFIG_DEFAULTS=sdkconfig.defaults set-target esp32c6
-idf.py -B build-esp32c6 -D SDKCONFIG_DEFAULTS=sdkconfig.defaults flash monitor
-\end{lstlisting}
+\lstinputlisting[
+    style=bash,
+    caption={%\fname{flash\_board.sh} \protect\
+       Building and flashing for the physical ESP32\nobreakdash-C6 board.}
+]{scripts/app_f_environment/flash_board.sh}
 
-\begin{lstlisting}[style=bash,caption={Building and running for the QEMU emulator (ESP32\nobreakdash-C3 target).}]
-idf.py -B build-qemu -D SDKCONFIG_DEFAULTS=sdkconfig.defaults.qemu set-target esp32c3
-idf.py -B build-qemu -D SDKCONFIG_DEFAULTS=sdkconfig.defaults.qemu qemu --graphics monitor
-\end{lstlisting}
+\lstinputlisting[
+    style=bash,
+    caption={%\fname{run\_qemu.sh} \protect\
+       Building and running for the QEMU emulator (ESP32\nobreakdash-C3 target).}
+]{scripts/app_f_environment/run_qemu.sh}
 
 \section{Confirming it works}
 
@@ -146,9 +143,11 @@ display pins, and finally ``PRG32 runtime initialized,'' then shows the splash
 workflow: environment, firmware build, cartridge build, and QEMU staging, and
 prints \code{=== SMOKE TEST PASSED ===} when all is well \citep{prg32repo}.
 
-\begin{lstlisting}[style=bash,caption={Running the end-to-end smoke test.}]
-./scripts/smoke_test.sh
-\end{lstlisting}
+\lstinputlisting[
+    style=bash,
+    caption={%\fname{smoke\_test.sh} \protect\
+       Running the end-to-end smoke test.}
+]{scripts/app_f_environment/smoke_test.sh}
 
 \begin{prgcheck}
 Your environment is ready when, on your operating system, \code{idf.py} runs in an

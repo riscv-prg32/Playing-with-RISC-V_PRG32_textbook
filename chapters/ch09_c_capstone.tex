@@ -18,26 +18,11 @@ main loop \citep{prg32tutorialc}. This is a temporary lab arrangement, restored
 afterwards, but it shortens the edit-build-run cycle while you are still changing
 the game often.
 
-\begin{lstlisting}[style=c,caption={Calling a C game's three functions from the firmware's main loop. \texttt{init} once, then \texttt{update} and \texttt{draw} each frame, with a present and a short delay.}]
-#include "prg32.h"
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-
-void pong_c_init(void);
-void pong_c_update(void);
-void pong_c_draw(void);
-
-void app_main(void) {
-    prg32_init();
-    pong_c_init();
-    while (1) {
-        pong_c_update();
-        pong_c_draw();
-        prg32_gfx_present();             /* show the finished frame */
-        vTaskDelay(pdMS_TO_TICKS(33));   /* ~30 frames per second */
-    }
-}
-\end{lstlisting}
+\lstinputlisting[
+    style=c,
+    caption={%\fname{pong\_c\_firmware\_loop.c} \protect\
+       Calling a C game's three functions from the firmware's main loop. \texttt{init} once, then \texttt{update} and \texttt{draw} each frame, with a present and a short delay.}
+]{examples/ch09/pong_c_firmware_loop.c}
 
 \begin{prgconcept}
 The frame loop you met as a diagram in Chapter~\ref{ch:platform} is, in the
@@ -78,11 +63,11 @@ used by the platform's raycaster, is \emph{fixed-point arithmetic}: represent a
 fractional value as an integer that has been scaled up by a fixed factor, do the
 arithmetic in integers, then scale back down \citep{prg32tutorialc,prg32repo}.
 
-\begin{lstlisting}[style=c,caption={Fixed-point in the raycaster. Direction vectors are stored scaled by 256; multiplying and then dividing by 256 keeps the fraction.}]
-/* dir_q8 holds direction components scaled by 256 (called Q8 fixed point). */
-int hx = player_x + (dir_q8[angle][0] * dist) / 256;
-int hy = player_y + (dir_q8[angle][1] * dist) / 256;
-\end{lstlisting}
+\lstinputlisting[
+    style=c,
+    caption={%\fname{raycast\_fixed\_point.c} \protect\
+       Fixed-point in the raycaster. Direction vectors are stored scaled by 256; multiplying and then dividing by 256 keeps the fraction.}
+]{examples/ch09/raycast_fixed_point.c}
 
 \begin{prgconcept}
 \textbf{Fixed-point arithmetic} stores a fractional number as an integer scaled by
@@ -109,24 +94,21 @@ is a \code{.c} file and the entry prefix matches the C function names. The same
 \fname{prg32\_game.py} tool resolves the framework symbols from the firmware ELF
 and produces a \fname{.prg32} cartridge \citep{prg32tutorialc}.
 
-\begin{lstlisting}[style=bash,caption={Building a C cartridge against the board firmware.}]
-python3 tools/prg32_game.py build \
-  examples/games/pong/c/game.c \
-  --firmware-elf build-esp32c6/PRG32.elf \
-  --entry-prefix pong_c \
-  --name pong-c \
-  --out build-esp32c6/pong-c.prg32
-\end{lstlisting}
+\lstinputlisting[
+    style=bash,
+    caption={%\fname{build\_pong\_c\_cartridge.sh} \protect\
+       Building a C cartridge against the board firmware.}
+]{scripts/ch09/build_pong_c_cartridge.sh}
 
 Deployment is the same as in Chapter~\ref{ch:asmcap}: upload over the board's Wi-Fi
 for hardware, or build against the QEMU firmware ELF and stage into the flash image
 for the emulator \citep{prg32qemu}.
 
-\begin{lstlisting}[style=bash,caption={Uploading the C cartridge to the board, then the QEMU variant.}]
-python3 tools/prg32_game.py upload build-esp32c6/pong-c.prg32 --url http://192.168.4.1
-# For QEMU: build against build-qemu/PRG32.elf, then:
-python3 tools/prg32_game.py upload-qemu build-qemu/pong-c.prg32
-\end{lstlisting}
+\lstinputlisting[
+    style=bash,
+    caption={%\fname{upload\_pong\_c\_cartridge.sh} \protect\
+       Uploading the C cartridge to the board, then the QEMU variant.}
+]{scripts/ch09/upload_pong_c_cartridge.sh}
 
 \begin{prgtargets}
 \textbf{Both targets.} A C cartridge and an assembly cartridge are the same kind of
