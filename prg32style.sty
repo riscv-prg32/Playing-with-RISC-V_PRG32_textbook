@@ -104,6 +104,7 @@
   xleftmargin=20pt,
   aboveskip=1.2em,
   belowskip=1.2em,
+  float,
 }
 
 % RISC-V assembly dialect
@@ -125,7 +126,10 @@
     bool,void,prg32_platform_actor_t,prg32_anim_sprite_t,prg32_note_t}}
 \lstdefinestyle{bash}{style=prgbase,language=bash,numbers=none}
 \lstdefinestyle{plain}{style=prgbase,numbers=none}
-\lstset{style=prgbase}
+\lstset{
+  style=prgbase,
+  inputencoding=utf8,
+}
 
 % ---- Callout boxes (tcolorbox) ---------------------------------------------
 \RequirePackage[most]{tcolorbox}
