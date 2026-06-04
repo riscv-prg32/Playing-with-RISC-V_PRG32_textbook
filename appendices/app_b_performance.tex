@@ -7,7 +7,7 @@ into the second using \prg's optional performance-metrics pipeline, which record
 per-frame timing and uploads it to a small local server for analysis
 \citep{prg32metrics,prg32scimeasure}. The workflow is designed to be reproducible,
 so that a classmate or a reviewer can repeat your experiment and obtain the same
-result---the defining property of a scientific measurement.
+result: this is the defining property of a scientific measurement.
 
 \section{Why measure, and what stays unchanged}
 
@@ -47,7 +47,7 @@ Field & Meaning \\
 The frame budget at 30 frames per second is about 33 milliseconds. If
 \code{update}, \code{draw}, and \code{present} together exceed that,
 \code{deadline\_missed} is set and the game cannot keep its rate. Profiling is the
-art of finding which of the three phases is the culprit and reducing it---a habit
+art of finding which of the three phases is the culprit and reducing it, a habit
 worth forming early.
 \end{prgconcept}
 
@@ -149,8 +149,8 @@ evidence rather than impression \citep{prg32qemu,prg32scimeasure}.
 \end{prgtargets}
 
 \begin{prgaside}
-The instruction to record one expected result, and one reason it might be wrong,
-before measuring is not bureaucracy---it is the heart of honest experiment. A
+The instruction to record one expected result, and one reason it might be wrong
+before measuring, is at the heart of a honest experiment. A
 prediction made after seeing the data is no prediction at all. By committing to an
 expectation first, you turn a casual look at some numbers into a genuine test, and
 you learn the most from the cases where the machine surprises you.

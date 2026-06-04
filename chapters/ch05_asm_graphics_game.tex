@@ -21,13 +21,13 @@ Recall the rectangle call from Chapter~\ref{ch:platform}:
 \code{prg32\_gfx\_rect(x, y, w, h, color)}. In assembly the five arguments go,
 in order, into \reg{a0} through \reg{a4}, following the calling convention. The
 colour in \reg{a4} is an RGB565 value; you may write it as a named constant in C,
-but in assembly it is usually a plain number---\code{65535} for white,
+but in assembly it is usually a plain number: \code{65535} for white,
 \code{65504} for yellow, \code{0} for black \citep{prg32repo}.
 
 \begin{prgconcept}
 The five arguments of \code{prg32\_gfx\_rect} occupy \reg{a0}=x, \reg{a1}=y,
 \reg{a2}=width, \reg{a3}=height, \reg{a4}=colour. Getting an argument into the
-wrong register draws the wrong rectangle---a vivid, immediate way to see what the
+wrong register draws the wrong rectangle: a vivid, immediate way to see what the
 calling convention actually means.
 \end{prgconcept}
 
@@ -57,7 +57,7 @@ Chapter~\ref{ch:asm1}.
 
 Now add a rectangle. We draw a white paddle near the bottom of the viewport, at
 a position read from \code{.data}. The platform's graphics Pong places the paddle
-at $y=188$, a 64-by-8 white bar---wide enough to be easy to see in the emulator
+at $y=188$, a 64-by-8 white bar: wide enough to be easy to see in the emulator
 \citep{prg32repo}.
 
 \begin{lstlisting}[style=asm,caption={Drawing the paddle from a stored position. The five arguments fill \reg{a0}--\reg{a4} in order.}]
@@ -115,7 +115,7 @@ ball_dx: .word 2               # +2 means moving right
 \textbf{Velocity} is just a number added to position each frame. A \emph{bounce}
 is negating that number when the object reaches a boundary: \code{neg t4, t4}
 turns $+2$ into $-2$, so the next frames move the ball back the way it came. With
-this one idea---add velocity, negate at the edges---you can make anything bounce.
+this one idea: add velocity and negate at the edges, you can make anything bounce.
 \end{prgconcept}
 
 \begin{prgaside}
@@ -230,7 +230,7 @@ hidden in a wall of untested code.
 \begin{prgtry}
 Build the game incrementally in exactly these six steps, rebuilding and running
 after each. Keep a short log: after each step, write one line saying what you
-added and what you saw. This log is not busywork---it is the written form of the
+added and what you saw. This log is not busywork: it is the written form of the
 ``change one thing, observe, record'' method, and it will make the difference
 between a frustrating afternoon and a productive one
 \citep{prg32repo}.

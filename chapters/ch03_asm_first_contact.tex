@@ -3,7 +3,7 @@
 
 This chapter begins the computer architecture track. By its end you will have a
 running \riscv assembly program on both QEMU and, if you have one, the physical
-board---a program that clears a console, prints text, and makes a sound. More
+board: a program that clears a console, prints text, and makes a sound. More
 importantly, you will understand the three ideas on which everything else rests:
 what a register is, how a value lives in memory, and what happens when you call a
 function. We build these ideas on the smallest possible game, the ASCII version
@@ -93,7 +93,7 @@ functions would exist but the loader could not see them.
 
 \begin{prgcheck}
 Build this skeleton for QEMU and confirm it runs without crashing. You will see
-no game yet---that is correct. The achievement is that the framework found your
+no game yet: that is correct. The achievement is that the framework found your
 three functions, called them, and survived. Appendix~\ref{app:env} has the exact
 build commands for your operating system; Appendix~\ref{app:worked} shows this
 skeleton wired into the firmware.
@@ -104,7 +104,7 @@ skeleton wired into the firmware.
 A game that only returns is not interesting for long. The first useful thing we
 can do is print text, using the framework's console. The console is written in C,
 so calling it means crossing the boundary between your assembly and the
-framework's C---and that boundary has one rule a beginner must internalise.
+framework's C, and that boundary has one rule a beginner must internalise.
 
 When you execute \code{call}, the processor records, in the register \reg{ra},
 the address it should return to. But the C function you are calling will itself
@@ -168,7 +168,7 @@ and adding to free, follows directly from that choice.
 
 \section{Values in memory: the \code{.data} section}
 
-A game must remember things between frames---where the ball is, what the score
+A game must remember things between frames: where the ball is, what the score
 is. In assembly, persistent values live in the \code{.data} section, each given a
 label and an initial value. This is the assembly equivalent of a global variable.
 For ASCII Pong, the platform's example declares its state exactly this way
@@ -202,8 +202,8 @@ is how every variable in every program ultimately works.
 
 \begin{prgwarn}
 Keep the two clearly apart in your mind: \reg{t0} holds an \emph{address}, \reg{t1}
-holds a \emph{value}. Confusing them---using an address where a value belongs, or
-vice versa---produces wrong numbers and is one of the most common beginner errors.
+holds a \emph{value}. Confusing them, using an address where a value belongs, or
+vice versa, produces wrong numbers and is one of the most common beginner errors.
 A useful habit, used throughout the platform's examples, is to comment each
 register with whether it holds an address or a value.
 \end{prgwarn}

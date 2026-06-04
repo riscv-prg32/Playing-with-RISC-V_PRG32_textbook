@@ -11,8 +11,8 @@ write the game's logic almost as plainly as you would describe it in words
 
 \section{Why C, and why the same platform}
 
-C occupies a deliberate middle ground. It is a high-level language---you write
-functions, name variables, and use \code{if} and \code{while}---yet it stays close
+C occupies a deliberate middle ground. It is a high-level language, you write
+functions, name variables, and use \code{if} and \code{while}, yet it stays close
 enough to the machine that nothing important is hidden. A C variable is a named
 box in memory; a C function compiles to the very calling convention you would
 write by hand in assembly. By learning C on the same platform, the same display,
@@ -36,7 +36,7 @@ with your game's prefix. The framework calls \code{<prefix>\_init} once and then
 \code{<prefix>\_update} and \code{<prefix>\_draw} once per frame, exactly as in the
 assembly track \citep{prg32tutorialc}. To use the framework you include one header.
 
-\begin{lstlisting}[style=c,caption={The smallest C game. Three functions that do nothing yet---the C counterpart of the assembly skeleton in Chapter~\ref{ch:asm1}.}]
+\begin{lstlisting}[style=c,caption={The smallest C game. Three functions that do nothing yet: the C counterpart of the assembly skeleton in Chapter~\ref{ch:asm1}.}]
 #include "prg32.h"
 
 void pong_c_init(void) {
@@ -50,7 +50,7 @@ void pong_c_draw(void) {
 \end{lstlisting}
 
 The single \code{\#include "prg32.h"} gives you every framework function and every
-named constant---the button bits, the colours, the screen dimensions---that you
+named constant: the button bits, the colours and the screen dimensions that you
 met in Chapter~\ref{ch:platform}. You never declare these yourself; the header does
 it for you, and Appendix~\ref{app:api} catalogues what it contains.
 
@@ -137,7 +137,7 @@ compact.
 \section{The ball: velocity and bounce, in C}
 
 The ball moves by adding its velocity to its position each frame and bounces by
-negating its velocity at the edges---the same rule as in
+negating its velocity at the edges: the same rule as in
 Chapter~\ref{ch:asm3}, now in three lines of C \citep{prg32repo}.
 
 \begin{lstlisting}[style=c,caption={Ball motion and edge bounce. Adding velocity moves the ball; negating it at the boundary turns it around.}]
@@ -168,8 +168,8 @@ inside an \code{if} \citep{prg32repo}.
 \begin{prgconcept}
 Collision detection in C is one function call and one \code{if}. The framework
 does the geometric work of testing overlap on both axes; you decide what happens
-when the answer is yes. This separation---the engine answers ``did they touch,''
-your code decides ``so what''---is a pattern you will meet throughout game
+when the answer is yes. This separation, the engine answers ``did they touch,''
+your code decides ``so what'', is a pattern you will meet throughout game
 programming.
 \end{prgconcept}
 
@@ -212,6 +212,6 @@ You can now write a complete C game: persistent state in file-scope variables,
 input read as a bitmask and tested with \code{\&}, motion by velocity with
 boundary clamps, bounce by negation, collision by one call, and rendering kept
 separate in \code{draw}. Chapter~\ref{ch:c2} scales these ideas up with the C
-features---arrays and structs---that let a game hold many objects and a whole
+features, arrays and structs, that let a game hold many objects and a whole
 world.
 \end{prgcheck}

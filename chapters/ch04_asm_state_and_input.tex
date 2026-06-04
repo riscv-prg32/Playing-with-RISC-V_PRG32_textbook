@@ -5,7 +5,7 @@ In Chapter~\ref{ch:asm1} a counter advanced on its own. A game, though, responds
 to a player. This chapter teaches the assembly you need to read the controller
 and to make decisions: the input bitmask, the bitwise \code{andi} test, and the
 conditional branch. By the end you will move an object with the joystick and keep
-it on the screen---the core interactive loop of every game in this book. We follow
+it on the screen: the core interactive loop of every game in this book. We follow
 the structure of the platform's ASCII Pong update routine, which was written to be
 read by first-year students \citep{prg32tutorialascii,prg32repo}.
 
@@ -28,7 +28,7 @@ zero; \code{bltz t, label} jumps if \reg{t} is negative; \code{ble a, b, label}
 jumps if \reg{a} $\le$ \reg{b}; and the unconditional \code{j label} always jumps.
 A common idiom, which surprises beginners, is to branch on the \emph{opposite} of
 what you want: to do something ``if the button is pressed,'' you test the button
-bit and \code{beqz}---branch away---when it is \emph{not} pressed, letting the
+bit and \code{beqz}, branch away, when it is \emph{not} pressed, letting the
 movement code run only when it is. This reads backwards at first but becomes
 natural quickly.
 

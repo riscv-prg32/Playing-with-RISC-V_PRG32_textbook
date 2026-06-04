@@ -14,7 +14,7 @@ board without reflashing the firmware \citep{prg32tutorial,prg32cartfmt}.
 You will spend far more of your career reading code than writing it, and the
 platform's example games are designed to be read. Once you have written Pong, the
 Breakout example is legible at a glance: it is Pong with an extra piece of
-state---a row of bricks---and one extra rule, removing a brick when the ball hits
+state, a row of bricks, and one extra rule: removing a brick when the ball hits
 it \citep{prg32repo}. The Breakout source even stores its bricks as a small bitmask,
 the same bitmask idea you learned for the input in Chapter~\ref{ch:asm2}, now
 repurposed so that each set bit means ``this brick is still present.''
@@ -39,8 +39,8 @@ maintainer does \citep{prg32repo}.
 \section{Extending your own game}
 
 Before packaging, extend the Pong you built in Chapter~\ref{ch:asm3} with one new
-feature of your choosing. The platform's suggested progression---one moving
-object, one collision, one score counter, then sound---means the natural next
+feature of your choosing. The platform's suggested progression, one moving
+object, one collision, one score counter, then sound, means the natural next
 features are a score that increases on a successful bounce, a second collision
 surface, or a beep on the event \citep{prg32tutorial}. Add exactly one, build it,
 and confirm it on QEMU. Resist the urge to add three features at once; the whole

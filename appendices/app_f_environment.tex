@@ -12,7 +12,7 @@ commands.
 \section{The one idea behind every setup}
 
 Whatever your operating system, the toolchain is ESP-IDF version 5.3 or newer,
-configured for the \code{esp32c3} and \code{esp32c6} targets---the first for the
+configured for the \code{esp32c3} and \code{esp32c6} targets: the first for the
 QEMU emulator, the second for the physical board \citep{prg32repo,prg32qemu}. Once
 ESP-IDF is installed and ``sourced'' (made active in your shell), the command
 \code{idf.py} builds, flashes, and runs everything. Almost every setup problem
@@ -77,7 +77,7 @@ sudo usermod -aG dialout "$USER"   # then log out and back in
 ESP32\nobreakdash-C6 boards usually appear as \fname{/dev/ttyACM0}, while USB-bridge boards may
 appear as \fname{/dev/ttyUSB0} \citep{prg32repo}. If flashing fails although the
 board is visible, the cause is almost always the \code{dialout} membership not yet
-taking effect---log out and back in after adding yourself to the group.
+taking effect. Log out and back in after adding yourself to the group.
 \end{prgaside}
 
 \section{Windows}
@@ -143,7 +143,7 @@ idf.py -B build-qemu -D SDKCONFIG_DEFAULTS=sdkconfig.defaults.qemu qemu --graphi
 A healthy board boot logs the firmware entering \code{app\_main}, the configured
 display pins, and finally ``PRG32 runtime initialized,'' then shows the splash
 \citep{prg32tutorial}. The platform also ships a smoke test that exercises the whole
-workflow---environment, firmware build, cartridge build, and QEMU staging---and
+workflow: environment, firmware build, cartridge build, and QEMU staging, and
 prints \code{=== SMOKE TEST PASSED ===} when all is well \citep{prg32repo}.
 
 \begin{lstlisting}[style=bash,caption={Running the end-to-end smoke test.}]
@@ -153,7 +153,7 @@ prints \code{=== SMOKE TEST PASSED ===} when all is well \citep{prg32repo}.
 \begin{prgcheck}
 Your environment is ready when, on your operating system, \code{idf.py} runs in an
 ESP-IDF shell, the QEMU build opens a virtual screen reaching ``PRG32 runtime
-initialized,'' and---if you have a board---the firmware flashes and shows its
+initialized,'' and, if you have a board, the firmware flashes and shows its
 splash. With that in place, every chapter and every example in this book is
 buildable on your machine.
 \end{prgcheck}

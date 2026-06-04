@@ -57,10 +57,10 @@ the commit where a bug appeared, descriptive messages are the difference between
 minute and an hour. The platform's own history follows this practice.
 \end{prgwarn}
 
-\section{Branches: experiment without fear}
+\section{Branches: experiment freely}
 
-A \emph{branch} is an independent line of work. Before a risky change---say, the
-firmware embedding of Chapter~\ref{ch:ccap}, or a large refactor of your game---make
+A \emph{branch} is an independent line of work. Before a risky change, such as the
+firmware embedding of Chapter~\ref{ch:ccap}, or a large refactor of your game, make
 a branch. If the experiment fails, you discard the branch and your main line is
 untouched; if it succeeds, you merge it back.
 
@@ -76,7 +76,7 @@ git branch -D experiment-embed-game    # discard it entirely
 A branch lets you try something that might break your project, in isolation. The
 embedding lab is the textbook case: branch first, embed and test, then either merge
 the working result or discard the branch to restore the firmware to its original
-state in one command---exactly the ``restore afterwards'' the tutorial requires
+state in one command: exactly the ``restore afterwards'' the tutorial requires
 \citep{prg32tutorialc}.
 \end{prgconcept}
 
@@ -90,7 +90,7 @@ git diff                               # show every uncommitted change
 git restore examples/games/mygame/game.S   # discard changes to one file
 \end{lstlisting}
 
-The discipline that makes this powerful is committing often---after each working
+The discipline that makes this powerful is committing often: after each working
 step of the incremental method this book teaches. If you commit after every
 verified change (``draw the paddle,'' ``add input,'' ``add the clamp''), then any
 break is, at worst, one step's worth of work to inspect or undo.

@@ -5,8 +5,8 @@ This chapter closes the C track the way Chapter~\ref{ch:asmcap} closed the
 assembly track: by extending a game and shipping it. You will embed a C game in
 the firmware for quick iteration, build it into a \fname{.prg32} cartridge, and
 deploy it to both QEMU and the board. Along the way you will meet two ideas that
-recur in serious systems programming---reusing helper functions, and doing
-arithmetic without a floating-point unit---both grounded in the platform's richer
+recur in serious systems programming: reusing helper functions, and doing
+arithmetic without a floating-point unit, both grounded in the platform's richer
 C examples \citep{prg32tutorialc,prg32repo}.
 
 \section{Embedding a C game in the firmware}
@@ -65,8 +65,8 @@ of near-identical lines. When you extend your own game, watch for three or more
 lines that recur with small variations, and lift them into a helper.
 
 The platform's raycaster example is the next step for a class ready for more
-\citep{prg32teaching}. It renders a Doom-style corridor---a convincing pseudo-3-D
-view---on the same \riscv runtime used for everything else. What makes it
+\citep{prg32teaching}. It renders a Doom-style corridor, a convincing pseudo-3-D
+view, on the same \riscv runtime used for everything else. What makes it
 instructive is not the 3-D effect but \emph{how} it computes that effect without a
 floating-point unit.
 
@@ -86,10 +86,10 @@ int hy = player_y + (dir_q8[angle][1] * dist) / 256;
 
 \begin{prgconcept}
 \textbf{Fixed-point arithmetic} stores a fractional number as an integer scaled by
-a fixed factor---here, 256. A value of $1.5$ is stored as $384$, because
+a fixed factor: here, 256. A value of $1.5$ is stored as $384$, because
 $1.5\times256=384$. Multiplications are done in integers and then divided by the
 scale to bring the result back. This lets a processor with no floating-point unit
-compute smooth motion and angles using only integer instructions---a technique as
+compute smooth motion and angles using only integer instructions, a technique as
 old as real-time graphics and still used in embedded systems today.
 \end{prgconcept}
 
@@ -138,8 +138,8 @@ runtime, two targets, one cartridge format.
 
 \begin{prgtry}
 Take the C Pong you wrote in Chapter~\ref{ch:c1}, add a score that increments when
-the ball bounces off the paddle---guarding against counting one hit many times, as
-warned in Chapter~\ref{ch:asmcap}---and display it with \code{prg32\_gfx\_text8}.
+the ball bounces off the paddle, guarding against counting one hit many times, as
+warned in Chapter~\ref{ch:asmcap}, and display it with \code{prg32\_gfx\_text8}.
 Build it as a cartridge for QEMU and run it. Then, if you have a board, upload the
 same cartridge over Wi-Fi and play it. You will have written, extended, packaged,
 and shipped a complete C game on real \riscv hardware \citep{prg32repo}.

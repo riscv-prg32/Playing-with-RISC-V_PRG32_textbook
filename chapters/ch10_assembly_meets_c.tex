@@ -22,8 +22,8 @@ if (input & PRG32_BTN_LEFT) {
 \end{lstlisting}
 
 In assembly it is the same idea spelled out in the machine's own terms: call,
-copy the result, mask the bit, branch if clear, subtract, and---because
-\code{paddle\_x} lives in memory---load before and store after.
+copy the result, mask the bit, branch if clear, subtract, and because
+\code{paddle\_x} lives in memory, load before and store after.
 
 \begin{lstlisting}[style=asm,caption={Move left, in assembly. The same logic, with every step the C compiler would have generated made explicit.}]
     call prg32_input_read     # input bitmask in a0
@@ -39,7 +39,7 @@ copy the result, mask the bit, branch if clear, subtract, and---because
 Line up the two listings and the correspondence is exact. The C \code{if (input \&
 PRG32\_BTN\_LEFT)} becomes \code{andi} followed by \code{beqz}. The C \code{paddle\_x
 -= 3} becomes a load, an \code{addi}, and a store, because a C variable in memory
-must be brought into a register to be changed and written back---the
+must be brought into a register to be changed and written back: the
 load--modify--store cycle of Chapter~\ref{ch:asm1}. Nothing in the assembly is
 arbitrary; every instruction is doing work the C statement implied.
 
@@ -56,7 +56,7 @@ have written by hand.
 
 The C version is shorter not because it does less but because the compiler writes
 the bookkeeping for you. It chooses the registers, emits the loads and stores,
-manages the stack frame, and saves \reg{ra} around calls---all the discipline you
+manages the stack frame, and saves \reg{ra} around calls, all the discipline you
 practised by hand in Part~II. This is C's bargain: you express intent, the
 compiler handles the mechanism.
 
@@ -108,7 +108,7 @@ share a single runtime, a single set of examples, and a single pair of targets
 
 \section{Where to go next}
 
-You have now written native \riscv games---in assembly, in C, or in both---that run
+You have now written native \riscv games, in assembly, in C, or in both, that run
 on a real open-architecture processor and on its emulator. The natural next steps
 are to read the richer examples you have not yet opened: Space Invaders for many
 moving enemies, Tetris for a falling-piece grid, the raycaster for fixed-point
@@ -124,7 +124,7 @@ on whichever operating system you use.
 
 \begin{prgcheck}
 You should now be able to look at a short C statement and describe, in words, the
-assembly the compiler will produce for it---and to look at a fragment of \riscv
+assembly the compiler will produce for it, and to look at a fragment of \riscv
 assembly and recognise the C construct it implements. That two-way fluency, between
 the notation and the machine, is the deepest thing a first year of computing can
 give you, and it is what this book set out to teach.

@@ -11,8 +11,8 @@ something you can see and hear. Read it once now; you will return to it often.
 Strip away the graphics and a game is a very old idea: a loop that never ends
 until you tell it to. Each turn around the loop is called a \emph{frame}. In a
 single frame the machine does three things, always in the same order. It
-\emph{reads} the state of the world---which buttons are pressed, how much time has
-passed. It \emph{updates} an internal model of the game---moves the ball, checks
+\emph{reads} the state of the world: which buttons are pressed, how much time has
+passed. It \emph{updates} an internal model of the game, moves the ball, checks
 for collisions, adjusts the score. And it \emph{draws} the new state to the
 screen. Then it does it again, fast enough that the eye perceives motion rather
 than a slideshow.
@@ -76,7 +76,7 @@ three of them.
 \begin{prgconcept}
 The entire interface between your game and \prg is three functions:
 \code{init}, \code{update}, and \code{draw}. Learn this shape once and every
-example in the book---assembly or C, emulator or hardware---becomes a variation
+example in the book, assembly or C, emulator or hardware, becomes a variation
 on it.
 \end{prgconcept}
 
@@ -123,7 +123,7 @@ $320\times240$; your game draws into the centred $320\times200$ viewport.}
 
 Colours are expressed in the \textbf{RGB565} format: a 16-bit number that packs
 five bits of red, six of green, and five of blue. You rarely need to compute these
-by hand, because the framework defines names for the common ones---\code{PRG32\_COLOR\_BLACK}
+by hand, because the framework defines names for the common ones: \code{PRG32\_COLOR\_BLACK}
 is \code{0x0000}, \code{PRG32\_COLOR\_WHITE} is \code{0xffff},
 \code{PRG32\_COLOR\_YELLOW} is \code{0xffe0}, and so on \citep{prg32repo}. When you
 see the literal \code{65535} in an assembly example, it is simply white written
@@ -134,7 +134,7 @@ RGB565 was the natural pixel format of countless devices in the era this book
 celebrates, precisely because it fits a pixel in two bytes while still giving the
 eye enough colour. The extra green bit reflects the fact that human vision is most
 sensitive to green. The format is a small, elegant compromise between memory and
-fidelity---exactly the kind of constraint that makes retro programming
+fidelity: exactly the kind of constraint that makes retro programming
 instructive.
 \end{prgaside}
 
@@ -173,7 +173,7 @@ tracks.
 \begin{prgwarn}
 Test a button with bitwise AND (\code{\&}), not equality (\code{==}). The mask may
 hold several pressed buttons at once, so \code{input \& PRG32\_BTN\_LEFT} asks
-``is the left bit set, regardless of the others?''---which is what you want.
+``is the left bit set, regardless of the others?'', which is what you want.
 Writing \code{input == PRG32\_BTN\_LEFT} would only be true when \emph{exactly}
 left and nothing else is pressed.
 \end{prgwarn}
@@ -215,8 +215,8 @@ Audio in \prg starts as simply as it can: \code{prg32\_audio\_beep(hz, ms)} play
 a tone of a given frequency for a given number of milliseconds \citep{prg32abi}.
 On the physical board this drives a small buzzer; on QEMU the call is accepted but
 silent, because the emulator does not model the buzzer. The framework's own
-advice, which this book repeats, is to play a beep only on an \emph{event}---a
-collision, a score, a button press---and never on every frame, because a tone
+advice, which this book repeats, is to play a beep only on an \emph{event}: a
+collision, a score, a button press. Don't play it on every frame, because a tone
 restarted sixty times a second is an unpleasant buzz rather than a sound effect.
 
 \begin{prgwarn}
@@ -230,8 +230,8 @@ detected will sound like a game.
 
 A finished \prg game is packaged as a \emph{cartridge}: a file ending in
 \fname{.prg32} that contains your compiled \riscv code together with a small
-header \citep{prg32cartfmt}. The resident firmware---flashed onto the board once,
-at the start of the course---knows how to load a cartridge and call its three
+header \citep{prg32cartfmt}. The resident firmware, flashed onto the board once,
+at the start of the course, knows how to load a cartridge and call its three
 functions. This separation is what lets you iterate quickly: you flash the
 firmware a single time, then upload cartridge after cartridge without reflashing,
 either over the board's own Wi-Fi network or, on the emulator, by staging the

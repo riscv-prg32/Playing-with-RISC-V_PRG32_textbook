@@ -4,15 +4,15 @@
 The Pong of Chapter~\ref{ch:c1} held a handful of separate variables. Real games
 hold many things at once: rows of bricks, swarms of enemies, a whole landscape of
 ground and platforms. This chapter introduces the two C features that make such
-games manageable---the \emph{array}, which holds many values of the same kind, and
-the \emph{struct}, which groups related values into one named thing---and applies
+games manageable: the \emph{array}, which holds many values of the same kind, and
+the \emph{struct}, which groups related values into one named thing, and applies
 them to a tile-based platform game built on the platform's own example
 \citep{prg32repo,prg32tutorialc}.
 
 \section{Arrays: many values under one name}
 
 An array is a numbered row of values of the same type. Where Pong needed one
-paddle position, Breakout needs a position---or simply a present/absent flag---for
+paddle position, Breakout needs a position, or simply a present/absent flag, for
 each of many bricks, and writing a separate variable for each would be absurd. An
 array lets you store them together and reach any one by its index.
 
@@ -33,8 +33,8 @@ element in turn. Together, the array and the loop replace dozens of separate
 variables and the repetitive code that would manage them.
 \end{prgconcept}
 
-The framework itself uses small arrays to describe artwork. An 8-by-8 tile---a
-patch of ground, a coin, a hazard---is stored as an array of eight bytes, one per
+The framework itself uses small arrays to describe artwork. An 8-by-8 tile: a
+patch of ground, a coin or a hazard, is stored as an array of eight bytes, one per
 row, where each bit is a pixel. The platformer example defines its tiles exactly
 this way \citep{prg32repo}.
 
@@ -91,7 +91,7 @@ is a \emph{tile map}: a grid in which each cell names a tile to draw there. The
 framework provides a two-layer playfield for this, and you fill it by placing tile
 identifiers at grid coordinates with \code{prg32\_playfield\_put} \citep{prg32repo}.
 The platformer example builds its landscape with small helpers that draw runs and
-columns of tiles---ordinary loops over the grid.
+columns of tiles: ordinary loops over the grid.
 
 \begin{lstlisting}[style=c,caption={Filling a run of ground tiles with a loop. The platformer uses helpers like this to lay out its world.}]
 static void put_run(uint8_t layer, uint8_t x0, uint8_t x1,
@@ -113,7 +113,7 @@ memory.
 \section{Behaviour from tile flags}
 
 A tile is not only a picture; it can carry \emph{behaviour}. The framework lets you
-attach flags to a tile identifier---solid, platform, hazard, collectable---and then
+attach flags to a tile identifier, solid, platform, hazard, collectable, and then
 the physics helpers know how a character should interact with it. You declare, for
 instance, that tile~2 is solid, and from then on a character cannot walk through
 it \citep{prg32repo}.
@@ -162,7 +162,7 @@ exactly the data and the operation the problem needs.
 \begin{prgwarn}
 Pass the \emph{address} of the actor, \code{\&player}, to the stepping and
 follow helpers, not the struct by value. These functions must \emph{change} the
-actor---its position and state---and in C a function can only change a value the
+actor, its position and state, and in C a function can only change a value the
 caller can see if it is given that value's address. Forgetting the \code{\&} is a
 common error; the symptom is an actor that never moves, because the function
 updated a private copy.

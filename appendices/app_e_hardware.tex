@@ -2,8 +2,8 @@
 \label{app:hw}
 
 Everything in this book runs on the QEMU emulator, so a board is never strictly
-required. But the platform comes alive on real hardware---real buttons, a real
-display, a real buzzer---and building it is an instructive exercise in its own
+required. But the platform comes alive on real hardware: real buttons, a real
+display, a real buzzer. Building it is an instructive exercise in its own
 right. This appendix is the classroom reference wiring for a breadboard PRG32,
 drawn from the platform's hardware notes \citep{prg32repo,prg32hardware}. Treat it
 as a parts list and a wiring map, not as a soldering course; the connections are
@@ -34,8 +34,8 @@ Qty & Item & Purpose \\
 
 \begin{prgconcept}
 The ESP32\nobreakdash-C6 is the \riscv microcontroller at the centre of the board: the same
-32-bit \riscv processor family your code targets on QEMU. Everything else---the
-display, the joystick, the buzzer---is a peripheral wired to its general-purpose
+32-bit \riscv processor family your code targets on QEMU. Everything else, such as the
+display, the joystick, the buzzer, is a peripheral wired to its general-purpose
 pins. Building the board is, concretely, connecting peripherals to a \riscv
 processor.
 \end{prgconcept}
