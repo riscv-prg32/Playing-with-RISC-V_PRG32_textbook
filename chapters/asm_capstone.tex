@@ -75,14 +75,6 @@ cartridge. The tool needs your source file, the firmware ELF so it can resolve
 the framework symbols your game calls, the entry-point prefix that names your
 three functions, a human-readable name, and an output path \citep{prg32tutorial}.
 
-\lstinputlisting[
-    style=bash,
-    caption={%
-        \fname{cartridge\_build.sh} \protect\\
-       Building an assembly cartridge against the board firmware. The \texttt{--entry-prefix} must match your \texttt{<prefix>\_init/update/draw} symbols.%
-    }
-]{scripts/ch06/cartridge_build.sh}
-
 \begin{prgconcept}
 A cartridge bundles your three compiled functions with a small header that the
 firmware reads to find them. The \code{--entry-prefix} you pass is how the tool
@@ -91,69 +83,16 @@ exactly match the prefix in your \code{.global} directives. A mismatch here is a
 common build-time error, and the message names the symbol it could not find.
 \end{prgconcept}
 
-\section{Deploying to both targets}
-
-The same cartridge runs on both targets; only the delivery differs
-\citep{prg32qemu}.
-
-On the \textbf{physical board}, the resident firmware starts its own Wi-Fi access
-point named \code{PRG32}. You connect your computer to that network and upload the
-cartridge over HTTP; the firmware stores it and runs it, no reflashing required.
-
-\lstinputlisting[
-    style=bash,
-    caption={%
-        \fname{cartridge\_upload.sh} \protect\\
-       Uploading a cartridge to the board over its Wi-Fi access point.%
-    }
-]{scripts/ch06/cartridge_upload.sh}
-
-On \textbf{QEMU}, there is no Wi-Fi to upload over, so you build the cartridge
-against the QEMU firmware ELF and stage it directly into the emulator's flash
-image. If the flash image does not yet exist, run QEMU once so ESP-IDF creates it,
-quit, then stage \citep{prg32qemu}.
-
-
-
-
-\lstinputlisting[
-    style=bash,
-    caption={%
-        \fname{build\_and\_stage\_pong\_qemu.sh} \protect\\
-       Building and staging a cartridge for the emulator. Note the QEMU firmware ELF and the \texttt{upload-qemu} subcommand.%
-    }
-]{scripts/ch06/build_and_stage_pong_qemu.sh}
-
-
-
-
-
-\begin{prgtargets}
-\textbf{Both targets.} The cartridge format is identical; what changes is the
-firmware ELF you build against (\fname{build-esp32c6} versus \fname{build-qemu})
-and the delivery (\code{upload} over Wi-Fi versus \code{upload-qemu} into the
-flash image). Your game source is byte-for-byte the same in both cases
-\citep{prg32qemu}.
-\end{prgtargets}
-
-\begin{prgwarn}
-Build the cartridge against the matching firmware ELF. A cartridge built against
-\fname{build-esp32c6/PRG32.elf} resolves the framework symbols at the addresses
-the board firmware uses; staging that same cartridge into a QEMU image built at
-different addresses will not work. Build for the target you intend to run on.
-\end{prgwarn}
-
 \section{When it goes wrong}
 
-The platform ships a self-check, \code{python3 tools/prg32\_game.py doctor}, that
-verifies your toolchain prerequisites and the partition layout before you spend
-time chasing a build failure \citep{prg32repo}. If a cartridge upload to QEMU
-fails, the usual cause is a missing or invalid \fname{build-qemu/qemu\_flash.bin};
-run QEMU once to create it, then stage again. If the board shows a black screen,
-the usual cause is the wrong build directory, as warned in
-Chapter~\ref{ch:platform}. These are not exotic failures; they are the everyday
-friction of embedded work, and learning to read the error and apply the known fix
-is itself part of the curriculum.
+The platform ships a self-check command that verifies your toolchain
+prerequisites and the partition layout before you spend time chasing an error
+\citep{prg32repo}. If a cartridge upload to QEMU fails, the usual cause is a
+missing or invalid QEMU flash image file; run QEMU once to create it, then stage
+again. If the board shows a black screen, the usual cause is targeting the
+wrong firmware variant, as warned in Chapter~\ref{ch:platform}. These are not
+exotic failures; they are the everyday friction of embedded work, and learning
+to read the error and apply the known fix is itself part of the curriculum.
 
 \begin{prgcheck}
 The assembly track is complete. You can read a register-level game written by

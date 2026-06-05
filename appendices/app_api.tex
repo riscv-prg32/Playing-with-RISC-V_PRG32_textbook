@@ -223,30 +223,10 @@ Function & Purpose \\
 
 \section{The cartridge tool}
 
-The \fname{tools/prg32\_game.py} script builds and deploys cartridges
-\citep{prg32repo}. Its subcommands:
-
-\begin{center}
-\begin{tabularx}{\linewidth}{@{}lX@{}}
-\toprule
-Subcommand & Purpose \\
-\midrule
-\code{build} & compile a \code{.S} or \code{.c} source into a \code{.prg32} cartridge \\
-\code{upload} & upload a cartridge to the board over HTTP (Wi-Fi) \\
-\code{upload-qemu} & stage a cartridge into the QEMU flash image \\
-\code{runtime} & print the runtime linker information \\
-\code{doctor} & check local toolchain prerequisites \\
-\bottomrule
-\end{tabularx}
-\captionof{table}{The cartridge tool's subcommands.}
-\end{center}
-
-The \code{build} subcommand's main options are \code{--out} (the output path,
-required), \code{--name} (the cartridge name), \code{--entry-prefix} (the prefix of
-your three functions), and \code{--firmware-elf} (the firmware ELF that resolves
-the framework symbols). By default it targets the \riscv architecture
-\code{rv32imc\_zicsr\_zifencei} with the \code{ilp32} ABI, the same 32-bit \riscv
-profile your code is written for \citep{prg32repo}.
+For detailed instructions on build/upload options and workflows (including
+upload via Wi‑Fi and staging for QEMU), see Chapter~\ref{ch:firstbuild}.
+The \fname{README.md} and the \fname{docs/} folder contain supporting material
+and practical examples.
 
 \section{The HTTP runtime API}
 

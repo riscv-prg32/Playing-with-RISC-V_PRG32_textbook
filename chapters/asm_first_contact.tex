@@ -86,10 +86,60 @@ functions would exist but the loader could not see them.
 \begin{prgcheck}
 Build this skeleton for QEMU and confirm it runs without crashing. You will see
 no game yet: that is correct. The achievement is that the framework found your
-three functions, called them, and survived. Appendix~\ref{app:env} has the exact
+three functions, called them, and survived. Chapter~\ref{ch:firstbuild} has the exact
 build commands for your operating system; Appendix~\ref{app:worked} shows this
 skeleton wired into the firmware.
 \end{prgcheck}
+
+\section{Cartridge building and uploading}
+
+The repository contains a quick-start guide in \fname{README.md} and documentation
+in the \fname{docs/} folder. For convenience, scripts and tools are provided to
+build cartridges, stage them for QEMU, or upload them to a board over Wi\-Fi.
+
+\subsection{ESP32-C6 hardware}
+
+To upload a cartridge to a real board, build it first and then use the included
+Python tool. Note that the board IP is \code{192.168.4.1} by default.
+
+\begin{lstlisting}[style=bash,caption={Examples: build and upload (Wi-Fi and QEMU)}]
+python3 tools/prg32_game.py build <PATH_IN.S|c> \ 
+--out <PATH_OUT.prg32> \
+--firmware-elf build-esp32c6/PRG32.elf \
+--entry-prefix <CARTRIDGE_PREFIX> \
+--name <CARTRIDGE_NAME> \
+
+python3 tools/prg32_game.py upload <PATH_OUT.prg32> --url http://192.168.4.1
+\end{lstlisting}
+
+\subsection{QEMU}
+
+To stage a cartridge for QEMU, build it, inject it into the image, and then
+launch the emulator.
+
+\begin{lstlisting}[style=bash,caption={Build and upload a cartridge to QEMU}]
+./scripts/cartridge/build_cartridge.sh <PATH_IN.S|c> <PATH_OUT.prg32> <GAME_PREFIX>
+./scripts/qemu/qemu_inject_cartridge.sh <PATH_OUT.prg32>
+./scripts/qemu/launch_qemu.sh
+\end{lstlisting}
+
+These commands work on both macOS and Linux. For additional details, see
+\fname{README.md} and the files in \fname{docs/} (for example \fname{docs/qemu.md}).
+
+\begin{prgtargets}
+\textbf{Both targets.} The cartridge format is identical; what changes is the
+firmware ELF you build against (\fname{build-esp32c6} versus \fname{build-qemu})
+and the delivery (\code{upload} over Wi-Fi versus \code{upload-qemu} into the
+flash image). Your game source is byte-for-byte the same in both cases
+\citep{prg32qemu}.
+\end{prgtargets}
+
+\begin{prgwarn}
+Build the cartridge against the matching firmware ELF. A cartridge built against
+\fname{build-esp32c6/PRG32.elf} resolves the framework symbols at the addresses
+the board firmware uses; staging that same cartridge into a QEMU image built at
+different addresses will not work. Build for the target you intend to run on.
+\end{prgwarn}
 
 \section{Simple instructions and program structure}
 

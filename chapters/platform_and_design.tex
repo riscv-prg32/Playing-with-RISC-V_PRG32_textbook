@@ -266,64 +266,31 @@ native code, wrapped in just enough metadata for the firmware to run them.
 
 \section{The two targets, concretely}
 
-You will build every game for two targets. The commands differ only in a build
-directory and a configuration profile; the source does not change at all
-\citep{prg32qemu}.
+Every game in this book is built for two targets: the physical ESP32\nobreakdash-C6
+board and the QEMU emulator. The source code is the same for both; only the build
+directory and profile differ \citep{prg32qemu}.
 
-For the \textbf{physical ESP32\nobreakdash-C6 board}, the build uses a directory named
-\fname{build-esp32c6} and the board configuration profile:
+The physical board uses \fname{build-esp32c6} and the ESP32\nobreakdash-C6 configuration.
+QEMU uses \fname{build-qemu} and the ESP32\nobreakdash-C3 emulator target, because the
+Espressif QEMU graphics path is mature for that chip. The two targets are different
+hardware, but from your game's point of view the framework interface stays the same.
 
-\lstinputlisting[
-    style=bash,
-    caption={%
-        \fname{building\_and\_flashing\_esp32c6.sh} \protect\\
-        Building and flashing for the physical board (abbreviated; see Appendix~\ref{app:env}).%
-    }
-]{scripts/ch02/building_and_flashing_esp32c6.sh}
-
-For the \textbf{QEMU emulator}, the build uses \fname{build-qemu} and the QEMU
-profile, and targets the ESP32\nobreakdash-C3 emulator.
-
-\medskip
-
-On Windows:
-
-\lstinputlisting[
-    style=bash,
-    caption={%
-        \fname{building\_and\_flashing\_qemu\_windows.ps1} \protect\\
-        Building and running for the QEMU emulator on Windows.%
-    }
-]{scripts/ch02/building_and_flashing_qemu_windows.ps1} 
-
-\medskip
-
-On Linux or MacOS:
-
-\lstinputlisting[
-    style=bash,
-    caption={%
-        \fname{building\_and\_flashing\_qemu\_shell.sh} \protect\\
-        Building and running for Linux or MacOS.%
-    }
-]{scripts/ch02/building_and_flashing_qemu_shell.sh}
+For the detailed workflow and the exact build commands, see the environment and
+build instructions in Chapter~\ref{ch:firstbuild}.
 
 \begin{prgwarn}
 Keep the two build directories strictly separate. Flashing a \fname{build-qemu}
-image to a real board produces a black screen, because the emulator build uses a
-virtual display panel that does not exist on real hardware. If your board shows
-nothing, the first thing to check is that you built in \fname{build-esp32c6}, not
-\fname{build-qemu} \citep{prg32qemu}.
+image to a real board can fail because the emulator build targets a different
+display path than the hardware. If the board shows nothing, the first thing to
+check is that you built in \fname{build-esp32c6}, not \fname{build-qemu}
+\citep{prg32qemu}.
 \end{prgwarn}
 
 \begin{prgaside}
-Why does the emulator target an ESP32\nobreakdash-C3 while the board is an ESP32\nobreakdash-C6? Both
-are \riscv microcontrollers from the same family, and both run the same 32-bit
-\riscv instructions. Espressif maintains a mature QEMU graphics path for the
-ESP32\nobreakdash-C3, so \prg uses it for desktop emulation, while the physical kits are
-built around the newer ESP32\nobreakdash-C6 \citep{prg32qemu}. From your game's point of
-view the difference is invisible: the calling convention and the framework
-interface are identical.
+The emulator uses ESP32\nobreakdash-C3 while the board uses ESP32\nobreakdash-C6, but both are
+\riscv microcontrollers running the same 32-bit instruction set. The framework
+keeps the calling convention and game interface identical, so the difference is
+largely an implementation detail.
 \end{prgaside}
 
 \section{Design principles for first games}
