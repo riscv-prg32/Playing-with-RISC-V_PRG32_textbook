@@ -36,8 +36,9 @@ this way \citep{prg32repo}.
 
 \lstinputlisting[
     style=c,
-    caption={%\fname{coin\_tile.c} \protect\
-       An 8-by-8 tile as an array of eight bytes. Each byte is one row; each bit is one pixel. This is the platformer's coin tile.}
+    caption={%
+        \fname{coin\_tile.c} \protect\\
+         An 8-by-8 tile as an array of eight bytes. Each byte is one row; each bit is one pixel. This is the platformer's coin tile.}
 ]{examples/ch08/coin_tile.c}
 
 \begin{prgaside}
@@ -55,7 +56,8 @@ A moving character has several attributes that always travel together: its
 position, its velocity, its size, its state. Keeping them in separate arrays that
 must be kept in step is error-prone. A \emph{struct} bundles them into a single
 named value, so the whole character is one thing you can pass around. The framework
-defines such a struct for platform-game characters, \code{prg32\_platform\_actor\_t}
+defines such a struct for platform-game characters, \code{prg32\_platform\_actor\_t}.
+This is used in the platformer example, which can be found in \fname{examples/games/platformer/c/game.c}
 \citep{prg32repo}.
 
 \lstinputlisting[
@@ -123,7 +125,7 @@ to what happened \citep{prg32repo,prg32tutorialc}.
        One frame of platform physics. The helper does the movement and collision; your code reads the resulting state.}
 ]{examples/ch08/platform_physics.c}
 
-Notice the economy. A single call advances the whole character: the joystick moves
+A single call advances the whole character: the joystick moves
 it, gravity pulls it down, the solid tiles stop it, and the returned \code{state}
 tells you if it touched a hazard. The camera-follow call then scrolls the tile map
 so the character stays in view. The same behaviour written from first principles
@@ -138,14 +140,6 @@ caller can see if it is given that value's address. Forgetting the \code{\&} is 
 common error; the symptom is an actor that never moves, because the function
 updated a private copy.
 \end{prgwarn}
-
-\begin{prgtargets}
-\textbf{Both targets.} The platformer's tile map, gravity, and camera all render on
-the QEMU virtual screen, so you can build and tune the whole level on a laptop. On
-the ESP32\nobreakdash-C6 you then play it with the joystick and hear the hazard beep
-\citep{prg32qemu}. The struct, the array of tiles, and the physics call are
-identical across the two targets.
-\end{prgtargets}
 
 \begin{prgtry}
 Open \fname{examples/games/platformer/c/game.c} and find where it defines the coin
