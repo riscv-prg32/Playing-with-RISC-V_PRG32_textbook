@@ -151,6 +151,28 @@ making the most of a fixed address space. Subtracting from \reg{sp} to allocate,
 and adding to free, follows directly from that choice.
 \end{prgaside}
 
+\section{Assembly sections: the anatomy of a program}
+
+When writing assembly, you must explicitly tell the assembler how to categorize different 
+parts of your program using directives. The \code{.section} keyword is the switch that selects 
+where the following code or data belongs: \code{.data} for mutable state, \code{.rodata} for constants, 
+and \code{.text} for executable instructions. The \code{.data} section is for mutable state—variables 
+like our counter that the program must modify during execution. Conversely, \code{.rodata} stands for 
+``read-only data'' and is reserved for constants, such as our game title string. On physical hardware, 
+placing constants in \code{.rodata} allows the toolchain to keep them safely locked in flash memory so 
+they cannot be accidentally overwritten by a bug.
+
+The very first directive in a PRG example is often \code{.option norelax}. That tells the assembler 
+not to apply its relaxation pass, so it does not rewrite certain branch or symbol addresses later. 
+For PRG32 cartridges, the exact layout of code and data matters, and \code{.option norelax} helps keep 
+that layout predictable.
+
+While section directives dictate \emph{where} data lives in memory, the \code{.global} directive 
+dictates \emph{who} can see it. By default, every label you define in an assembly file is strictly 
+private to that file. By marking a label as \code{.global}, you export it into the project's global 
+symbol table. This step is what bridges your assembly code to the rest of the ecosystem, explicitly 
+giving the game framework permission to locate, link against, and jump into your functions from the outside.
+
 \section{Values in memory: the \code{.data} section}
 
 A game must remember things between frames: where the ball is, what the score
@@ -195,28 +217,6 @@ vice versa, produces wrong numbers and is one of the most common beginner errors
 A useful habit, used throughout the platform's examples, is to comment each
 register with whether it holds an address or a value.
 \end{prgwarn}
-
-\section{Assembly Sections}
-
-When writing assembly, you must explicitly tell the assembler how to categorize different 
-parts of your program using directives. The \code{.section} keyword is the switch that selects 
-where the following code or data belongs: \code{.data} for mutable state, \code{.rodata} for constants, 
-and \code{.text} for executable instructions. The \code{.data} section is for mutable state—variables 
-like our counter that the program must modify during execution. Conversely, \code{.rodata} stands for 
-``read-only data'' and is reserved for constants, such as our game title string. On physical hardware, 
-placing constants in \code{.rodata} allows the toolchain to keep them safely locked in flash memory so 
-they cannot be accidentally overwritten by a bug.
-
-The very first directive in a PRG example is often \code{.option norelax}. That tells the assembler 
-not to apply its relaxation pass, so it does not rewrite certain branch or symbol addresses later. 
-For PRG32 cartridges, the exact layout of code and data matters, and \code{.option norelax} helps keep 
-that layout predictable.
-
-While section directives dictate \emph{where} data lives in memory, the \code{.global} directive 
-dictates \emph{who} can see it. By default, every label you define in an assembly file is strictly 
-private to that file. By marking a label as \code{.global}, you export it into the project's global 
-symbol table. This step is what bridges your assembly code to the rest of the ecosystem, explicitly 
-giving the game framework permission to locate, link against, and jump into your functions from the outside.
 
 \section{Putting it together: a console game that ticks}
 
