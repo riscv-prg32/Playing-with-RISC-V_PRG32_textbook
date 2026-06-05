@@ -91,8 +91,104 @@ build commands for your operating system; Appendix~\ref{app:worked} shows this
 skeleton wired into the firmware.
 \end{prgcheck}
 
-\section{Calling a C helper: the stack frame}
+\section{Simple instructions and program structure}
 
+A working program is built from a few very small operations. These
+operations are provided by the RISC-V Instruction Set Architecture (ISA).
+We will now introduce the foundational operations you need for writing
+your first programs.
+
+\subsection{Arithmetic and bit operations}
+
+The first group is the arithmetic and bitwise instructions. In a real program
+these are used to update counters, combine values, compute flags, and prepare
+arguments for later work. They all read values from registers and write the
+result back into a register. The result is stored in the first register.
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}lXl@{}}
+\toprule
+Instruction & What it does & Example \\
+\midrule
+\code{add} & Add two registers & \code{add t0, t1, t2} \\
+\code{sub} & Subtract one register from another & \code{sub t0, t1, t2} \\
+\code{xor} & Bitwise exclusive-or of two registers & \code{xor t0, t1, t2} \\
+\code{or} & Bitwise OR of two registers & \code{or t0, t1, t2} \\
+\code{and} & Bitwise AND of two registers & \code{and t0, t1, t2} \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+The RISC-V ISA also provides immediate forms of many of these operations.
+These instructions take one register operand and one small constant, which is
+useful for adding a fixed amount or applying a fixed mask in one step.
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}lXl@{}}
+\toprule
+Instruction & What it does & Example \\
+\midrule
+\code{addi} & Add a register and a constant & \code{addi t0, t1, 4} \\
+\code{xori} & Exclusive-or a register with a constant & \code{xori t0, t1, 1} \\
+\code{ori} & OR a register with a constant & \code{ori t0, t1, 0xff} \\
+\code{andi} & AND a register with a constant & \code{andi t0, t1, 7} \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\subsection{Load and store word}
+
+A second group of instructions moves whole 32-bit values between memory and
+registers. In a real program these are the only instructions that touch the
+state stored in the program data; they let the program remember values
+from one frame to the next.
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}lXl@{}}
+\toprule
+Instruction & What it does & Example \\
+\midrule
+\code{lw} & Load a 32-bit word from memory into a register & \code{lw t0, 0(t1)} \\
+\code{sw} & Store a 32-bit word from a register into memory & \code{sw t0, 0(t1)} \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+Each load or store combines a register holding a memory address with a small
+constant offset. That makes it easy to access fields inside a data structure or
+variables laid out in memory. You can use a zero offset when you don't need it.
+
+\subsection{Pseudo-instructions}
+
+The final group is the pseudo-instructions. They are not separate hardware
+operations; instead, they are convenient shortcuts that the assembler expands 
+into one or more real instructions. In everyday code they make assembly 
+easier to read and write.
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}lXl@{}}
+\toprule
+Pseudo & What it does & Example \\
+\midrule
+\code{la} & Load the address of a symbol into a register & \code{la a0, title} \\
+\code{li} & Load a constant value into a register & \code{li t0, 42} \\
+\code{mv} & Copy one register to another & \code{mv t0, t1} \\
+\code{not} & Bitwise complement of a register & \code{not t0, t1} \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+In practice, \code{la} is used whenever a program needs the address of a string
+or a data variable. \code{li} is used to load a number directly into a register
+without first storing it in memory. \code{mv} is simply a copy, and \code{not}
+computes the one’s complement of a register value.
+
+With these instruction families, the RISC-V card has the basic operations a
+program needs: arithmetic and bitwise logic, memory load/store, and the
+pseudo-instructions that make assembly manageable. The next section shows how
+this instruction set is used when your assembly calls into the framework.
+
+\section{Calling a C helper: the stack frame}
 A game that only returns is not interesting for long. The first useful thing we
 can do is print text, using the framework's console. The console is written in C,
 so calling it means crossing the boundary between your assembly and the
