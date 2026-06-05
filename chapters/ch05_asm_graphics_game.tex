@@ -5,49 +5,47 @@ You can now move an object with the joystick and keep it on the screen. This
 chapter gives that object a body. We move from the text console to the
 320-by-200 graphics viewport, draw rectangles for a paddle and a ball, detect
 when they touch, and tie the three functions together into a complete, playable
-graphical game. The viewport calls behave identically on QEMU and on the
-ESP32\nobreakdash-C6, so you can develop everything on a laptop and confirm it on hardware
-later \citep{prg32qemu,prg32tutorialgraphic}.
+graphical Pong game. \citep{prg32qemu,prg32tutorialgraphic}.
 
-\section{From text columns to pixels}
+\section{A blank frame}
 
-The console measured position in values; the viewport measures it in
-pixels. The mental model is otherwise unchanged: state lives in \code{.data},
-\code{update} changes it, \code{draw} renders it. What changes is the drawing
-call. Instead of \code{prg32\_console\_write}, we use \code{prg32\_gfx\_clear} to
-erase the frame and \code{prg32\_gfx\_rect} to draw a filled rectangle.
-
-Recall the rectangle call from Chapter~\ref{ch:platform}:
-\code{prg32\_gfx\_rect(x, y, w, h, color)}. In assembly the five arguments go,
-in order, into \reg{a0} through \reg{a4}, following the calling convention. The
-colour in \reg{a4} is an RGB565 value; you may write it as a named constant in C,
-but in assembly it is usually a plain number: \code{65535} for white,
-\code{65504} for yellow, \code{0} for black \citep{prg32repo}.
-
-\begin{prgconcept}
-The five arguments of \code{prg32\_gfx\_rect} occupy \reg{a0}=x, \reg{a1}=y,
-\reg{a2}=width, \reg{a3}=height, \reg{a4}=colour. Getting an argument into the
-wrong register draws the wrong rectangle: a vivid, immediate way to see what the
-calling convention actually means.
-\end{prgconcept}
-
-\section{A blank frame, then one rectangle}
-
-Following the platform's own first-game rhythm, we start with a \code{draw} that
-clears the screen to black and does nothing else: confirm it runs.
+We start with a \code{draw} that clears the screen to black and does nothing else: confirm it runs.
 
 \lstinputlisting[
     style=asm,
     caption={%
-        \fname{blank\_graphics.S} \protect\\
-       A \code{draw} that clears the frame. Build this first and confirm a black screen before drawing anything on it.%
+        \fname{hello\_world\_graphics.S} \protect\\
+       A \code{draw} that clears the frame. Build this first and confirm%
+       a black screen before drawing anything on it.%
     }
-]{examples/ch05/blank_graphics.S}
+]{examples/ch05/hello_world_graphics.S}
 
-Now add a rectangle. We draw a white paddle near the bottom of the viewport, at
-a position read from \code{.data}. The platform's graphics Pong places the paddle
-at $y=188$, a 64-by-8 white bar: wide enough to be easy to see in the emulator
-\citep{prg32repo}.
+\section{Drawing a rectangle}
+
+The mental model from ASCII based programs is unchanged: state lives in \code{.data},
+\code{update} changes it, \code{draw} renders it. What changes is the drawing
+call. Instead of \code{prg32\_console\_write}, we use \code{prg32\_gfx\_clear} to
+erase the frame and \code{prg32\_gfx\_rect} to draw a filled rectangle.
+
+To draw a rectangle, we use the call \code{prg32\_gfx\_rect(x, y, w, h, color)}. 
+In assembly the five arguments go, in order, into \reg{a0} through \reg{a4}, 
+following the calling convention. The colour in \reg{a4} is an RGB565 value; 
+you may write it as a named constant in C,
+but in assembly it is usually a plain number: \code{65535} for white,
+\code{65504} for yellow, \code{0} for black \citep{prg32repo}.
+
+\begin{prgwarn}
+The five arguments of \code{prg32\_gfx\_rect} occupy \reg{a0}=x, \reg{a1}=y,
+\reg{a2}=width, \reg{a3}=height, \reg{a4}=colour. Getting an argument into the
+wrong register draws the wrong rectangle: a vivid, immediate way to see what the
+calling convention actually means.
+\end{prgwarn}
+
+In the next full example we will draw a white paddle near the bottom of the viewport,  
+at a position read from \code{.data}. The other dimensions are constant: we will draw
+a 64-by-8 white bar at $y=188$. Wide enough to be easy to see in the emulator and
+perfect for recreating the old classic Pong. \citep{prg32repo}. Here is what
+the paddle draw section will look like:
 
 \lstinputlisting[
     style=asm,
@@ -57,29 +55,18 @@ at $y=188$, a 64-by-8 white bar: wide enough to be easy to see in the emulator
     }
 ]{examples/ch05/paddle_draw.S}
 
-\begin{prgwarn}
-The order of the loads matters because each \code{li} into \reg{a0}--\reg{a4}
-sets one argument. If you load the width into \reg{a1} instead of \reg{a2}, you
-draw a rectangle of the wrong shape in the wrong place. The platform's
-break-and-fix lab asks you to do exactly this on purpose, observe the distorted
-rectangle, then restore the order and explain the error
-\citep{prg32tutorialgraphic}.
-\end{prgwarn}
-
 \section{The ball: position, velocity, and the bounce}
 
-A paddle the player moves is half a game; the other half is a ball that moves on
-its own and bounces. The ball needs four words of state: its $x$ and $y$ position
+Now we need a ball. The ball needs four words of state: its $x$ and $y$ position
 and its $x$ and $y$ velocity (which the examples call \code{dx} and \code{dy}).
 Each frame, the velocity is added to the position; when the ball reaches an edge,
-the velocity is negated so it travels back the other way. This is the heart of
-the platform's graphics Pong update \citep{prg32repo}.
+the velocity is negated so it travels back the other way. \citep{prg32repo}.
 
 \lstinputlisting[
     style=asm,
     caption={%
         \fname{ball\_motion.S} \protect\\
-       Autonomous ball motion on the x axis with edge bounce. The same pattern, repeated for y, gives full 2-D motion.%
+       Autonomous ball motion on the x and y axis with edge bounce.%
     }
 ]{examples/ch05/ball_motion.S}
 
@@ -89,14 +76,6 @@ is negating that number when the object reaches a boundary: \code{neg t4, t4}
 turns $+2$ into $-2$, so the next frames move the ball back the way it came. With
 this one idea: add velocity and negate at the edges, you can make anything bounce.
 \end{prgconcept}
-
-\begin{prgaside}
-Notice that the bounce reuses the clamp from Chapter~\ref{ch:asm2}, with one
-addition: where the clamp merely stopped the object at the edge, the bounce also
-negates the velocity. The platform's examples keep the clamp so the ball never
-visibly leaves the screen even for a single frame, then negate so it returns. Good
-game feel often comes from such small combinations of simple rules.
-\end{prgaside}
 
 \section{Did they touch? Rectangle collision}
 
@@ -110,16 +89,22 @@ overlap \citep{prg32tutorialgraphic}. In assembly the eight arguments fill
 \lstinputlisting[
     style=asm,
     caption={%
-        \fname{collision\_testing.S} \protect\\
+        \fname{collision\_detection.S} \protect\\
        Testing ball-versus-paddle overlap. A non-zero result in \reg{a0} means they touched this frame.%
     }
-]{examples/ch05/collision_testing.S}
+]{examples/ch05/collision_detection.S}
 
-\begin{prgconcept}
 Two rectangles overlap when they intersect on \emph{both} axes at once: the $x$
 ranges overlap \emph{and} the $y$ ranges overlap. \code{prg32\_sprite\_hitbox}
 performs this two-axis test for you and returns the answer as a single value, so
 collision becomes one call followed by one branch.
+
+\begin{prgconcept}
+Notice that the bounce reuses the clamp from Chapter~\ref{ch:asm2}, with one
+addition: where the clamp merely stopped the object at the edge, the bounce also
+negates the velocity. The platform's examples keep the clamp so the ball never
+visibly leaves the screen even for a single frame, then negate so it returns. Good
+game feel often comes from such small combinations of simple rules.
 \end{prgconcept}
 
 \section{Assembling the complete game}
@@ -127,26 +112,33 @@ collision becomes one call followed by one branch.
 We now have every part: a paddle moved by input and clamped, a ball that moves
 and bounces, and a collision test. Putting them in the three functions gives a
 complete graphical game whose structure exactly matches the platform's
-\code{pong\_graphics} example \citep{prg32repo}. The \code{init} prints a title
-and beeps once; the \code{update} moves the paddle from input, advances and
-bounces the ball, and applies collision; the \code{draw} clears the frame and
-renders the paddle and ball.
+\code{pong\_graphics} example \citep{prg32repo}. The \code{update} moves the 
+paddle from input,  advances and bounces the ball, and applies collision; 
+the \code{draw} clears the frame and renders the paddle and ball.
 
 \lstinputlisting[
     style=asm,
     caption={%
-        \fname{ball\_game.S} \protect\\
-       The \code{draw} of the complete game. Compare it line for line with \code{pong\_graphics\_draw} in the repository.%
+        \fname{pong\_skeleton.S} \protect\\
+       The \code{draw} of the complete game. Compare it line for line%
+        with \code{pong\_graphics\_draw} in the repository.%
     }
-]{examples/ch05/ball_game.S}
+]{examples/ch05/pong_skeleton.S}
+
+A brief stylistic note: earlier chapters tended to use simple numeric 
+labels for branch targets; in this chapter we switch to descriptive, 
+named labels for different sections of control flow. This is a readability 
+improvement only; it does not change program behaviour but makes the 
+structure and intent of each labelled section easier to follow.
 
 \begin{prgtargets}
-\textbf{Both targets.} Develop and watch this on the QEMU virtual screen, where
-the ball bounces and the paddle responds to injected input. Then build the
-identical source for the ESP32\nobreakdash-C6 to play it with a real joystick and hear the
-beep. Because QEMU defaults disable the physical GPIO buttons, the paddle may sit
-still in the emulator unless input is injected; the ball still moves, so the
-render path is fully verified on the desktop \citep{prg32qemu}.
+\textbf{Both targets.} Develop and watch this on the QEMU virtual screen, 
+where the ball bounces and the paddle responds to injected input. Then 
+build the identical source for the ESP32\nobreakdash-C6 to play it with 
+a real joystick and hear the beep. Because QEMU's defaults disable the 
+physical GPIO buttons, the paddle may sit still in the emulator unless 
+input is injected; the ball still moves, so the render path is fully 
+verified on the desktop \citep{prg32qemu}.
 \end{prgtargets}
 
 \section{Step-by-step: how this game was built}
@@ -154,25 +146,21 @@ render path is fully verified on the desktop \citep{prg32qemu}.
 It is worth making explicit the pedagogical order in which a game like this is
 constructed, because it is the order the platform recommends and the order in
 which the example games in \code{examples/games} were themselves written
-\citep{prg32tutorial,prg32tutorialgraphic}. You do not write the listing above in
-one sitting; you grow it.
+\citep{prg32tutorial,prg32tutorialgraphic}.
 
-First, write \code{init}, \code{update}, and \code{draw} that only return, and
-confirm the framework runs them. Second, add one \code{.data} variable for the
-paddle position and draw the paddle at it. Third, read input in \code{update} and
-move the paddle, then add its clamp. Fourth, add the ball's four state words and
-its autonomous motion with bounces. Fifth, add the collision test. Only then,
-sixth, add sound on the collision event. Each step is buildable and observable on
-its own; if a step breaks, the bug is in the few lines you just added, not
-hidden in a wall of untested code.
+First, write \code{init}, \code{update}, and \code{draw} that only return, 
+and confirm the framework runs them. Second, add one \code{.data} variable.
+Third, read input in \code{update} and move the objects, then add clamping. 
+Fourth, add the collision test. Only then, fifth, add sound on the collision 
+event. Each step is buildable and observable on its own; if a step breaks, 
+the bug is in the few lines you just added, not hidden in a wall of untested code.
 
 \begin{prgtry}
-Build the game incrementally in exactly these six steps, rebuilding and running
+Build the game incrementally in exactly these five steps, rebuilding and running
 after each. Keep a short log: after each step, write one line saying what you
 added and what you saw. This log is not busywork: it is the written form of the
 ``change one thing, observe, record'' method, and it will make the difference
-between a frustrating afternoon and a productive one
-\citep{prg32repo}.
+between a frustrating afternoon and a productive one \citep{prg32repo}.
 \end{prgtry}
 
 \begin{prgcheck}

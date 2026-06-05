@@ -1,9 +1,9 @@
 .option norelax
 .section .data
-counter:  .word 0
+    counter:  .word 0
 
 .section .rodata
-title:    .asciz "HELLO PRG32\n"
+    title:    .asciz "HELLO PRG32\n"
 
 .section .text
 .global counter_init
