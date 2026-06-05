@@ -54,7 +54,7 @@ examples/                Verbatim PRG32 example sources used by Appendix C
 ## About the platform
 
 The textbook is built around the PRG32 open educational runtime for RISC-V
-assembly and C games, by Raffaele Montella and Ivan Cafiero (University of
+assembly and C games, by Raffaele Montella, Ivan Cafiero and Simone Boscaglia (University of
 Naples "Parthenope"), distributed under the MIT License:
 
   https://github.com/riscv-prg32/PRG32
