@@ -94,7 +94,7 @@ skeleton wired into the firmware.
 \section{Simple instructions and program structure}
 
 A working program is built from a few very small operations. These
-operations are provided by the RISC-V Instruction Set Architecture (ISA).
+operations are provided by the RISC-V Instruction Set Architecture \citep{riscvisa}.
 We will now introduce the foundational operations you need for writing
 your first programs.
 
@@ -183,7 +183,7 @@ or a data variable. \code{li} is used to load a number directly into a register
 without first storing it in memory. \code{mv} is simply a copy, and \code{not}
 computes the one’s complement of a register value.
 
-With these instruction families, the RISC-V ISA has the basic operations a
+With these instruction families, the RISC-V ISA provides the basic operations a
 program needs: arithmetic and bitwise logic, memory load/store, and the
 pseudo-instructions that make assembly manageable. The next section shows how
 this instruction set is used when your assembly calls into the framework.
