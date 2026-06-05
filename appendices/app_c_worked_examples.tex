@@ -24,7 +24,13 @@ Chapters~\ref{ch:asm1}--\ref{ch:asm3}. It exports the three symbols
 bouncing ball, and renders them with \code{prg32\_gfx\_rect}. The optional debug
 overlay at the end is guarded by a compile-time flag.
 
-\lstinputlisting[style=asm,caption={\fname{examples/games/pong/graphics/game.S} --- complete graphics Pong in \riscv assembly \citep{prg32repo}.}]{examples/pong_graphics_game.S}
+\lstinputlisting[
+    style=asm,
+    caption={%
+        \fname{examples/games/pong/graphics/game.S} \protect\\
+        complete graphics Pong in \riscv assembly \citep{prg32repo}.%
+        }
+    ]{examples/complete/pong_graphics_game.S}
 
 \section{Pong in ASCII assembly}
 
@@ -34,7 +40,12 @@ as used in Chapter~\ref{ch:asm1}. Note how closely its \code{update} mirrors the
 graphics version: the same input read, the same bit tests, the same clamps,
 differing only in units (text columns rather than pixels).
 
-\lstinputlisting[style=asm,caption={\fname{examples/games/pong/ascii/game.S} --- complete ASCII Pong in \riscv assembly \citep{prg32repo}.}]{examples/pong_ascii_game.S}
+\lstinputlisting[
+    style=asm,
+    caption={%
+    \fname{examples/games/pong/ascii/game.S} \protect\\
+    complete ASCII Pong in \riscv assembly \citep{prg32repo}.%
+}]{examples/complete/pong_ascii_game.S}
 
 \section{Pong in C}
 
@@ -44,7 +55,12 @@ C statement here corresponds to a block of instructions there, which is the less
 of Chapter~\ref{ch:join}. This version also keeps a second paddle alive with a
 fallback AI so the two-player screen stays in motion even without a second player.
 
-\lstinputlisting[style=c,caption={\fname{examples/games/pong/c/game.c} --- complete Pong in C \citep{prg32repo}.}]{examples/pong_c_game.c}
+\lstinputlisting[
+    style=c,
+    caption={%
+    \fname{examples/games/pong/c/game.c} \protect\\
+    complete Pong in C \citep{prg32repo}.%
+}]{examples/complete/pong_c_game.c}
 
 \section{Breakout in C}
 
@@ -54,11 +70,16 @@ brick row, the code clears the corresponding bit with a bitwise AND and bounces 
 ball. This is the bitmask technique of Chapter~\ref{ch:asm2} reused for game state,
 as discussed in Chapter~\ref{ch:asmcap}.
 
-\lstinputlisting[style=c,caption={\fname{examples/games/breakout/c/game.c} --- complete Breakout in C, showing bricks as a bitmask \citep{prg32repo}.}]{examples/breakout_c_game.c}
+\lstinputlisting[
+    style=c,
+    caption={%
+    \fname{examples/games/breakout/c/game.c} \protect\\
+    complete Breakout in C, showing bricks as a bitmask \citep{prg32repo}.%
+}]{examples/complete/breakout_c_game.c}
 
 \section{Where to find the rest}
 
-The repository contains, for each of the nine example games, an ASCII assembly
+The \code{PRG32} repository contains, for each of the nine example games, an ASCII assembly
 version, a graphics assembly version, and a C version, alongside focused feature
 demos for scrolling, parallax, animated sprites, and dual playfields
 \citep{prg32repo}. Having read the four listings above, you have the vocabulary to
