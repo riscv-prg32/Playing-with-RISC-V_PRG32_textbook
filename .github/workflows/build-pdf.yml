@@ -1,0 +1,30 @@
+name: Build textbook PDF
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build-pdf:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Compile LaTeX
+        uses: xu-cheng/latex-action@v3
+        with:
+          root_file: main.tex
+          latexmk_shell_escape: true
+
+      - name: Rename PDF
+        run: cp main.pdf Playing-with-RISC-V_PRG32_textbook.pdf
+
+      - name: Upload PDF artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Playing-with-RISC-V_PRG32_textbook
+          path: Playing-with-RISC-V_PRG32_textbook.pdf
