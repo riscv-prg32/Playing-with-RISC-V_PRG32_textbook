@@ -11,7 +11,7 @@ later \citep{prg32qemu,prg32tutorialgraphic}.
 
 \section{From text columns to pixels}
 
-The console measured position in text columns; the viewport measures it in
+The console measured position in values; the viewport measures it in
 pixels. The mental model is otherwise unchanged: state lives in \code{.data},
 \code{update} changes it, \code{draw} renders it. What changes is the drawing
 call. Instead of \code{prg32\_console\_write}, we use \code{prg32\_gfx\_clear} to
@@ -34,23 +34,15 @@ calling convention actually means.
 \section{A blank frame, then one rectangle}
 
 Following the platform's own first-game rhythm, we start with a \code{draw} that
-clears the screen to black and does nothing else, confirm it runs, then add a
-single rectangle \citep{prg32tutorialgraphic}.
+clears the screen to black and does nothing else: confirm it runs.
 
 \lstinputlisting[
     style=asm,
     caption={%
-        \fname{game\_draw.S} \protect\\
+        \fname{blank\_graphics.S} \protect\\
        A \code{draw} that clears the frame. Build this first and confirm a black screen before drawing anything on it.%
     }
-]{examples/ch05/game_draw.S}
-
-\begin{prgcheck}
-Build this for QEMU and confirm the virtual screen shows solid black with no
-crash. A black screen is success: the frame is being cleared every frame. If you
-see garbage or the program hangs, recheck the \reg{ra} save/restore pair from
-Chapter~\ref{ch:asm1}.
-\end{prgcheck}
+]{examples/ch05/blank_graphics.S}
 
 Now add a rectangle. We draw a white paddle near the bottom of the viewport, at
 a position read from \code{.data}. The platform's graphics Pong places the paddle
