@@ -38,9 +38,8 @@ assembly track \citep{prg32tutorialc}. To use the framework, include one header.
 \lstinputlisting[
     style=c,
     caption={%
-        \fname{examples/ch07/hello\_world\_c.c} \protect\\
-        The smallest C game. Three functions that do nothing yet: the C counterpart of the assembly skeleton in Chapter~\ref{ch:asm1}.%
-    }]{examples/ch07/hello_world_c.c}
+        \fname{hello\_world\_c.c}: The smallest C game. Three functions that do nothing yet: the C counterpart of the assembly skeleton in Chapter~\ref{ch:asm1}.%
+    }]{examples/c_first_contact/hello_world_c.c}
 
 The single \code{\#include "prg32.h"} gives you every framework function and every
 named constant: the button bits, the colours, and the screen dimensions that you
@@ -65,7 +64,7 @@ declares its paddle and ball state exactly this way \citep{prg32repo}.
     caption={%
         \fname{pong\_c\_state.c} \protect\\
        Game state as file-scope variables. Declared outside the functions, they persist across frames. \texttt{static} keeps them private to this file.}
-]{examples/ch07/pong_c_state.c}
+]{examples/c_first_contact/pong_c_state.c}
 
 The \code{init} function is where you can set the starting values of the variables.
 In the pong example, this is where the initial position and velocities are set.
@@ -75,7 +74,7 @@ In the pong example, this is where the initial position and velocities are set.
     caption={%
         \fname{pong\_c\_init.c} \protect\\
        Initialising state in \code{init}. This runs once, before the first frame.}
-]{examples/ch07/pong_c_init.c}
+]{examples/c_first_contact/pong_c_init.c}
 
 \begin{prgconcept}
 File-scope variables in C play the role that labelled words in \code{.data} play
@@ -96,7 +95,7 @@ call returns a value you store in a variable, and the test is an \code{if}.
     caption={%
         \fname{pong\_c\_update.c} \protect\\
        Reading input and moving the paddle. Note the bitwise \texttt{\&}, not \texttt{==}, exactly as warned in Chapter~\ref{ch:platform}.}
-]{examples/ch07/pong_c_update.c}
+]{examples/c_first_contact/pong_c_update.c}
 
 \begin{prgwarn}
 Use \code{input \& PRG32\_BTN\_LEFT}, with a single ampersand for bitwise AND, not
@@ -123,7 +122,7 @@ Chapter~\ref{ch:asm3}, now in three lines of C \citep{prg32repo}.
     caption={%
         \fname{pong\_c\_ball\_motion.c} \protect\\
         Ball motion and edge bounce. Adding velocity moves the ball; negating it at the boundary turns it around.}
-]{examples/ch07/pong_c_ball_motion.c}
+]{examples/c_first_contact/pong_c_ball_motion.c}
 
 \section{Collision: one call, one decision}
 
@@ -137,7 +136,7 @@ inside an \code{if} \citep{prg32repo}.
     caption={%
         \fname{pong\_c\_paddle\_collision.c} \protect\\
         Bouncing the ball off the paddle. The hitbox test returns non-zero on overlap.}
-]{examples/ch07/pong_c_paddle_collision.c}
+]{examples/c_first_contact/pong_c_paddle_collision.c}
 
 \begin{prgconcept}
 Collision detection in C is one function call and one \code{if}. The framework
@@ -160,7 +159,7 @@ We do this to follow the phase separation from Chapter~\ref{ch:platform}.
     caption={%
         \fname{pong\_c\_draw.c} \protect\\
         Rendering the frame. \code{draw} only reads state and puts pixels; it changes nothing.}
-]{examples/ch07/pong_c_draw.c}
+]{examples/c_first_contact/pong_c_draw.c}
 
 Now we can look at the full Pong example, built in C. If you followed the assembly course,
 you can compare it line by line with the previous version.
@@ -170,7 +169,7 @@ you can compare it line by line with the previous version.
     caption={%
         \fname{pong\_skeleton.c} \protect\\
         Rendering the frame. \code{draw} only reads state and puts pixels; it changes nothing.}
-]{examples/ch07/pong_skeleton.c}
+]{examples/c_first_contact/pong_skeleton.c}
 
 \begin{prgtargets}
 \textbf{Both targets.} This complete C Pong runs unchanged on QEMU and the

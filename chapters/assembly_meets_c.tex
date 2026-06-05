@@ -18,7 +18,7 @@ English.
     style=c,
     caption={%\fname{move\_left\_c.c} \protect\
        Move left, in C. Read input, test the bit, change the position.}
-]{examples/ch10/move_left_c.c}
+]{examples/assembly_meets_c/move_left_c.c}
 
 In assembly it is the same idea spelled out in the machine's own terms: call,
 copy the result, mask the bit, branch if clear, subtract, and because
@@ -28,7 +28,7 @@ copy the result, mask the bit, branch if clear, subtract, and because
     style=asm,
     caption={%\fname{move\_left\_asm.S} \protect\
        Move left, in assembly. The same logic, with every step the C compiler would have generated made explicit.}
-]{examples/ch10/move_left_asm.S}
+]{examples/assembly_meets_c/move_left_asm.S}
 
 Line up the two listings and the correspondence is exact. The C \code{if (input \&
 PRG32\_BTN\_LEFT)} becomes \code{andi} followed by \code{beqz}. The C \code{paddle\_x

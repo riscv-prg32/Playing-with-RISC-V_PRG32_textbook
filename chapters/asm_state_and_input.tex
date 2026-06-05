@@ -53,7 +53,7 @@ somewhere safe, because the next \code{call} you make would overwrite \reg{a0}.
         \fname{get\_input.S} \protect\\
         Read the input bitmask and keep it. The copy to a temporary is essential, because later calls reuse \reg{a0}.%    
     }
-]{examples/ch04/get_input.S}
+]{examples/asm_state_and_input/get_input.S}
 
 \begin{prgwarn}
 Copy the input mask out of \reg{a0} immediately. \reg{a0} is the argument and
@@ -73,7 +73,7 @@ pressed.
         \fname{button\_test.S} \protect\\
         Testing one button. \code{andi} keeps only the chosen bit; \code{beqz} skips the body when that bit is clear.%    
     }
-]{examples/ch04/button_test.S}
+]{examples/asm_state_and_input/button_test.S}
 
 \begin{prgconcept}
 \code{andi t3, t0, 1} computes the bitwise AND of the input mask with the
@@ -88,18 +88,17 @@ We now assemble a complete \code{update} that moves an object left and right wit
 the joystick. The state is a single word in \code{.data}, exactly as in
 Chapter~\ref{ch:asm1}. The routine reads input, tests LEFT and RIGHT, and updates
 the position. For now, we limit the draw to displaying the position on screen.
-In the future, the position will make a graphics object move.
+    In the future, the position will make a graphics object move 
+    
+    \citep{prg32repo}.
 
-\citep{prg32repo}.
-
-\lstinputlisting[
-    style=asm,
-    caption={%
-        \fname{examples/ch04/input\_read.S} \protect\\
-        A full \code{update}: read input, move on LEFT/RIGHT, store the result. 
-        Compare with the platform's \code{pong\_ascii\_update}%
-    }
-]{examples/ch04/input_read.S}
+    \lstinputlisting[
+        style=asm,
+        caption={%
+            A full update: read input, move on LEFT/RIGHT, store the result. 
+            Compare with the platform's \texttt{pong\_ascii\_update}.%
+        }
+    ]{examples/asm_state_and_input/input_read.S}
 
 Trace it once by hand. Suppose \code{game\_x} holds \code{20} and the player
 holds RIGHT. The input read returns a mask with bit~1 set. The LEFT test
@@ -138,7 +137,7 @@ object's width. The logic is identical either way.
         \fname{x\_clamping.S} \protect\\
         Clamping x to the range [0, 39]. Negative values snap to 0; values past the edge snap to the maximum.% %
     }
-]{examples/ch04/x_clamping.S}
+]{examples/asm_state_and_input/x_clamping.S}
 
 \begin{prgconcept}
 A \textbf{boundary clamp} keeps a value inside a legal range: if it went below the

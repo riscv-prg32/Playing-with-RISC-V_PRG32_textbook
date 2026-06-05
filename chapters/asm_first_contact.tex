@@ -73,7 +73,7 @@ and ``do nothing else'' is simply not writing anything else. We name our game
         The smallest \prg assembly game: three functions that return immediately.
         Build it, confirm it runs, then add to it.%
     }
-]{examples/ch03/hello_world_asm.S}
+]{examples/asm_first_contact/hello_world_asm.S}
 
 A few details deserve explanation. The directive \code{.option norelax} tells the
 assembler not to apply an optimisation that can interfere with the way \prg
@@ -217,7 +217,7 @@ Here is the pattern, which you will repeat in nearly every function:
         \fname{print\_asm.S} \protect\\
         The stack-frame idiom. Save \reg{ra}, do work that may call C, restore \reg{ra}, return.%
     }
-]{examples/ch03/print_asm.S}
+]{examples/asm_first_contact/print_asm.S}
 
 
 Read this slowly, because it contains five distinct ideas. The \code{addi sp, sp,
@@ -283,7 +283,7 @@ For ASCII Pong, the platform's example declares its state exactly this way
         \fname{game\_state\_data.S} \protect\\
         Game state in \code{.data}. Each label names a memory location holding one 32-bit word.%
     }
-]{examples/ch03/game_state_data.S}
+]{examples/asm_first_contact/game_state_data.S}
 
 To use such a value you do two things, and the distinction between them is the
 crux of understanding memory. First you load the \emph{address} of the label into
@@ -296,7 +296,7 @@ a register with \code{la}. Then you load the \emph{value} at that address with
         \fname{load\_modify\_store.S} \protect\\
         The load--modify--store cycle: read a value from memory, change it in a register, write it back.%
     }
-]{examples/ch03/load_modify_store.S}
+]{examples/asm_first_contact/load_modify_store.S}
 
 \begin{prgconcept}
 A label such as \code{hello\_x} names a \emph{location} in memory. \code{la t0,
@@ -328,7 +328,7 @@ We also included a short beep sound that works with the \code{prg32\_audio\_beep
         \fname{counter.S} \protect\\
         A counter example that displays an incrementing score.%    
     }
-]{examples/ch03/counter.S}
+]{examples/asm_first_contact/counter.S}
 
 This short program demonstrates the core design pattern of every game on this platform. 
 Notice how the work is split across distinct phases: \code{counter\_update} handles the logic 

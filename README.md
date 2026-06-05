@@ -36,18 +36,23 @@ frontmatter/
   howtoread.tex          Conventions and the two reading tracks
   references.bib         Bibliography (BibTeX)
 chapters/
-  ch01_introduction.tex          Why a game, why RISC-V (European IP), why now
-  ch02_platform_and_design.tex   Game design principles + the PRG32 framework
-  ch03..ch06                     Computer Architecture track (RISC-V assembly)
-  ch07..ch09                     Computer Programming track (C)
-  ch10_assembly_meets_c.tex      Reunion: one game, two languages
+  introduction.tex          Why a game, why RISC-V (European IP), why now
+  platform_and_design.tex   Game design principles + the PRG32 framework
+  asm_first_contact.tex     Computer Architecture track (RISC-V assembly)
+  asm_state_and_input.tex   Computer Architecture track (RISC-V assembly)
+  asm_graphics_game.tex     Computer Architecture track (RISC-V assembly)
+  asm_capstone.tex          Computer Architecture track (RISC-V assembly)
+  c_first_contact.tex       Computer Programming track (C)
+  c_structs_and_tiles.tex   Computer Programming track (C)
+  c_capstone.tex            Computer Programming track (C)
+  assembly_meets_c.tex      Reunion: one game, two languages
 appendices/
-  app_a_api.tex          The PRG32 runtime interface (full API reference)
-  app_b_performance.tex  Measuring performance like a scientist
-  app_c_worked_examples.tex  Full working example sources (verbatim)
-  app_d_github.tex       Using GitHub for coursework
-  app_e_hardware.tex     Building the physical PRG32 board
-  app_f_environment.tex  Environment setup (Windows / Linux / macOS)
+  app_api.tex               The PRG32 runtime interface (full API reference)
+  app_performance.tex       Measuring performance like a scientist
+  app_worked_examples.tex   Full working example sources (verbatim)
+  app_github.tex            Using GitHub for coursework
+  app_hardware.tex          Building the physical PRG32 board
+  app_environment.tex       Environment setup (Windows / Linux / macOS)
 examples/                Verbatim PRG32 example sources used by Appendix C
 ```
 

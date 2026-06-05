@@ -18,7 +18,7 @@ We start with a \code{draw} that clears the screen to black and does nothing els
        A \code{draw} that clears the frame. Build this first and confirm%
        a black screen before drawing anything on it.%
     }
-]{examples/ch05/hello_world_graphics.S}
+]{examples/asm_graphics_game/hello_world_graphics.S}
 
 \section{Drawing a rectangle}
 
@@ -53,7 +53,7 @@ the paddle draw section will look like:
         \fname{paddle\_draw.S} \protect\\
        Drawing the paddle from a stored position. The five arguments fill \reg{a0}--\reg{a4} in order.%
     }
-]{examples/ch05/paddle_draw.S}
+]{examples/asm_graphics_game/paddle_draw.S}
 
 \section{The ball: position, velocity, and the bounce}
 
@@ -68,7 +68,7 @@ the velocity is negated so it travels back the other way. \citep{prg32repo}.
         \fname{ball\_motion.S} \protect\\
        Autonomous ball motion on the x and y axis with edge bounce.%
     }
-]{examples/ch05/ball_motion.S}
+]{examples/asm_graphics_game/ball_motion.S}
 
 \begin{prgconcept}
 \textbf{Velocity} is just a number added to position each frame. A \emph{bounce}
@@ -92,7 +92,7 @@ overlap \citep{prg32tutorialgraphic}. In assembly the eight arguments fill
         \fname{collision\_detection.S} \protect\\
        Testing ball-versus-paddle overlap. A non-zero result in \reg{a0} means they touched this frame.%
     }
-]{examples/ch05/collision_detection.S}
+]{examples/asm_graphics_game/collision_detection.S}
 
 Two rectangles overlap when they intersect on \emph{both} axes at once: the $x$
 ranges overlap \emph{and} the $y$ ranges overlap. \code{prg32\_sprite\_hitbox}
@@ -123,7 +123,7 @@ the \code{draw} clears the frame and renders the paddle and ball.
        The \code{draw} of the complete game. Compare it line for line%
         with \code{pong\_graphics\_draw} in the repository.%
     }
-]{examples/ch05/pong_skeleton.S}
+]{examples/asm_graphics_game/pong_skeleton.S}
 
 A brief stylistic note: earlier chapters tended to use simple numeric 
 labels for branch targets; in this chapter we switch to descriptive, 
