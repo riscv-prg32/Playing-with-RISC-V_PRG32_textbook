@@ -1,0 +1,424 @@
+\chapter{First Contact: Registers, Memory, and the Call}
+\label{ch:asm1}
+
+This chapter begins the computer architecture track. By its end you will have a
+running \riscv assembly program on both QEMU and, if you have one, the physical
+board: a program that clears a console, prints text, and makes a sound. More
+importantly, you will understand the three ideas on which everything else rests:
+what a register is, how a value lives in memory, and what happens when you call a
+function. We build these ideas on the smallest possible game, the ASCII version
+of Pong, exactly as the platform's own tutorial does \citep{prg32tutorialascii}.
+
+\section{The machine you are programming}
+
+A \riscv processor of the kind in your board is, from the programmer's point of
+view, astonishingly simple. It has thirty-two registers, each holding a 32-bit
+value, and it executes instructions that, with few exceptions, do one of three
+things: an arithmetic or logical operation between registers, a transfer of a
+value between a register and memory, or a change in which instruction runs next.
+That is very nearly the whole machine. The richness of computing comes not from a
+large instruction set but from combining a small one in long sequences.
+
+\begin{prgconcept}
+A register is a tiny, extremely fast storage location inside the processor that
+holds one 32-bit value. The processor can only compute on values that are in
+registers. To work on a value stored in memory, you must first \emph{load} it
+into a register; to keep a result, you must \emph{store} it back to memory.
+\end{prgconcept}
+
+The thirty-two registers have conventional roles, fixed not by the hardware but
+by an agreement called the \emph{calling convention} or \emph{ABI}. Following the
+convention is what lets your assembly code and the framework's C code call each
+other. Table~\ref{tab:registers} shows the registers you will actually use; the
+full convention is in Appendix~\ref{app:api}.
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}llX@{}}
+\toprule
+Register & Name & Role in this book \\
+\midrule
+\reg{a0}--\reg{a7} & arguments & values passed into and out of calls; \reg{a0} also holds the return value \\
+\reg{t0}--\reg{t6} & temporaries & scratch values; a call may destroy them \\
+\reg{s0}--\reg{s11} & saved & values a call promises to preserve \\
+\reg{ra} & return address & where a \code{ret} jumps back to \\
+\reg{sp} & stack pointer & top of the stack; kept 16-byte aligned \\
+\reg{zero} & zero & always reads as 0 \\
+\bottomrule
+\end{tabularx}
+\captionof{table}{The \riscv registers you will use, and their agreed roles
+\citep{prg32abi}.}
+\label{tab:registers}
+\end{center}
+
+\begin{prgconcept}
+The \textbf{calling convention} is an agreement about which registers carry
+arguments (\reg{a0}--\reg{a7}), which carry results (\reg{a0}), and which survive
+a function call (\reg{s0}--\reg{s11}, but not \reg{t0}--\reg{t6}). \prg follows the
+standard \riscv convention, which is exactly why an assembly game can call a C
+helper such as \code{prg32\_gfx\_clear} \citep{prg32tutorial}.
+\end{prgconcept}
+
+\section{The smallest program that runs}
+
+Recall the three-function contract from Chapter~\ref{ch:platform}. The smallest
+legal \prg game provides \code{init}, \code{update}, and \code{draw} that each do
+nothing but return. In \riscv assembly, ``return'' is the instruction \code{ret},
+and ``do nothing else'' is simply not writing anything else. We name our game
+\code{hello} and give every symbol that prefix.
+
+\lstinputlisting[
+    style=asm,
+    caption={%
+        \fname{hello\_world\_asm.S} \protect\\
+        The smallest \prg assembly game: three functions that return immediately.
+        Build it, confirm it runs, then add to it.%
+    }
+]{examples/asm_first_contact/hello_world_asm.S}
+
+A few details deserve explanation. The directive \code{.option norelax} tells the
+assembler not to apply an optimisation that can interfere with the way \prg
+cartridges are linked; every example begins with it \citep{prg32tutorialgraphic}.
+The \code{.section .text} directive says that what follows is executable code, as
+opposed to data. The \code{.global} directives make the three symbols visible to
+the framework, which must find them by name. Without \code{.global}, your
+functions would exist but the loader could not see them.
+
+\begin{prgcheck}
+Build this skeleton for QEMU and confirm it runs without crashing. You will see
+no game yet: that is correct. The achievement is that the framework found your
+three functions, called them, and survived. Chapter~\ref{ch:firstbuild} has the exact
+build commands for your operating system; Appendix~\ref{app:worked} shows this
+skeleton wired into the firmware.
+\end{prgcheck}
+
+\section{Cartridge building and uploading}
+
+The repository contains a quick-start guide in \fname{README.md} and documentation
+in the \fname{docs/} folder. For convenience, scripts and tools are provided to
+build cartridges, stage them for QEMU, or upload them to a board over Wi\-Fi.
+
+\subsection{ESP32-C6 hardware}
+
+To upload a cartridge to a real board, build it first and then use the included
+Python tool. Note that the board IP is \code{192.168.4.1} by default.
+
+\begin{lstlisting}[style=bash,caption={Examples: build and upload (Wi-Fi and QEMU)}]
+python3 tools/prg32_game.py build <PATH_IN.S|c> \ 
+--out <PATH_OUT.prg32> \
+--firmware-elf build-esp32c6/PRG32.elf \
+--entry-prefix <CARTRIDGE_PREFIX> \
+--name <CARTRIDGE_NAME> \
+
+python3 tools/prg32_game.py upload <PATH_OUT.prg32> --url http://192.168.4.1
+\end{lstlisting}
+
+\subsection{QEMU}
+
+To stage a cartridge for QEMU, build it, inject it into the image, and then
+launch the emulator.
+
+\begin{lstlisting}[style=bash,caption={Build and upload a cartridge to QEMU}]
+./scripts/cartridge/build_cartridge.sh <PATH_IN.S|c> <PATH_OUT.prg32> <GAME_PREFIX>
+./scripts/qemu/qemu_inject_cartridge.sh <PATH_OUT.prg32>
+./scripts/qemu/launch_qemu.sh
+\end{lstlisting}
+
+These commands work on both macOS and Linux. For additional details, see
+\fname{README.md} and the files in \fname{docs/} (for example \fname{docs/qemu.md}).
+
+\begin{prgtargets}
+\textbf{Both targets.} The cartridge format is identical; what changes is the
+firmware ELF you build against (\fname{build-esp32c6} versus \fname{build-qemu})
+and the delivery (\code{upload} over Wi-Fi versus \code{upload-qemu} into the
+flash image). Your game source is byte-for-byte the same in both cases
+\citep{prg32qemu}.
+\end{prgtargets}
+
+\begin{prgwarn}
+Build the cartridge against the matching firmware ELF. A cartridge built against
+\fname{build-esp32c6/PRG32.elf} resolves the framework symbols at the addresses
+the board firmware uses; staging that same cartridge into a QEMU image built at
+different addresses will not work. Build for the target you intend to run on.
+\end{prgwarn}
+
+\section{Simple instructions and program structure}
+
+A working program is built from a few very small operations. These
+operations are provided by the RISC-V Instruction Set Architecture \citep{riscvisa}.
+We will now introduce the foundational operations you need for writing
+your first programs.
+
+\subsection{Arithmetic and bit operations}
+
+The first group is the arithmetic and bitwise instructions. In a real program
+these are used to update counters, combine values, compute flags, and prepare
+arguments for later work. They all read values from registers and write the
+result back into a register. The result is stored in the first register.
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}lXl@{}}
+\toprule
+Instruction & What it does & Example \\
+\midrule
+\code{add} & Add two registers & \code{add t0, t1, t2} \\
+\code{sub} & Subtract one register from another & \code{sub t0, t1, t2} \\
+\code{xor} & Bitwise exclusive-or of two registers & \code{xor t0, t1, t2} \\
+\code{or} & Bitwise OR of two registers & \code{or t0, t1, t2} \\
+\code{and} & Bitwise AND of two registers & \code{and t0, t1, t2} \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+The RISC-V ISA also provides immediate forms of many of these operations.
+These instructions take one register operand and one small constant, which is
+useful for adding a fixed amount or applying a fixed mask in one step.
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}lXl@{}}
+\toprule
+Instruction & What it does & Example \\
+\midrule
+\code{addi} & Add a register and a constant & \code{addi t0, t1, 4} \\
+\code{xori} & Exclusive-or a register with a constant & \code{xori t0, t1, 1} \\
+\code{ori} & OR a register with a constant & \code{ori t0, t1, 0xff} \\
+\code{andi} & AND a register with a constant & \code{andi t0, t1, 7} \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\subsection{Load and store word}
+
+A second group of instructions moves whole 32-bit values between memory and
+registers. In a real program these are the only instructions that touch the
+state stored in the program data; they let the program remember values
+from one frame to the next.
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}lXl@{}}
+\toprule
+Instruction & What it does & Example \\
+\midrule
+\code{lw} & Load a 32-bit word from memory into a register & \code{lw t0, 0(t1)} \\
+\code{sw} & Store a 32-bit word from a register into memory & \code{sw t0, 0(t1)} \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+Each load or store combines a register holding a memory address with a small
+constant offset. That makes it easy to access fields inside a data structure or
+variables laid out in memory. You can use a zero offset when you don't need it.
+
+\subsection{Pseudo-instructions}
+
+The final group is the pseudo-instructions. They are not separate hardware
+operations; instead, they are convenient shortcuts that the assembler expands 
+into one or more real instructions. In everyday code they make assembly 
+easier to read and write.
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}lXl@{}}
+\toprule
+Pseudo & What it does & Example \\
+\midrule
+\code{la} & Load the address of a symbol into a register & \code{la a0, title} \\
+\code{li} & Load a constant value into a register & \code{li t0, 42} \\
+\code{mv} & Copy one register to another & \code{mv t0, t1} \\
+\code{not} & Bitwise complement of a register & \code{not t0, t1} \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+In practice, \code{la} is used whenever a program needs the address of a string
+or a data variable. \code{li} is used to load a number directly into a register
+without first storing it in memory. \code{mv} is simply a copy, and \code{not}
+computes the one’s complement of a register value.
+
+With these instruction families, the RISC-V ISA provides the basic operations a
+program needs: arithmetic and bitwise logic, memory load/store, and the
+pseudo-instructions that make assembly manageable. The next section shows how
+this instruction set is used when your assembly calls into the framework.
+
+\section{Calling a C helper: the stack frame}
+A game that only returns is not interesting for long. The first useful thing we
+can do is print text, using the framework's console. The console is written in C,
+so calling it means crossing the boundary between your assembly and the
+framework's C, and that boundary has one rule a beginner must internalise.
+
+When you execute \code{call}, the processor records, in the register \reg{ra},
+the address it should return to. But the C function you are calling will itself
+use \reg{ra} for its own calls, overwriting yours. If you do nothing to protect
+your \reg{ra}, then when your function tries to \code{ret}, it will jump to the
+wrong place and your program will misbehave or crash. The solution is to save
+\reg{ra} on the \emph{stack} before the call and restore it afterwards.
+
+\begin{prgconcept}
+The \textbf{stack} is a region of memory that grows downward and is used to save
+values across function calls. Before calling a C helper, an assembly function
+lowers the stack pointer \reg{sp} to make room, stores \reg{ra} there, makes its
+call, then loads \reg{ra} back and raises \reg{sp}. This save/restore pair is the
+single most important habit in \riscv assembly.
+\end{prgconcept}
+
+Here is the pattern, which you will repeat in nearly every function:
+
+\lstinputlisting[
+    style=asm,
+    caption={%
+        \fname{print\_asm.S} \protect\\
+        The stack-frame idiom. Save \reg{ra}, do work that may call C, restore \reg{ra}, return.%
+    }
+]{examples/asm_first_contact/print_asm.S}
+
+
+Read this slowly, because it contains five distinct ideas. The \code{addi sp, sp,
+-16} subtracts sixteen from the stack pointer, reserving sixteen bytes; we use a
+multiple of sixteen because the convention requires \reg{sp} to stay 16-byte
+aligned across calls \citep{prg32abi}. The \code{sw ra, 12(sp)} stores the word in
+\reg{ra} at an offset of twelve bytes above the new stack top. The \code{la a0,
+title} loads the \emph{address} of our string into \reg{a0}, because the
+convention puts the first argument in \reg{a0} and the console function expects a
+pointer. The two \code{call} instructions invoke C helpers. Finally the load and
+\code{addi} undo the save and the reservation, in the reverse order, before
+\code{ret}.
+
+\begin{prgwarn}
+Forgetting \code{sw ra} before a \code{call}, or \code{lw ra} after it, is the
+classic first bug. The symptom is a function that ``returns to the wrong place'':
+the program jumps somewhere unexpected, often crashing. If your assembly behaves
+strangely around a call, check the \reg{ra} save/restore pair first
+\citep{prg32tutorialascii}.
+\end{prgwarn}
+
+\begin{prgaside}
+Why does the stack grow \emph{downward}, toward smaller addresses? It is a
+convention almost as old as the stored-program computer, and it lets the stack
+and the program's data grow toward each other from opposite ends of memory,
+making the most of a fixed address space. Subtracting from \reg{sp} to allocate,
+and adding to free, follows directly from that choice.
+\end{prgaside}
+
+\section{Assembly sections: the anatomy of a program}
+
+When writing assembly, you must explicitly tell the assembler how to categorize different 
+parts of your program using directives. The \code{.section} keyword is the switch that selects 
+where the following code or data belongs: \code{.data} for mutable state, \code{.rodata} for constants, 
+and \code{.text} for executable instructions. The \code{.data} section is for mutable state—variables 
+like our counter that the program must modify during execution. Conversely, \code{.rodata} stands for 
+``read-only data'' and is reserved for constants, such as our game title string. On physical hardware, 
+placing constants in \code{.rodata} allows the toolchain to keep them safely locked in flash memory so 
+they cannot be accidentally overwritten by a bug.
+
+The very first directive in a PRG example is often \code{.option norelax}. That tells the assembler 
+not to apply its relaxation pass, so it does not rewrite certain branch or symbol addresses later. 
+For PRG32 cartridges, the exact layout of code and data matters, and \code{.option norelax} helps keep 
+that layout predictable.
+
+While section directives dictate \emph{where} data lives in memory, the \code{.global} directive 
+dictates \emph{who} can see it. By default, every label you define in an assembly file is strictly 
+private to that file. By marking a label as \code{.global}, you export it into the project's global 
+symbol table. This step is what bridges your assembly code to the rest of the ecosystem, explicitly 
+giving the game framework permission to locate, link against, and jump into your functions from the outside.
+
+\section{Values in memory: the \code{.data} section}
+
+A game must remember things between frames: where the ball is, what the score
+is. In assembly, persistent values live in the \code{.data} section, each given a
+label and an initial value. This is the assembly equivalent of a global variable.
+For ASCII Pong, the platform's example declares its state exactly this way
+\citep{prg32repo}:
+
+\lstinputlisting[
+    style=asm,
+    caption={%
+        \fname{game\_state\_data.S} \protect\\
+        Game state in \code{.data}. Each label names a memory location holding one 32-bit word.%
+    }
+]{examples/asm_first_contact/game_state_data.S}
+
+To use such a value you do two things, and the distinction between them is the
+crux of understanding memory. First you load the \emph{address} of the label into
+a register with \code{la}. Then you load the \emph{value} at that address with
+\code{lw}, or store a new value with \code{sw}.
+
+\lstinputlisting[
+    style=asm,
+    caption={%
+        \fname{load\_modify\_store.S} \protect\\
+        The load--modify--store cycle: read a value from memory, change it in a register, write it back.%
+    }
+]{examples/asm_first_contact/load_modify_store.S}
+
+\begin{prgconcept}
+A label such as \code{hello\_x} names a \emph{location} in memory. \code{la t0,
+hello\_x} puts that location's address in \reg{t0}; \code{lw t1, 0(t0)} reads the
+\emph{contents} of that location into \reg{t1}. The processor computes only on
+contents, in registers, then writes results back. This load--modify--store cycle
+is how every variable in every program ultimately works.
+\end{prgconcept}
+
+\begin{prgwarn}
+Keep the two clearly apart in your mind: \reg{t0} holds an \emph{address}, \reg{t1}
+holds a \emph{value}. Confusing them, using an address where a value belongs, or
+vice versa, produces wrong numbers and is one of the most common beginner errors.
+A useful habit, used throughout the platform's examples, is to comment each
+register with whether it holds an address or a value.
+\end{prgwarn}
+
+\section{Putting it together: a console game that ticks}
+
+We now have every piece needed for a minimal but genuine program: an \code{init}
+that prints a title, an \code{update} that advances a counter each frame, and a
+\code{draw} that prints the score to screen.
+We also included a short beep sound that works with the \code{prg32\_audio\_beep} call.
+\citep{prg32tutorialascii}.
+
+\lstinputlisting[
+    style=asm,
+    caption={%
+        \fname{counter.S} \protect\\
+        A counter example that displays an incrementing score.%    
+    }
+]{examples/asm_first_contact/counter.S}
+
+This short program demonstrates the core design pattern of every game on this platform. 
+Notice how the work is split across distinct phases: \code{counter\_update} handles the logic 
+by modifying our variable in memory, while \code{counter\_draw} focuses purely on presentation. 
+This separation of concerns is fundamental; it ensures that your game mechanics remain entirely 
+independent of how or when the screen is drawn.
+
+The program also highlights how data types behave at the machine level through our choice 
+of console helpers. While \code{prg32\_console\_write} requires the memory address of a null-terminated 
+ASCII string, \code{prg32\_console\_hex32} takes a raw 32-bit numeric value directly in \reg{a0}. It 
+reads the content of the register itself and formats that raw integer into human-readable text 
+on the fly. Confusing these two---passing a raw number where an address is expected---is a classic 
+recipe for a crash.
+
+Finally, look at the entry and exit points of all three functions. Every single one opens 
+with an identical prologue to lower \reg{sp} and save \reg{ra}, and closes with a matching 
+epilogue to restore them. Because every function here uses a \code{call} instruction to hand 
+off work to the framework, they would all overwrite their own return path without this defensive 
+housekeeping.
+
+\begin{prgtargets}
+\textbf{Both targets.} On QEMU you will see the title on the serial monitor; the
+beep is accepted but silent because the emulator does not model the buzzer. On the
+ESP32\nobreakdash-C6 you will additionally hear the beep through the buzzer. The
+\emph{source is identical}; only the build directory and configuration profile
+differ, as shown in Chapter~\ref{ch:platform}.
+\end{prgtargets}
+
+\begin{prgtry}
+Change the beep frequency from \code{440} to \code{880} and rebuild. On the board,
+the tone rises by an octave. Then change the increment in \code{hello\_update}
+from \code{1} to \code{2} and predict, before running, what the counter does.
+Verify your prediction. This ``change one thing, predict, verify'' loop is the
+method of the entire book \citep{prg32repo}.
+\end{prgtry}
+
+\begin{prgcheck}
+You should now be able to build and run an assembly program on at least QEMU;
+explain why \reg{ra} must be saved before a \code{call}; explain the difference
+between \code{la} and \code{lw}; and describe what the \code{.data}, \code{.text},
+and \code{.rodata} sections are for. If any of these is shaky, re-read the
+relevant section before Chapter~\ref{ch:asm2}; everything ahead builds on them.
+\end{prgcheck}

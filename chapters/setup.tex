@@ -1,0 +1,255 @@
+\chapter{Setting Up Your Development Environment}
+\label{ch:firstbuild}
+
+This chapter helps you get a built, runnable \prg on Windows,
+Linux, or macOS. The instructions follow the platform's own setup guides
+\citep{prg32repo}. The common foundation on every operating system is the same:
+install Espressif's ESP-IDF, the development framework for these \riscv
+microcontrollers, then build the firmware for your chosen target. Pick your
+operating system's section, then read the shared sections on QEMU and the build
+commands.
+
+\section{The one idea behind every setup}
+
+Whatever your operating system, the toolchain is ESP-IDF version 5.3 or newer,
+configured for the \code{esp32c3} and \code{esp32c6} targets: the first for the
+QEMU emulator, the second for the physical board \citep{prg32repo,prg32qemu}. Once
+ESP-IDF is installed and "sourced" (made active in your shell), the command
+\code{idf.py} builds, flashes, and runs everything. Almost every setup problem
+reduces to ESP-IDF not being active in the current shell.
+
+\begin{prgwarn}
+ESP-IDF must be activated in \emph{each new terminal} before \code{idf.py} works.
+If you see \code{idf.py: command not found} or a missing \code{riscv32-esp-elf-gcc},
+ESP-IDF is simply not sourced in that shell. This is the single most common
+setup error, and the fix is always the same: re-run the export step
+\citep{prg32repo}.
+\end{prgwarn}
+
+\section{Environment installation}
+
+Install ESP-IDF and any platform prerequisites first. After ESP-IDF is active,
+\code{idf.py} becomes available in the shell and the rest of this workflow can
+run.
+
+\subsection{Windows}
+
+The platform recommends a classroom path built on Visual Studio Code with the
+Espressif ESP-IDF extension, which installs the toolchain for you, plus the
+PlatformIO and Microsoft C/C++ and Python extensions \citep{prg32repo}. There is
+also a standalone path using the official ESP-IDF Tools Installer, after which you
+work from the "ESP-IDF PowerShell" shortcut it creates.
+
+\lstinputlisting[
+    style=bash,
+    caption={%\fname{windows\_setup.sh} \protect\
+       Windows standalone path, run from the ESP-IDF PowerShell shortcut.}
+]{scripts/setup/windows_setup.sh}
+
+\begin{prgwarn}
+On Windows, use the ESP-IDF PowerShell or ESP-IDF Command Prompt, not a plain
+terminal where \code{idf.py} has not been exported. If flashing fails, check Device
+Manager for the board's serial port and pass it explicitly with \code{-p COMx}; if
+the monitor cannot open the port, close every other program using it (Arduino
+Serial Monitor, other ESP-IDF monitors, and so on) \citep{prg32repo}.
+\end{prgwarn}
+
+\subsection{Linux}
+
+On Debian or Ubuntu, install the build prerequisites with the system package
+manager, then ESP-IDF as above \citep{prg32repo}. Other distributions use their own
+package names for the equivalent libraries.
+
+\lstinputlisting[
+    style=bash,
+    caption={%\fname{linux\_prereqs.sh} \protect\
+       Linux (Debian/Ubuntu) prerequisites, then ESP-IDF.}
+]{scripts/setup/linux_prereqs.sh}
+
+\subsection{macOS}
+
+The platform's macOS path, tested on Apple Silicon, installs the prerequisites with
+Homebrew and then ESP-IDF \citep{prg32repo}.
+
+\lstinputlisting[
+    style=bash,
+    caption={%\fname{macos\_setup.sh} \protect\
+       macOS setup with Homebrew and ESP-IDF.}
+]{scripts/setup/macos_setup.sh}
+
+A convenient habit is an alias so a single word activates ESP-IDF in any shell
+\citep{prg32repo}.
+
+\lstinputlisting[
+    style=bash,
+    caption={%\fname{alias\_activate\_idf.sh} \protect\
+       A quality-of-life alias for activating ESP-IDF.}
+]{scripts/setup/alias_activate_idf.sh}
+
+\section{Physical board install}
+
+The physical ESP32\nobreakdash-C6 board uses the ESP-IDF toolchain for the
+\code{esp32c6} target. Make sure your board is connected, ESP-IDF is active, and
+you have serial-port access configured for your OS.
+
+\subsection{Windows}
+
+Use the ESP-IDF PowerShell or ESP-IDF Command Prompt created by the installer.
+Once ESP-IDF is active, the same firmware build and flash commands work.
+
+\subsection{Linux}
+
+To flash a real board, your user must be allowed to use the serial port. Add
+yourself to the \code{dialout} group, then log out and back in
+\citep{prg32repo}.
+
+\lstinputlisting[
+    style=bash,
+    caption={%\fname{linux\_serial\_access.sh} \protect\
+       Granting serial-port access on Linux.}
+]{scripts/setup/linux_serial_access.sh}
+
+\begin{prgaside}
+ESP32\nobreakdash-C6 boards usually appear as \fname{/dev/ttyACM0}, while USB-bridge boards may
+appear as \fname{/dev/ttyUSB0} \citep{prg32repo}. If flashing fails although the
+board is visible, the cause is almost always the \code{dialout} membership not yet
+taking effect. Log out and back in after adding yourself to the group.
+\end{prgaside}
+
+\subsection{macOS}
+
+On macOS, once ESP-IDF is active the physical board flash workflow is the same as
+on the other platforms. Use the native serial device exposed by the board and
+flash it from an active ESP-IDF shell.
+
+\subsection{Build and flash}
+
+With ESP-IDF active, build and flash the firmware for the physical board using the
+following commands. On the \textbf{physical board}, the resident firmware starts its own Wi-Fi access
+point named \code{PRG32}. You connect your computer to that network and upload the
+cartridge over HTTP; the firmware stores it and runs it, no reflashing required.
+
+\lstinputlisting[
+    style=bash,
+    caption={%\fname{flash\_board.sh} \protect\
+       Building and flashing for the physical ESP32\nobreakdash-C6 board.}
+]{scripts/setup/flash_board.sh}
+
+\section{QEMU install}
+
+Installing QEMU lets you run the PRG32 platform on the desktop using the
+\code{esp32c3} target.
+
+Linux and MacOS hosts need a few native libraries for the QEMU display window
+\citep{prg32qemu}.
+
+\subsection{macOS}
+
+\lstinputlisting[
+    style=bash,
+    caption={%
+       QEMU window libraries for MacOS.}
+]{scripts/setup/qemu_window_libs_macos.sh}
+
+\subsection{Linux}
+
+\lstinputlisting[
+    style=bash,
+    caption={%
+       QEMU window libraries for Linux.}
+]{scripts/setup/qemu_window_libs_linux.sh}
+
+\subsection{Install the Risc-V QEMU tool}
+
+Install Espressif's \riscv QEMU after ESP-IDF, then re-activate ESP-IDF so the
+new tool is on the path \citep{prg32qemu}.
+
+\lstinputlisting[
+    style=bash,
+    caption={%\fname{install\_qemu.sh} \protect\
+       Installing the RISC-V QEMU tool and re-activating ESP-IDF.}
+]{scripts/setup/install_qemu.sh}
+
+\section{Build and run}
+
+You will build every game for two targets. The commands differ only in a build
+directory and a configuration profile; the source does not change at all
+\citep{prg32qemu}. Make sure that ESP-IDF 
+is active by sourcing \code{export.sh} in the \code{esp-idf} directory.
+
+For the \textbf{physical ESP32\nobreakdash-C6 board}, the build uses a directory named
+\fname{build-esp32c6} and the board configuration profile. 
+
+\lstinputlisting[
+    style=bash,
+    caption={%
+        \fname{building\_and\_flashing\_esp32c6.sh} \protect\\
+        Building and flashing for the physical board (abbreviated; see Chapter~\ref{ch:firstbuild}).%
+    }
+]{scripts/setup/building_and_flashing_esp32c6.sh}
+
+For the \textbf{QEMU emulator}, the build uses \fname{build-qemu} and the QEMU
+profile, and targets the ESP32\nobreakdash-C3 emulator. On \textbf{QEMU}, there is no Wi-Fi to upload over, so you build the cartridge
+against the QEMU firmware ELF and stage it directly into the emulator's flash
+image. If the flash image does not yet exist, run QEMU once so ESP-IDF creates it,
+quit, then stage \citep{prg32qemu}.
+
+\subsection{Windows}
+
+\lstinputlisting[
+    style=bash,
+    caption={%
+        \fname{building\_and\_flashing\_qemu\_windows.ps1} \protect\\
+        Building and running for the QEMU emulator on Windows.%
+    }
+]{scripts/setup/building_and_flashing_qemu_windows.ps1}
+
+\subsection{Linux and MacOS}
+
+\lstinputlisting[
+    style=bash,
+    caption={%
+        \fname{building\_and\_flashing\_qemu\_shell.sh} \protect\\
+        Building and running for Linux or MacOS.%
+    }
+]{scripts/setup/building_and_flashing_qemu_shell.sh}
+
+\begin{prgwarn}
+Keep the two build directories strictly separate. Flashing a \fname{build-qemu}
+image to a real board produces a black screen, because the emulator build uses a
+virtual display panel that does not exist on real hardware. If your board shows
+nothing, the first thing to check is that you built in \fname{build-esp32c6}, not
+\fname{build-qemu} \citep{prg32qemu}.
+\end{prgwarn}
+
+\begin{prgaside}
+Why does the emulator target an ESP32\nobreakdash-C3 while the board is an ESP32\nobreakdash-C6? Both
+are \riscv microcontrollers from the same family, and both run the same 32-bit
+\riscv instructions. Espressif maintains a mature QEMU graphics path for the
+ESP32\nobreakdash-C3, so \prg uses it for desktop emulation, while the physical kits are
+built around the newer ESP32\nobreakdash-C6 \citep{prg32qemu}. From your game's point of
+view the difference is invisible: the calling convention and the framework
+interface are identical.
+\end{prgaside}
+
+\section{Confirming it works}
+
+A healthy board boot logs the firmware entering \code{app\_main}, the configured
+display pins, and finally "PRG32 runtime initialized," then shows the splash
+\citep{prg32tutorial}. The platform also ships a smoke test that exercises the whole
+workflow: environment, firmware build, cartridge build, and QEMU staging, and
+prints \code{=== SMOKE TEST PASSED ===} when all is well \citep{prg32repo}.
+
+\lstinputlisting[
+    style=bash,
+    caption={%\fname{smoke\_test.sh} \protect\
+       Running the end-to-end smoke test.}
+]{scripts/setup/smoke_test.sh}
+
+\begin{prgcheck}
+Your environment is ready when, on your operating system, \code{idf.py} runs in an
+ESP-IDF shell, the QEMU build opens a virtual screen reaching "PRG32 runtime
+initialized," and, if you have a board, the firmware flashes and shows its
+splash. With that in place, every chapter and every example in this book is
+buildable on your machine.
+\end{prgcheck}

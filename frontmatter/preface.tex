@@ -31,7 +31,7 @@ The platform that makes this possible is \prg, an open educational runtime for
 emulator that hides the processor behind a comfortable layer. Student code runs
 \emph{natively} as 32-bit \riscv machine code, either on a real ESP32\nobreakdash-C6
 board on the desk or on Espressif's QEMU build on a laptop. The same three
-functions---\code{init}, \code{update}, and \code{draw}---structure every
+functions \code{init}, \code{update} and \code{draw} structure every
 example, whether it is written in hand-tuned assembly or in plain C. Because the
 two language tracks call exactly the same runtime, a teacher can show the same
 game logic at two altitudes: as a C function that reads almost like prose, and as
@@ -61,13 +61,13 @@ or together. The computer architecture track and the computer programming track
 occupy separate parts and never depend on each other's internals, exactly as the
 \prg teaching guide recommends \citep{prg32teaching}. A short shared foundation at
 the start, and a short reunion at the end, are the only places the two paths
-touch. The appendices collect the reference material---the full runtime API, the
+touch. The appendices collect the reference material: the full runtime API, the
 performance-measurement workflow, complete worked examples, the use of GitHub,
 the construction of the physical board, and the configuration of the development
-environment on Windows, Linux, and macOS---so that the chapters can stay focused
+environment on Windows, Linux, and macOS. This way, the chapters can stay focused
 on teaching.
 
 I hope that by the last page a student will not merely have passed two courses,
 but will have built something that moves, makes noise, and runs on a chip they
-can hold in their hand---and will understand, instruction by instruction, why it
+can hold in their hand, and will understand, instruction by instruction, why it
 works.
