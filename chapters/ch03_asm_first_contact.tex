@@ -198,19 +198,40 @@ register with whether it holds an address or a value.
 
 \section{Putting it together: a console game that ticks}
 
-We now have every piece needed for a minimal but genuine game: an \code{init}
+We now have every piece needed for a minimal but genuine program: an \code{init}
 that prints a title, an \code{update} that advances a counter each frame, and a
-\code{draw} that returns (we will draw properly in the next chapter). This is
-deliberately close to the platform's own ASCII Pong skeleton
+\code{draw} that prints the score to screen.
+We also included a short beep sound that works with the \code{prg32_audio_beep} call.
 \citep{prg32tutorialascii}.
 
 \lstinputlisting[
     style=asm,
     caption={%
-        \fname{minimal\_ascii\_game.S} \protect\\
-        A complete, minimal ASCII game.%    
+        \fname{counter.S} \protect\\
+        A counter example that displays an incrementing score.%    
     }
-]{examples/ch03/minimal_ascii_game.S}
+]{examples/ch03/counter.S}
+
+### Anatomy of the Counter Program
+
+This short program demonstrates the core design pattern of every game on this platform. 
+Notice how the work is split across distinct phases: `counter_update` handles the logic 
+by modifying our variable in memory, while `counter_draw` focuses purely on presentation. 
+This separation of concerns is fundamental; it ensures that your game mechanics remain entirely 
+independent of how or when the screen is drawn.
+
+The program also highlights how data types behave at the machine level through our choice 
+of console helpers. While `prg32_console_write` requires the memory address of a null-terminated 
+ASCII string, `prg32_console_hex32` takes a raw 32-bit numeric value directly in \reg{a0}. It 
+reads the content of the register itself and formats that raw integer into human-readable text 
+on the fly. Confusing these two—passing a raw number where an address is expected—is a classic 
+recipe for a crash.
+
+Finally, look at the entry and exit points of all three functions. Every single one opens 
+with an identical prologue to lower \reg{sp} and save \reg{ra}, and closes with a matching 
+epilogue to restore them. Because every function here uses a \code{call} instruction to hand 
+off work to the framework, they would all overwrite their own return path without this defensive 
+housekeeping. 
 
 \begin{prgtargets}
 \textbf{Both targets.} On QEMU you will see the title on the serial monitor; the
