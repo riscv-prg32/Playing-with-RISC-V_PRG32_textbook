@@ -87,7 +87,9 @@ pressed, \reg{t3} is non-zero; if not, it is zero. Testing a button is therefore
 We now assemble a complete \code{update} that moves an object left and right with
 the joystick. The state is a single word in \code{.data}, exactly as in
 Chapter~\ref{ch:asm1}. The routine reads input, tests LEFT and RIGHT, and updates
-the position. This mirrors the platform's ASCII Pong update almost line for line
+the position. For now, we limit the draw to displaying the position on screen.
+In the future, the position will make a graphics object move.
+
 \citep{prg32repo}.
 
 \lstinputlisting[
@@ -107,6 +109,20 @@ becomes \code{21}. The store writes \code{21} back. Next frame it becomes
 \code{22}, and so on. The object slides right as long as RIGHT is held. This kind
 of by-hand trace is the most valuable debugging skill you will build in this
 course.
+
+The code also introduces a tiny performance trick. Instead of redrawing the
+screen on every update, it stores a small flag in \code{text\_update} whenever
+LEFT or RIGHT actually changes \code{game\_x}. The draw routine checks this
+flag and skips the clear/write sequence when nothing moved. In the previous
+chapter, the example redrew continuously, but a real game should avoid doing
+work when the state does not change.
+
+There is also something to notice about the numbers on screen. If you move
+left past zero, the value underflows and the display shows \code{0xffffffff} instead
+of a normal count. If you move right past \code{9}, the console printer keeps
+counting in hexadecimal, so \code{10} appears as \code{a}, \code{11} as
+\code{b}, and so on. That is because we are displaying the 
+32 bit score word is displayed as an hexadecimal value.
 
 \section{Staying on the screen: the boundary clamp}
 
