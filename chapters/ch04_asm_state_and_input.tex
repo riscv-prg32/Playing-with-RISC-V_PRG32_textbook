@@ -156,9 +156,7 @@ graphics Pong clamps the paddle to exactly \code{256} for this reason
 \end{prgwarn}
 
 \begin{prgtry}
-Add the clamp above to your \code{update}. Then deliberately break it: change the
-maximum from \code{39} to \code{60}, rebuild, and hold RIGHT. Watch the object
-leave the visible area. Restore the clamp, rebuild, and confirm it stays. Write
+Add the clamp above to your \code{update}. Write
 one sentence explaining which comparison protects the right edge. This
 break-and-fix exercise is taken directly from the platform's labs
 \citep{prg32tutorialgraphic}.
