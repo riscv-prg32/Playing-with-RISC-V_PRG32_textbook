@@ -11,7 +11,7 @@ void platformer_c_update(void) {
     /* move_speed, jump_speed, gravity, max_fall */
     uint16_t state = prg32_platform_actor_step(&player, input, 2, -7, 1, 5);
     if (state & PRG32_PLATFORM_HAZARD) {
-        prg32_audio_beep(120, 60);                   /* hit a hazard */
+        prg32_buzzer_tone(120, 60, 512);                   /* hit a hazard */
     }
     prg32_platform_camera_follow(&player, 64, 48);   /* scroll the world */
 }

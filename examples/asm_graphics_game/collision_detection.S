@@ -19,7 +19,8 @@ beqz a0, no_overlap       # no overlap: skip the bounce
 # play a sound
 li   a0, 440            # 440 Hz: a short beep on start
 li   a1, 60             # 60 ms duration
-call prg32_audio_beep   # silent on QEMU, audible on the board
+li a2, 512             # buzzer duty cycle
+call prg32_buzzer_tone   # uses the physical buzzer; harmless on QEMU
 
 # reverse direction
 la   t0, ball_dy

@@ -211,7 +211,7 @@ is exactly the test a beginner needs for ``did the ball hit the paddle?''
 
 \section{Sound: a beep when something happens}
 
-Audio in \prg starts as simply as it can: \code{prg32\_audio\_beep(hz, ms)} plays
+Audio in \prg starts as simply as it can: \code{prg32\_buzzer\_tone(hz, ms)} plays
 a tone of a given frequency for a given number of milliseconds \citep{prg32abi}.
 On the physical board this drives a small buzzer; on QEMU the call is accepted but
 silent, because the emulator does not model the buzzer. The framework's own
@@ -220,7 +220,7 @@ collision, a score, a button press. Don't play it on every frame, because a tone
 restarted sixty times a second is an unpleasant buzz rather than a sound effect.
 
 \begin{prgwarn}
-Do not call \code{prg32\_audio\_beep} every frame. Trigger sound on events only.
+Do not call \code{prg32\_buzzer\_tone} every frame. Trigger sound on events only.
 A beep in \code{update} that fires whenever the ball is in flight will play
 continuously; a beep that fires only in the frame where a collision is newly
 detected will sound like a game.
@@ -259,8 +259,8 @@ assembly and C, hardware and emulator \citep{prg32repo}.}
 The cartridge header begins with the magic bytes \code{PRG2} and records, among
 other things, the offsets of the \code{init}, \code{update}, and \code{draw}
 functions, so the firmware knows where to jump \citep{prg32cartfmt}. You will not
-write this header by hand; a tool called \fname{prg32\_game.py} builds it for you,
-and Appendix~\ref{app:api} documents the tool's command line. For now the
+write this header by hand; \code{python3 -m prg32 cartridge build} builds it for you,
+and Chapter~\ref{ch:firstbuild} shows the build workflow. For now the
 important idea is conceptual: a cartridge is your three functions, compiled to
 native code, wrapped in just enough metadata for the firmware to run them.
 

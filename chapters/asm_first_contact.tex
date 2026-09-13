@@ -102,14 +102,12 @@ build cartridges, stage them for QEMU, or upload them to a board over Wi\-Fi.
 To upload a cartridge to a real board, build it first and then use the included
 Python tool. Note that the board IP is \code{192.168.4.1} by default.
 
-\begin{lstlisting}[style=bash,caption={Examples: build and upload (Wi-Fi and QEMU)}]
-python3 tools/prg32_game.py build <PATH_IN.S|c> \ 
---out <PATH_OUT.prg32> \
---firmware-elf build-esp32c6/PRG32.elf \
---entry-prefix <CARTRIDGE_PREFIX> \
---name <CARTRIDGE_NAME> \
-
-python3 tools/prg32_game.py upload <PATH_OUT.prg32> --url http://192.168.4.1
+\begin{lstlisting}[style=bash,caption={Build and upload a portable cartridge to the board}]
+python3 -m prg32 cartridge build examples/games/pong/graphics/game.S \
+  --portable --entry-prefix pong_graphics --name pong \
+  --architecture esp32c6 --out build-esp32c6/pong.prg32
+python3 -m prg32 esp32c6 upload build-esp32c6/pong.prg32 \
+  --url http://192.168.4.1
 \end{lstlisting}
 
 \subsection{QEMU}
@@ -117,19 +115,21 @@ python3 tools/prg32_game.py upload <PATH_OUT.prg32> --url http://192.168.4.1
 To stage a cartridge for QEMU, build it, inject it into the image, and then
 launch the emulator.
 
-\begin{lstlisting}[style=bash,caption={Build and upload a cartridge to QEMU}]
-./scripts/cartridge/build_cartridge.sh <PATH_IN.S|c> <PATH_OUT.prg32> <GAME_PREFIX>
-./scripts/qemu/qemu_inject_cartridge.sh <PATH_OUT.prg32>
-./scripts/qemu/launch_qemu.sh
+\begin{lstlisting}[style=bash,caption={Build and stage a portable cartridge for QEMU}]
+python3 -m prg32 cartridge build examples/games/pong/graphics/game.S \
+  --portable --entry-prefix pong_graphics --name pong \
+  --architecture qemu --out build-qemu/pong.prg32
+python3 -m prg32 qemu upload build-qemu/pong.prg32
+python3 -m prg32 qemu run
 \end{lstlisting}
 
 These commands work on both macOS and Linux. For additional details, see
-\fname{README.md} and the files in \fname{docs/} (for example \fname{docs/qemu.md}).
+\fname{README.md} and the files in \fname{docs/} (for example \fname{docs/usage/qemu.md}).
 
 \begin{prgtargets}
 \textbf{Both targets.} The cartridge format is identical; what changes is the
 firmware ELF you build against (\fname{build-esp32c6} versus \fname{build-qemu})
-and the delivery (\code{upload} over Wi-Fi versus \code{upload-qemu} into the
+and the delivery (\code{upload} over Wi-Fi versus \code{qemu upload} into the
 flash image). Your game source is byte-for-byte the same in both cases
 \citep{prg32qemu}.
 \end{prgtargets}

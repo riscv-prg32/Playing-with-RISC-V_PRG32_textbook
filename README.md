@@ -76,3 +76,7 @@ License. If you use PRG32 in coursework, cite it via the repository's
 - The book compiles cleanly with no errors and no overfull boxes.
 - Every code example in the book is designed to run on both the QEMU emulator
   (ESP32-C3 graphics target) and the physical ESP32-C6 board.
+
+## Staying aligned with PRG32
+
+The [PRG32 `main` branch](https://github.com/riscv-prg32/PRG32) is the source of truth for the runtime API and current build commands. Before a course, check the [getting-started guide](https://github.com/riscv-prg32/PRG32/blob/main/docs/usage/getting_started.md), [cartridge guide](https://github.com/riscv-prg32/PRG32/blob/main/docs/software/cartridges.md), and [public header](https://github.com/riscv-prg32/PRG32/blob/main/components/prg32/include/prg32.h). The textbook examples show the corresponding portable-cartridge workflow.
