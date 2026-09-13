@@ -197,8 +197,8 @@ Function & Purpose \\
 \code{prg32\_console\_clear()} & clear the text console \\
 \code{prg32\_console\_write(s)} & write a string to the console \\
 \code{prg32\_console\_hex32(v)} & write a 32-bit value in hexadecimal \\
-\code{prg32\_audio\_beep(hz,ms)} & play a tone (event sounds only) \\
-\code{prg32\_audio\_note(midi,ms)} & play a MIDI note for a duration \\
+\code{prg32\_buzzer\_tone(hz,ms,duty)} & play a tone (event sounds only) \\
+\code{prg32\_audio\_note(channel,instrument,note,volume,ms)} & play a MIDI note for a duration \\
 \bottomrule
 \end{tabularx}
 \captionof{table}{Console and basic sound calls. Sound is audible on the board and

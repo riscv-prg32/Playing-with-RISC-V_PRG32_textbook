@@ -56,7 +56,7 @@ void pong_skeleton_update(void) {
             ball_x, ball_y, 8, 8,
             paddle_x, 188, 64, 8)) {
         /* Match the assembly: beep and only reverse dy when the ball is moving down. */
-        prg32_audio_beep(440, 60);
+        prg32_buzzer_tone(440, 60, 512);
         if (ball_dy > 0) {
             ball_dy = -ball_dy;
         }

@@ -1,2 +1,3 @@
-idf.py -B build-qemu -D SDKCONFIG_DEFAULTS=sdkconfig.defaults.qemu set-target esp32c3
-idf.py -B build-qemu -D SDKCONFIG_DEFAULTS=sdkconfig.defaults.qemu qemu --graphics monitor
+# Run from the PRG32 repository root in an ESP-IDF PowerShell.
+python -m prg32 qemu build
+python -m prg32 qemu run
