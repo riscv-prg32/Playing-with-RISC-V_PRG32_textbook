@@ -140,6 +140,18 @@ function readListing(src, range) {
   while (lines.length && !lines[lines.length - 1].trim()) lines.pop();
   return lines;
 }
+function wrapListing(lines, cwid, ch) {
+  // Soft-wrap over-long lines at a space, at the largest font for which the result still fits.
+  for (const pt of [12.5, 11.5, 10.5, 10]) {
+    const maxCols = Math.floor((cwid - 0.55) * 72 / (pt * 0.635)), out = [];
+    for (const l of lines) {
+      const indent = (l.match(/^\s*/) || [""])[0] + "    ", cut = l.length > maxCols ? l.lastIndexOf(" ", maxCols) : -1;
+      if (cut > indent.length) out.push(l.slice(0, cut), indent + l.slice(cut + 1)); else out.push(l);
+    }
+    if (out.length * pt * 1.2 / 72 <= ch - 0.4 || pt === 10) return out;
+  }
+  return lines;
+}
 function commentAt(line, lang) {
   if (lang === "asm") { const i = line.indexOf("#"); return i; }
   if (lang === "sh") { const i = line.search(/(^|\s)#/); return i < 0 ? -1 : i; }
@@ -251,14 +263,7 @@ function build(deck) {
       const s = light(title); let lines = readListing(src, range);
       const lang = /\.[Ss]$/.test(src) ? "asm" : /\.(sh|ps1)$/.test(src) || /^\$|python3 -m|^#!/m.test(src) ? "sh" : "c";
       const side = callouts && callouts.length, cwid = side ? 8.1 : CW, ch = BOT - TOP;
-      const maxCols = Math.floor((cwid - 0.55) * 72 / (10 * 0.635));
-      for (let i = 0; i < lines.length; i++) {       // soft-wrap over-long lines at a space
-        if (lines[i].length > maxCols) {
-          const indent = (lines[i].match(/^\s*/) || [""])[0] + "    ";
-          const cut = lines[i].lastIndexOf(" ", maxCols);
-          if (cut > indent.length) lines.splice(i, 1, lines[i].slice(0, cut), indent + lines[i].slice(cut + 1));
-        }
-      }
+      lines = wrapListing(lines, cwid, ch);
       const longest = Math.max(...lines.map((l) => l.length));
       let fsz = 18;
       while (fsz > 10 && (lines.length * fsz * 1.2 / 72 > ch - 0.4 || longest * fsz * 0.635 / 72 > cwid - 0.55)) fsz -= 0.5;
@@ -404,7 +409,7 @@ function build(deck) {
         let f = fsz; while (text.length * 0.54 * f / 72 + 0.4 > lw - 0.6 - (indent || 0) * 0.45 && f > 10) f -= 0.5;
         const w = Math.min(lw - 0.6 - (indent || 0) * 0.45, text.length * 0.54 * f / 72 + 0.5);
         s.addText(text, { isTextBox: true, shape: pres.ShapeType.roundRect, rectRadius: 0.1, x, y: TOP + 0.2 + i * (bh + 0.08), w, h: bh,
-          fill: { color: col[kind] }, line: { color: P.white, width: 1 }, color: P.white, bold: true, fontFace: BODY, fontSize: f, align: "left", valign: "middle", margin: [0, 8, 0, 10] });
+          fill: { color: col[kind] }, line: { color: P.white, width: 1 }, color: P.white, bold: true, fontFace: BODY, fontSize: f, align: "left", valign: "middle", margin: 7 });
       });
       rows(s, items, MX + lw + 0.4, TOP, CW - lw - 0.4, BOT - TOP);
       notes(s, note);
@@ -413,11 +418,7 @@ function build(deck) {
       const s = light(title); let lines = readListing(src, range);
       const lang = /\.[Ss]$/.test(src) ? "asm" : /\.(sh|ps1)$/.test(src) ? "sh" : "c";
       const cwid = 7.75, ch = BOT - TOP, x2 = MX + cwid + 0.3, w2 = W - MX - x2;
-      const maxCols = Math.floor((cwid - 0.55) * 72 / (10 * 0.635));
-      for (let i = 0; i < lines.length; i++) if (lines[i].length > maxCols) {
-        const indent = (lines[i].match(/^\s*/) || [""])[0] + "    ", cut = lines[i].lastIndexOf(" ", maxCols);
-        if (cut > indent.length) lines.splice(i, 1, lines[i].slice(0, cut), indent + lines[i].slice(cut + 1));
-      }
+      lines = wrapListing(lines, cwid, ch);
       const longest = Math.max(...lines.map((l) => l.length));
       let fsz = 20;
       while (fsz > 9.5 && (lines.length * fsz * 1.2 / 72 > ch - 0.4 || longest * fsz * 0.635 / 72 > cwid - 0.55)) fsz -= 0.5;
@@ -444,7 +445,7 @@ function build(deck) {
       const s = light(title), n = fields.length, capH = caption ? 0.95 : 0, g = 0.07;
       const rh = Math.min(0.62, (BOT - TOP - capH - g * (n - 1)) / n), cols = [P.steel, P.teal, P.violet, P.amber, P.green, P.red];
       let off = base || 0;
-      const fz = Math.min(16, rh * 26);
+      const fz = Math.min(16, rh * 34);
       fields.forEach(([name, size, desc], i) => {
         const y = TOP + i * (rh + g), c = cols[i % 6];
         tx(s, typeof size === "number" ? `+${off}` : "", { x: MX, y, w: 0.9, h: rh, fontFace: MONO, fontSize: fz - 2, color: P.mute, align: "right", valign: "middle" });

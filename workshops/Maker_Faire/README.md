@@ -40,6 +40,10 @@ export PRG32_URL=http://192.168.4.1     # the kit's own Wi-Fi network; omit to u
 ./run.sh 3 3        # Part 3, step 3
 ```
 
+> **QEMU note.** On PRG32 `main` (a8669e5) with ESP-IDF v5.4 the QEMU firmware does not build from a fresh
+> clone (`esp_crt_bundle.h` not found). Until fixed upstream, add the line `mbedtls` to `PRG32_PRIV_REQUIRES`
+> in `components/prg32/CMakeLists.txt`. Kits and PRG32-QT are not affected.
+
 ## Regenerating
 
 ```bash

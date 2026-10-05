@@ -60,6 +60,22 @@ screenshot). The same tool generates the workshop material in `workshops/`.
   `instruction fetch outside cartridge memory`.
 - The publishing lab (Chapter 17) was run end to end against a local Cartridge
   Store; the replies shown on its slides are the real ones.
-- Not verified here: behaviour on a physical board and in QEMU's window, and
-  the interactive PRG32-QT debugger steps (the readings they ask for follow
-  from the source and the calling convention).
+- `labs/run.sh` and both workshop run scripts were run through both paths:
+  QEMU (the real firmware boots and logs `loaded cartridge ...`) and a device
+  URL (PRG32-QT 0.4.1: upload, run, screenshot).
+- The debugger lab was single-stepped in PRG32-QT 0.4.1 through its
+  `/api/debug` interface; the addresses and values on its slides are the
+  recorded ones.
+- The Construction Kit steps (Play, Step with a held key, Generate C, Compile
+  Cartridge) and the Store's browser pages (register, complete, tokens,
+  publish) were exercised on local instances.
+- Every deck was opened in Microsoft PowerPoint and exported to PDF.
+- Not verified: a physical PRG32 board (none was connected), and readings that
+  need a key held inside the PRG32-QT window.
+
+## Known upstream issue
+
+On PRG32 `main` (a8669e5) with ESP-IDF v5.4, `python3 -m prg32 qemu build`
+fails from a fresh clone with `esp_crt_bundle.h: No such file or directory`.
+Until it is fixed upstream, add the line `mbedtls` to `PRG32_PRIV_REQUIRES` in
+`components/prg32/CMakeLists.txt`. The board firmware is not affected.

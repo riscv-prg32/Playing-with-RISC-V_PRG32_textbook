@@ -65,6 +65,10 @@ export PRG32_URL=http://192.168.4.1     # indirizzo della scheda o di PRG32-QT
 Versione Construction Kit: avviare il Kit su un computer raggiungibile dalle
 postazioni (`python app.py`, porta 5090) e scrivere l'indirizzo alla lavagna.
 
+> **Nota (QEMU).** Su PRG32 `main` (a8669e5) con ESP-IDF v5.4 la compilazione del firmware QEMU da un clone
+> pulito si ferma su `esp_crt_bundle.h`. Finché non è corretto a monte, aggiungere la riga `mbedtls` a
+> `PRG32_PRIV_REQUIRES` in `components/prg32/CMakeLists.txt`. Le schede e PRG32-QT non sono interessati.
+
 ## Rigenerare tutto
 
 ```bash
