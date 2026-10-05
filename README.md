@@ -22,38 +22,43 @@ pdflatex main.tex
 pdflatex main.tex
 ```
 
-The result is `main.pdf` (≈108 pages).
+The result is `main.pdf` (about 180 pages).
+
+## What is in the book
+
+| Part | Content | Audience |
+| --- | --- | --- |
+| I | Foundations: why, the framework, setup, PRG32-QT | everyone |
+| II | Computer Architecture track: RISC-V assembly | university |
+| III | Computer Programming track: C | university |
+| IV | Young Makers track: Blocks with the PRG32 Construction Kit, plus a chapter for teachers | ages 7+, teachers |
+| V | Assembly meets C; publishing on the Cartridge Store | everyone |
 
 ## Project layout
 
 ```
 main.tex                 Master document; \input order defines the book
-prg32style.sty           Shared style: palette, code listings, callout boxes
-frontmatter/
-  titlepage.tex          Designed title page
-  copyright.tex          Colophon / licensing / trademarks
-  preface.tex            Preface
-  howtoread.tex          Conventions and the two reading tracks
-  references.bib         Bibliography (BibTeX)
+prg32style.sty           Shared style: palette, code listings, callout boxes, block drawings
+frontmatter/             Title page, colophon, preface, reading guide, bibliography
 chapters/
-  introduction.tex          Why a game, why RISC-V (European IP), why now
-  platform_and_design.tex   Game design principles + the PRG32 framework
-  asm_first_contact.tex     Computer Architecture track (RISC-V assembly)
-  asm_state_and_input.tex   Computer Architecture track (RISC-V assembly)
-  asm_graphics_game.tex     Computer Architecture track (RISC-V assembly)
-  asm_capstone.tex          Computer Architecture track (RISC-V assembly)
-  c_first_contact.tex       Computer Programming track (C)
-  c_structs_and_tiles.tex   Computer Programming track (C)
-  c_capstone.tex            Computer Programming track (C)
-  assembly_meets_c.tex      Reunion: one game, two languages
-appendices/
-  app_api.tex               The PRG32 runtime interface (full API reference)
-  app_performance.tex       Measuring performance like a scientist
-  app_worked_examples.tex   Full working example sources (verbatim)
-  app_github.tex            Using GitHub for coursework
-  app_hardware.tex          Building the physical PRG32 board
-  app_environment.tex       Environment setup (Windows / Linux / macOS)
-examples/                Verbatim PRG32 example sources used by Appendix C
+  introduction.tex              Why a game, why RISC-V (European IP), the ecosystem
+  platform_and_design.tex       Game design principles + the PRG32 framework
+  setup.tex                     Toolchain, targets, profiles
+  prg32qt.tex                   PRG32-QT: a third host with an RV32IMAC debugger
+  asm_*.tex                     Computer Architecture track (4 chapters)
+  c_*.tex                       Computer Programming track (3 chapters)
+  kids_*.tex                    Young Makers track (3 chapters, ages 7+)
+  teaching_construction_kit.tex The Construction Kit, for teachers
+  assembly_meets_c.tex          Reunion: one game, two languages
+  cartridge_store.tex           Publishing: visitor, user, editor, administrator
+appendices/              API reference, performance, worked examples, GitHub, hardware
+examples/                Source files listed in the book
+  blocks_first_steps/    Construction Kit projects (.blocks.json) and their generated C
+  store_publishing/      Bundle manifest and colophon
+  complete/              Full games, including Lemon Catcher in hand-written C
+scripts/                 Shell listings (setup, Store, Construction Kit, PRG32-QT, ...)
+figures/                 Screenshots
+presentations/           Two slide decks per chapter (lecture + lab) and their generator
 ```
 
 ## About the platform
@@ -64,9 +69,13 @@ Naples "Parthenope"), distributed under the MIT License:
 
   https://github.com/riscv-prg32/PRG32
 
-The verbatim source files under `examples/` are reproduced from that
-repository's `examples/games` directory and remain under their original MIT
-License. If you use PRG32 in coursework, cite it via the repository's
+Most source files under `examples/` are reproduced from that repository's
+`examples/games` directory and remain under their original MIT License; the
+Blocks projects, the Lemon Catcher game, and the Store and audio examples were
+written for this book. The companion projects are the
+[Cartridge Store](https://github.com/riscv-prg32/CartridgeStore), the
+[PRG32-Construction-Kit](https://github.com/riscv-prg32/PRG32-Construction-Kit),
+and [PRG32-QT](https://github.com/riscv-prg32/PRG32-QT). If you use PRG32 in coursework, cite it via the repository's
 `CITATION.cff`.
 
 ## Notes
@@ -75,7 +84,15 @@ License. If you use PRG32 in coursework, cite it via the repository's
   `prg32style.sty`; edit colours and styles there in one place.
 - The book compiles cleanly with no errors and no overfull boxes.
 - Every code example in the book is designed to run on both the QEMU emulator
-  (ESP32-C3 graphics target) and the physical ESP32-C6 board.
+  (ESP32-C3 graphics target) and the physical ESP32-C6 board, and, as a
+  portable cartridge, in PRG32-QT.
+- The new C and assembly examples were built with `python3 -m prg32 cartridge
+  build --portable` against PRG32 `main` (cartridge ABI 1.6).
+
+## Slide decks
+
+`presentations/` holds a lecture deck and a lab deck for every chapter; see
+[presentations/README.md](presentations/README.md).
 
 ## Staying aligned with PRG32
 

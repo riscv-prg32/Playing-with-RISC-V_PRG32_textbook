@@ -161,7 +161,7 @@ desktop emulator and the physical board. The emulator, Espressif's QEMU build,
 lets you compile, run, and debug graphics on a laptop with no hardware at all; it
 is ideal for checking layout, movement, timing, and for stepping through code
 with a debugger. The physical ESP32\nobreakdash-C6 board is where the program meets the
-real world: real buttons, a real display, a real buzzer, and wireless cartridge
+real world: real buttons, a real display, a real loudspeaker, and wireless cartridge
 upload \citep{prg32qemu}. The QEMU target is configured as an ESP32\nobreakdash-C3 emulator
 profile because that is the \riscv graphics path Espressif maintains, while the
 hardware is the ESP32\nobreakdash-C6; the \riscv calling convention and the \prg interface
@@ -170,7 +170,7 @@ do not change between them, so the same source builds for both.
 \begin{prgtargets}
 \textbf{Both targets, every example.} Throughout the book this badge marks code
 that has been designed to run unchanged on QEMU and on the ESP32\nobreakdash-C6. Where a
-feature is hardware-only (physical buttons, the buzzer, Wi-Fi upload) or
+feature is hardware-only (physical buttons, the status light, Wi-Fi upload) or
 emulator-only (host-side debugging conveniences), the text says so explicitly.
 \end{prgtargets}
 
@@ -188,15 +188,62 @@ Part~III is the computer programming track, in C. It is structured to parallel
 Part~II without depending on it: the same three-function shape, the same runtime,
 the same two targets, expressed in a high-level language.
 
-Part~IV is a short reunion. Having written games in both languages, you will look
-at the two side by side and see, concretely, what a compiler does.
+Part~IV is the Young Makers track. Three short chapters, written for children
+from about seven years old, build games from blocks in the PRG32 Construction
+Kit, on the same three-function shape and the same runtime; a fourth chapter
+gives their teachers the installation, lesson plans, and assessment they need.
+University readers should at least skim it: the C that the Kit generates from a
+child's blocks is an excellent first reading exercise.
+
+Part~V is the reunion. Having written games in both languages, you will look
+at the two side by side and see, concretely, what a compiler does; and you will
+take a finished cartridge through review to publication on the Cartridge Store.
 
 The appendices are the reference shelf: the complete runtime interface,
 the performance-measurement workflow, full annotated example programs, a guide to
-using GitHub for your coursework, instructions for building the physical board,
-and step-by-step environment setup for Windows, Linux, and macOS. The chapters
-send you to the appendices rather than interrupting the narrative with reference
-tables.
+using GitHub for your coursework, and instructions for building the physical
+board. The chapters send you to the appendices rather than interrupting the
+narrative with reference tables.
+
+\section{The ecosystem around the runtime}
+
+\prg began as a runtime and a cartridge format. Around them four companion
+projects have grown, and this book uses all of them \citep{prg32repo,prg32store,prg32kit,prg32qt}.
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}lXl@{}}
+\toprule
+Project & Role & In this book \\
+\midrule
+\prg & resident firmware, cartridge ABI, \code{python3 -m prg32} tooling, examples & everywhere \\
+Cartridge Store & catalogue with editorial review; scores, metrics, multiplayer relay & Chapter~\ref{ch:store} \\
+PRG32-Construction-Kit & Blocks editor, browser simulator, sprite editor, C generator, publisher & Part~IV \\
+PRG32-QT & portable host for desktop, mobile, and TV, with an RV32IMAC debugger & Chapter~\ref{ch:qt} \\
+\bottomrule
+\end{tabularx}
+\captionof{table}{The \prg ecosystem.}
+\label{tab:ecosystem}
+\end{center}
+
+\begin{center}
+\begin{tikzpicture}[font=\sffamily\scriptsize,node distance=6mm,
+  s/.style={rounded corners=2pt,draw=prgsteel,fill=prgpanel,minimum height=10mm,minimum width=27mm,align=center},
+  h/.style={rounded corners=2pt,draw=prggreen,fill=prggreen!10,minimum height=8mm,minimum width=27mm,align=center},
+  ar/.style={-{Stealth[length=2mm]},draw=prgink!70}]
+  \node[s] (kit) {Construction Kit\\blocks $\to$ C};
+  \node[s,below=of kit] (src) {hand-written\\assembly or C};
+  \node[s,right=10mm of $(kit)!0.5!(src)$] (tool) {\code{prg32} tooling\\\code{.prg32} cartridge};
+  \node[s,right=10mm of tool] (store) {Cartridge Store\\review, catalogue};
+  \node[h,right=10mm of store,yshift=11mm] (b) {ESP32-C6 board};
+  \node[h,right=10mm of store] (q) {Espressif QEMU};
+  \node[h,right=10mm of store,yshift=-11mm] (t) {PRG32-QT};
+  \draw[ar] (kit) -- (tool); \draw[ar] (src) -- (tool); \draw[ar] (tool) -- (store);
+  \draw[ar] (store) -- (b.west); \draw[ar] (store) -- (q.west); \draw[ar] (store) -- (t.west);
+\end{tikzpicture}
+\captionof{figure}{How the pieces fit. Every path ends in the same portable
+cartridge, and every host runs it.}
+\label{fig:ecosystem}
+\end{center}
 
 \begin{prgcheck}
 Before continuing, you should be able to explain, in a sentence or two each: why

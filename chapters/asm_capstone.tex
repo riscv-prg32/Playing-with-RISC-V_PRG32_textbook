@@ -67,13 +67,47 @@ overlaps. This is the same ``act on the event'' discipline as the beep warning i
 Chapter~\ref{ch:platform}.
 \end{prgwarn}
 
+\section{Sound that works everywhere: the mixer call}
+
+The beeps in the earlier chapters used the legacy buzzer helper. The call below
+uses the runtime's mixer, which sounds on the board's amplifier, on QEMU, and in
+PRG32-QT alike. It also shows a pattern worth learning for its own sake:
+detecting the \emph{edge} of a button, the frame in which it goes from released
+to pressed, by comparing this frame's bitmask with the previous one.
+
+\lstinputlisting[style=asm,
+  caption={\fname{examples/asm\_capstone/audio\_note\_event.S}: one note per new
+  press of A. Five arguments, in \reg{a0}--\reg{a4}.}
+]{examples/asm_capstone/audio_note_event.S}
+
+\begin{prgtry}
+Run this cartridge in the PRG32-QT debugger (Chapter~\ref{ch:qt}). Put a
+breakpoint on the \code{beqz}. Hold A and resume twice. Explain, from the values
+of \reg{s0} and \reg{t1}, why the note plays on the first stop and not on the
+second.
+\end{prgtry}
+
 \section{Building a cartridge}
 
 When your firmware has been flashed once and your game source is ready, the
-\fname{prg32\_game.py} tool compiles and packages it into a \fname{.prg32}
-cartridge. The tool needs your source file, the firmware ELF so it can resolve
-the framework symbols your game calls, the entry-point prefix that names your
-three functions, a human-readable name, and an output path \citep{prg32tutorial}.
+command \code{python3 -m prg32 cartridge build} compiles and packages it into a
+\fname{.prg32} cartridge. The tool needs your source file, the \code{--portable}
+flag, the entry-point prefix that names your three functions, a human-readable
+name, and an output path \citep{prg32tutorial}. It no longer needs the firmware
+itself: a portable cartridge calls the framework through the ABI table.
+
+\begin{lstlisting}[style=bash,caption={Building, inspecting, and running your assembly game.}]
+python3 -m prg32 cartridge build work/mygame/game.S \
+  --portable --entry-prefix mygame --name mygame \
+  --out work/mygame/mygame.prg32
+python3 -m prg32 cartridge summary work/mygame/mygame.prg32
+python3 -m prg32 qemu upload work/mygame/mygame.prg32
+python3 -m prg32 qemu run
+\end{lstlisting}
+
+The \code{summary} command prints what the firmware will read: the ABI version
+and hash, the import model, the code and memory sizes, and the feature bits. It
+is the quickest way to confirm that a cartridge is what you think it is.
 
 \begin{prgconcept}
 A cartridge bundles your three compiled functions with a small header that the

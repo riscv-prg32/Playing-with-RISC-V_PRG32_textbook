@@ -10,7 +10,7 @@ chapter: the assembly listings reward the reader of Part~II, the C listings the
 reader of Part~III, and the side-by-side comparison rewards anyone who has read
 Chapter~\ref{ch:join}.
 
-All four programs implement games discussed in the text, and all four are designed
+All the programs implement games discussed in the text, and all are designed
 to run unchanged on both the QEMU emulator and the physical ESP32\nobreakdash-C6, packaged as
 \fname{.prg32} cartridges by the workflow of Appendix~\ref{app:api}
 \citep{prg32qemu}.
@@ -77,9 +77,26 @@ as discussed in Chapter~\ref{ch:asmcap}.
     complete Breakout in C, showing bricks as a bitmask \citep{prg32repo}.%
 }]{examples/complete/breakout_c_game.c}
 
+\section{Lemon Catcher in C}
+
+This listing is not from the \prg repository; it was written for this book. It
+is the game that the Young Makers track builds from blocks in
+Chapter~\ref{ch:kids2}, rewritten by hand: named constants replace the numbers
+typed into blocks, a helper function removes a repetition, the score is printed
+as digits, a round ends after five misses, and the result goes to the
+scoreboard. Set it beside the Kit's generated
+\fname{examples/blocks\_first\_steps/lemon\_catcher.c} and list every difference;
+each one is a decision a programmer made.
+
+\lstinputlisting[style=c,
+caption={%
+    \fname{examples/complete/lemon\_catcher\_c\_game.c} \protect\\
+    Lemon Catcher, hand-written in C.%
+}]{examples/complete/lemon_catcher_c_game.c}
+
 \section{Where to find the rest}
 
-The \code{PRG32} repository contains, for each of the nine example games, an ASCII assembly
+The \code{PRG32} repository contains, for each of its example games, an ASCII assembly
 version, a graphics assembly version, and a C version, alongside focused feature
 demos for scrolling, parallax, animated sprites, and dual playfields
 \citep{prg32repo}. Having read the four listings above, you have the vocabulary to

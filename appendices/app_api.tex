@@ -5,7 +5,11 @@ This appendix is the working reference for the \prg framework calls used
 throughout the book, together with the calling convention, the cartridge tool, and
 the constants you will reach for most often. It catalogues the public interface
 declared in \fname{components/prg32/include/prg32.h} and documented in the
-platform's ABI notes \citep{prg32repo,prg32abi}. It is organised by task rather
+platform's ABI notes \citep{prg32repo,prg32abi}. A cartridge can call exactly the
+functions listed in the portable cartridge ABI (\fname{prg32/abi/prg32\_abi.json};
+version 1.6, 139 entries, at the time of writing). A few functions declared in
+the header are \emph{resident-only}: they belong to the firmware, and a cartridge
+that calls one fails to link with an undefined-symbol error. It is organised by task rather
 than alphabetically, so that you can find a call by what you are trying to do.
 
 \section{The calling convention}
@@ -40,9 +44,10 @@ Register & Role & Preserved across a call? \\
 \toprule
 Function & Purpose \\
 \midrule
-\code{prg32\_init()} & initialise the runtime; call once before the loop \\
 \code{prg32\_ticks\_ms()} & milliseconds since start, for timing and animation \\
+\code{prg32\_random\_number(min,max)} & uniform random value in an inclusive range \\
 \code{prg32\_gfx\_present()} & display the frame you have drawn \\
+\code{prg32\_init()} & initialise the runtime (resident-only; embedded firmware builds) \\
 \bottomrule
 \end{tabularx}
 \captionof{table}{Lifecycle and timing calls.}
@@ -96,10 +101,40 @@ Function & Purpose \\
 \code{prg32\_gfx\_rect(x,y,w,h,color)} & filled rectangle \\
 \code{prg32\_gfx\_text8(x,y,s,fg,bg)} & draw a text string \\
 \code{prg32\_gfx\_present()} & present the finished frame \\
-\code{prg32\_gfx\_lock()} / \code{\_unlock()} & enter / leave the graphics critical section \\
+\code{prg32\_gfx\_set\_fullscreen(on)} & draw into the full 320-by-240 display instead of the viewport \\
 \bottomrule
 \end{tabularx}
 \captionof{table}{Core graphics calls.}
+\end{center}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+Function & Purpose \\
+\midrule
+\code{prg32\_palette\_set(index,rgb565)} & assign a colour to one of 256 palette entries \\
+\code{prg32\_palette\_get(index)} & read a palette entry \\
+\code{prg32\_gfx\_clear\_indexed(index)} & fill the viewport with a palette index \\
+\code{prg32\_gfx\_rect\_indexed(x,y,w,h,index)} & filled rectangle in a palette index \\
+\code{prg32\_gfx\_pixel\_indexed(x,y,index)} & one pixel in a palette index \\
+\bottomrule
+\end{tabularx}
+\captionof{table}{Indexed (palette) graphics calls.}
+\end{center}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+Function & Purpose \\
+\midrule
+\code{prg32\_band\_set\_mode(band,mode)} & what a status band shows: nothing, FPS, Wi-Fi, game, debug, custom \\
+\code{prg32\_band\_set\_text(band,text)} & custom text for a band \\
+\code{prg32\_band\_set\_game\_info(text)} & the game-information line (score, level) \\
+\code{prg32\_band\_set\_colors(band,fg,bg)} & band colours \\
+\bottomrule
+\end{tabularx}
+\captionof{table}{The two 20-pixel status bands above and below the viewport
+(\code{PRG32\_BAND\_TOP}, \code{PRG32\_BAND\_BOTTOM}).}
 \end{center}
 
 \begin{center}
@@ -127,6 +162,9 @@ Function & Purpose \\
 \code{prg32\_sprite\_anim\_frame(now,count,ms)} & which animation frame to show now \\
 \code{prg32\_sprite\_draw\_frame(x,y,w,h,frames,frame,transparent)} & draw one frame of an animation \\
 \code{prg32\_sprite\_draw\_8x8(x,y,bits,fg,bg)} & draw an 8-by-8 bit sprite \\
+\code{prg32\_sprite\_draw\_16x16(x,y,rgb565)} & draw a 16-by-16 RGB565 sprite (also \code{\_24x24}) \\
+\code{prg32\_sprite\_anim\_init / \_update / \_draw} & an animated sprite object that advances its own frames \\
+\code{prg32\_sprite\_draw\_indexed(x,y,\&spr,frame)} & draw a palette-indexed sprite (1, 2, 4, or 8 bits per pixel) \\
 \bottomrule
 \end{tabularx}
 \captionof{table}{Sprite and collision calls \citep{prg32repo}.}
@@ -187,62 +225,174 @@ Tile flag & Meaning & & Actor state & Meaning \\
 (\code{PRG32\_PLATFORM\_*}) \citep{prg32repo}.}
 \end{center}
 
-\section{Console and sound}
+\section{Console}
 
 \begin{center}
 \begin{tabularx}{\linewidth}{@{}lX@{}}
 \toprule
 Function & Purpose \\
 \midrule
-\code{prg32\_console\_clear()} & clear the text console \\
+\code{prg32\_console\_clear()} & clear the 40-by-25 text console \\
+\code{prg32\_console\_putc(ch)} & write one character \\
 \code{prg32\_console\_write(s)} & write a string to the console \\
 \code{prg32\_console\_hex32(v)} & write a 32-bit value in hexadecimal \\
-\code{prg32\_buzzer\_tone(hz,ms,duty)} & play a tone (event sounds only) \\
-\code{prg32\_audio\_note(channel,instrument,note,volume,ms)} & play a MIDI note for a duration \\
 \bottomrule
 \end{tabularx}
-\captionof{table}{Console and basic sound calls. Sound is audible on the board and
-silent on QEMU.}
+\captionof{table}{Console calls.}
 \end{center}
 
-\section{Cartridges and scores}
+\section{Sound}
+
+The mixer has eight voices at 22\,050\,Hz. It drives the I2S amplifier on the
+board and host audio on QEMU and PRG32-QT. Samples, instruments, and tracker
+music come from the optional audio block of the cartridge \citep{prg32cartfmt}.
 
 \begin{center}
 \begin{tabularx}{\linewidth}{@{}lX@{}}
 \toprule
 Function & Purpose \\
 \midrule
-\code{prg32\_cart\_default\_slot()} & saved default cartridge slot, or $-1$ \\
-\code{prg32\_cart\_select\_default()} & load the saved default cartridge \\
-\code{prg32\_score\_submit(game,player,score)} & record a local score \\
-\code{prg32\_device\_demo\_run()} & run the built-in device demo \\
+\code{prg32\_audio\_note(ch,instr,note,vol,ms)} & play a MIDI note for a duration; returns at once \\
+\code{prg32\_audio\_note\_on(ch,instr,note,vol)} / \code{\_note\_off(ch)} & start and stop a sustained note \\
+\code{prg32\_audio\_notes(ch,instr,vol,notes,count)} & play a sequence of notes (blocking) \\
+\code{prg32\_audio\_play\_sample(id,vol,pitch)} & play a sample from the audio block \\
+\code{prg32\_audio\_play\_track(id)} / \code{\_stop\_track()} & start and stop tracker music \\
+\code{prg32\_audio\_set\_master\_volume(v)} & overall volume \\
+\code{prg32\_audio\_set\_channel\_pan(ch,pan)} & stereo position of a channel \\
+\code{prg32\_buzzer\_tone(hz,ms,duty)} & legacy: PWM tone on a passive buzzer, if one is fitted \\
 \bottomrule
 \end{tabularx}
-\captionof{table}{Selected cartridge and score calls \citep{prg32abi}.}
+\captionof{table}{Sound calls. Prefer the \code{prg32\_audio\_*} family; the
+buzzer helpers remain for older examples. Consult \fname{prg32\_audio.h} for exact
+argument types.}
 \end{center}
 
-\section{The cartridge tool}
+\section{Text entry}
 
-For detailed instructions on build/upload options and workflows (including
-upload via Wi‑Fi and staging for QEMU), see Chapter~\ref{ch:firstbuild}.
-The \fname{README.md} and the \fname{docs/} folder contain supporting material
-and practical examples.
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+Function & Purpose \\
+\midrule
+\code{prg32\_text\_input(buffer,capacity,title)} & run a complete on-screen keyboard dialogue \\
+\code{prg32\_keyboard\_init / \_update / \_draw} & the same keyboard, driven from your own loop \\
+\bottomrule
+\end{tabularx}
+\captionof{table}{On-screen keyboard calls.}
+\end{center}
+
+\section{Scores}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+Function & Purpose \\
+\midrule
+\code{prg32\_score\_submit(game,player,score)} & record a score under a given name \\
+\code{prg32\_score\_submit\_current\_player(game,score)} & record a score under the name saved in setup \\
+\code{prg32\_score\_player\_prompt()} & ask the player for a name with the on-screen keyboard \\
+\code{prg32\_score\_count(game)} / \code{prg32\_score\_get(game,i,\&s)} & read the local leaderboard \\
+\code{prg32\_scoreboard\_show(game,title)} & display the leaderboard \\
+\code{prg32\_score\_sync\_remote()} & exchange scores with the configured Cartridge Store \\
+\bottomrule
+\end{tabularx}
+\captionof{table}{Score calls \citep{prg32abi}. Remote scores are described in
+Chapter~\ref{ch:store}.}
+\end{center}
+
+\section{Multiplayer}
+
+A cartridge joins a room identified by a \emph{signature} string; only
+cartridges with the same signature see each other. On the board the relay is
+reached over Wi-Fi through the Cartridge Store; QEMU provides an offline stub so
+that the same code builds and runs.
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+Function & Purpose \\
+\midrule
+\code{prg32\_multiplayer\_available()} & non-zero when the service can be used \\
+\code{prg32\_multiplayer\_join(signature,flags)} / \code{\_leave()} & enter and leave a room \\
+\code{prg32\_multiplayer\_set\_local\_state(\dots)} & publish this player's position and state \\
+\code{prg32\_multiplayer\_tick()} & exchange state; call once per frame \\
+\code{prg32\_multiplayer\_get\_peer\_count()} / \code{\_get\_peer(i,\dots)} & read the other players \\
+\bottomrule
+\end{tabularx}
+\captionof{table}{Multiplayer calls; see \fname{prg32\_multiplayer.h} for the
+peer structure.}
+\end{center}
+
+\section{Cartridge slots and network state}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+Function & Purpose \\
+\midrule
+\code{prg32\_cart\_stored\_count()} & how many of the four slots hold a cartridge \\
+\code{prg32\_cart\_get\_slot\_info(slot,\&info)} & name, sizes, and flags of a stored cartridge \\
+\code{prg32\_cart\_default\_slot()} & saved default cartridge slot, or $-1$ \\
+\code{prg32\_cart\_select\_slot(slot)} / \code{\_select\_default()} & switch to another stored cartridge \\
+\code{prg32\_wifi\_current\_mode()} / \code{\_current\_ip()} & Wi-Fi mode and address \\
+\bottomrule
+\end{tabularx}
+\captionof{table}{Selected cartridge-slot and network calls \citep{prg32abi}.}
+\end{center}
+
+\section{The command-line tool}
+
+Everything is one Python module, run from the \prg repository root with ESP-IDF
+active \citep{prg32repo}. Add \code{--help} to any command for its options.
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+Command & Purpose \\
+\midrule
+\code{doctor} & check the toolchain and partition table \\
+\code{esp32c6 build | flash | build-and-flash} & resident firmware for the board \\
+\code{esp32c6 upload | run | upload-and-run} & send a cartridge to a board (or PRG32-QT) over HTTP \\
+\code{esp32c6 screenshot | memory | performance} & capture the screen; analyse memory; fetch test results \\
+\code{qemu build | run | build-and-run} & emulator firmware and virtual screen \\
+\code{qemu upload} & stage a cartridge into the emulator flash image \\
+\code{cartridge build} & build a portable \fname{.prg32} from \fname{.S} or \fname{.c} \\
+\code{cartridge summary} & print header, ABI, sizes, features, metadata \\
+\code{store attach-metadata | inspect-metadata} & write and read the metadata trailer \\
+\code{store discover | list | download} & find a Store and fetch from it \\
+\code{store pack-bundle | publish-bundle} & create and submit a Store bundle \\
+\code{wifi set} & preconfigure the board's Wi-Fi \\
+\code{debug enable | pause | step | resume | speed | state} & control the PRG32-QT debugger \\
+\code{abi gen | check} & regenerate and verify the ABI headers (framework developers) \\
+\bottomrule
+\end{tabularx}
+\captionof{table}{\code{python3 -m prg32 \dots}: the unified tool.}
+\label{tab:cli}
+\end{center}
+
+Useful options of \code{cartridge build} are \code{--portable} (always),
+\code{--entry-prefix}, \code{--name}, \code{--out}, \code{--architecture}
+(\code{esp32c6} or \code{qemu}), \code{--cart-ram-kib}, \code{--audio-block},
+\code{--multiplayer}, and \code{--required-feature}.
 
 \section{The HTTP runtime API}
 
 When the board's firmware is running and reachable, it exposes a small HTTP
-interface useful for tooling and labs \citep{prg32repo}.
+interface useful for tooling and labs \citep{prg32repo}. PRG32-QT serves the
+same interface and adds the debugger route.
 
 \begin{center}
 \begin{tabularx}{\linewidth}{@{}lX@{}}
 \toprule
 Endpoint & Returns \\
 \midrule
-\code{GET /api/runtime} & firmware version, cartridge state, frame count, last input \\
+\code{GET /api/runtime} & firmware version, cartridge state and RAM size, frame count, last input \\
 \code{GET /api/games} & the installed cartridges \\
 \code{POST /api/games?slot=cart0} & install a cartridge into a slot \\
 \code{GET /api/screenshot.bmp} & the current 320-by-240 framebuffer as a BMP \\
+\code{GET /api/performance.json} & the latest performance-test result \\
+\code{GET}, \code{POST /api/debug} & PRG32-QT only: debugger state and commands \\
 \bottomrule
 \end{tabularx}
-\captionof{table}{Selected HTTP runtime endpoints \citep{prg32repo}.}
+\captionof{table}{Selected HTTP runtime endpoints \citep{prg32repo,prg32qt}.}
 \end{center}

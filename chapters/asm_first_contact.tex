@@ -128,17 +128,19 @@ These commands work on both macOS and Linux. For additional details, see
 
 \begin{prgtargets}
 \textbf{Both targets.} The cartridge format is identical; what changes is the
-firmware ELF you build against (\fname{build-esp32c6} versus \fname{build-qemu})
-and the delivery (\code{upload} over Wi-Fi versus \code{qemu upload} into the
-flash image). Your game source is byte-for-byte the same in both cases
+architecture label you pass (\code{esp32c6} versus \code{qemu}) and the
+delivery (\code{upload} over Wi-Fi versus \code{qemu upload} into the flash
+image). Your game source is byte-for-byte the same in both cases
 \citep{prg32qemu}.
 \end{prgtargets}
 
 \begin{prgwarn}
-Build the cartridge against the matching firmware ELF. A cartridge built against
-\fname{build-esp32c6/PRG32.elf} resolves the framework symbols at the addresses
-the board firmware uses; staging that same cartridge into a QEMU image built at
-different addresses will not work. Build for the target you intend to run on.
+Always pass \code{--portable}. A portable cartridge reaches the framework through
+the numbered ABI table instead of fixed firmware addresses, so it keeps working
+when the firmware is rebuilt. Older, firmware-specific cartridges were linked
+against one particular firmware image; the current tool refuses to build them.
+If a runtime rejects your cartridge, read the message: it names the ABI hash or
+the feature it was missing.
 \end{prgwarn}
 
 \section{Simple instructions and program structure}
@@ -400,9 +402,11 @@ off work to the framework, they would all overwrite their own return path withou
 housekeeping.
 
 \begin{prgtargets}
-\textbf{Both targets.} On QEMU you will see the title on the serial monitor; the
-beep is accepted but silent because the emulator does not model the buzzer. On the
-ESP32\nobreakdash-C6 you will additionally hear the beep through the buzzer. The
+\textbf{Both targets.} On QEMU you will see the title on the serial monitor. The
+beep uses the legacy buzzer helper: it is audible only on a board that has a
+passive buzzer fitted, and silent on QEMU and on the current reference board,
+which uses an I2S amplifier instead. Chapter~\ref{ch:asmcap} shows the mixer
+call that replaces it and sounds on every host. The
 \emph{source is identical}; only the build directory and configuration profile
 differ, as shown in Chapter~\ref{ch:platform}.
 \end{prgtargets}

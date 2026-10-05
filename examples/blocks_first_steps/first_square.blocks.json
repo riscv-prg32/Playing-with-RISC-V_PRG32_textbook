@@ -1,0 +1,114 @@
+{
+  "abi": "prg32-construction-kit-project-1.0",
+  "title": "First Square",
+  "description": "Mission 1: a yellow square on a black screen.",
+  "author": "Playing with RISC-V",
+  "tags": [
+    "blocks",
+    "mission-1"
+  ],
+  "blocks_json": {
+    "blocks": {
+      "languageVersion": 0,
+      "blocks": [
+        {
+          "type": "prg32_on_start",
+          "id": "first_square-on_start",
+          "x": 20,
+          "y": 20,
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "prg32_comment",
+                "id": "first_square-3",
+                "fields": {
+                  "TEXT": "Where the square starts"
+                },
+                "next": {
+                  "block": {
+                    "type": "prg32_set_state",
+                    "id": "first_square-2",
+                    "fields": {
+                      "VAR": "player_x",
+                      "VALUE": "152"
+                    },
+                    "next": {
+                      "block": {
+                        "type": "prg32_set_state",
+                        "id": "first_square-1",
+                        "fields": {
+                          "VAR": "player_y",
+                          "VALUE": "92"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "prg32_update",
+          "id": "first_square-update",
+          "x": 330,
+          "y": 20,
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "prg32_comment",
+                "id": "first_square-4",
+                "fields": {
+                  "TEXT": "Nothing moves yet"
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "prg32_draw",
+          "id": "first_square-draw",
+          "x": 680,
+          "y": 20,
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "prg32_clear_screen",
+                "id": "first_square-7",
+                "fields": {
+                  "COLOR": "BLACK"
+                },
+                "next": {
+                  "block": {
+                    "type": "prg32_draw_rect",
+                    "id": "first_square-6",
+                    "fields": {
+                      "X": "player_x",
+                      "Y": "player_y",
+                      "W": "16",
+                      "H": "16",
+                      "COLOR": "YELLOW"
+                    },
+                    "next": {
+                      "block": {
+                        "type": "prg32_draw_text",
+                        "id": "first_square-5",
+                        "fields": {
+                          "TEXT": "HELLO PRG32",
+                          "X": "8",
+                          "Y": "8",
+                          "FG": "GREEN",
+                          "BG": "BLACK"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

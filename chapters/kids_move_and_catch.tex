@@ -1,0 +1,255 @@
+\chapter{Mission 2 and 3: Move It, Catch It}
+\label{ch:kids2}
+
+Your square sits still. A game where nothing moves is not much of a game. In
+this chapter you make the square obey the buttons, and then you build a whole
+game called \textbf{Lemon Catcher}.
+
+\section{The game pad}
+
+Under the game screen there is a game pad. It has a cross with four arrows, two
+round buttons called \kbtn{A} and \kbtn{B}, and two small buttons called
+\kbtn{SELECT} and \kbtn{START}. You can click them with the mouse or touch them
+with a finger. The arrow keys on the keyboard work too, with \kbtn{Z} for A and
+\kbtn{X} for B.
+
+\section{If}
+
+The red block in the \textbf{Input \& Logic} drawer asks a question:
+
+\kinput{if button LEFT pressed}
+
+The blocks you put \emph{inside} it run only when the answer is yes. If the
+button is not pressed, the computer skips them.
+
+\begin{prgconcept}
+\textbf{If} lets a program choose. \emph{If} the button is pressed, do this.
+Otherwise, do nothing and carry on.
+\end{prgconcept}
+
+\section{Change}
+
+The purple block \textbf{change} adds a number to a variable.
+
+\kstate{change player\_x by 3}
+
+If player\_x was 152, it becomes 155. Next frame, 158. Then 161. The square
+slides to the right.
+
+To go left, x must get \emph{smaller}. So we add a number below zero:
+
+\kstate{change player\_x by -3}
+
+\begin{prgmission}[Mission 2, step 1: move left and right]
+Open your First Square project. Drag \textbf{every frame update} into the
+workspace and build this:
+
+\kgame{every frame update}
+\kinput[6mm]{if button LEFT pressed}
+\kstate[12mm]{change player\_x by -3}
+\kinput[6mm]{if button RIGHT pressed}
+\kstate[12mm]{change player\_x by 3}
+
+Press \kbtn{Save} and \kbtn{Play}. Use the arrows!
+\end{prgmission}
+
+\begin{prgtry}
+\begin{enumerate}
+  \item Change 3 to 1. Then to 10. What does this number do?
+  \item Add two more \textbf{if} blocks for UP and DOWN. They must change
+        \textbf{player\_y}. Which one needs the minus sign?
+\end{enumerate}
+\end{prgtry}
+
+\section{Do not fall off the world}
+
+Hold the right arrow for a long time. The square walks off the screen and never
+comes back! The variable keeps growing: 320, 330, 340\dots
+
+The purple block \textbf{keep} is a fence. It stops a number from going too low
+or too high.
+
+\kstate{keep player\_x between 0 and 304}
+
+Why 304 and not 320? The square is 16 wide. Its left side is at x. If x is 304,
+its right side is at $304 + 16 = 320$, exactly the edge.
+
+\begin{prgmission}[Mission 2, step 2: the fence]
+Add two \textbf{keep} blocks at the bottom of \emph{every frame update}:
+
+\kstate[6mm]{keep player\_x between 0 and 304}
+\kstate[6mm]{keep player\_y between 0 and 184}
+
+Play again. Can the square escape now?
+\end{prgmission}
+
+\section{Watching the numbers}
+
+Under the game pad there is a grey line. It shows your variables and their
+numbers while the game runs.
+
+Press \kbtn{Play} once more to pause. Now press \kbtn{Step}. The game moves
+forward by \emph{one} frame only. Hold the right arrow on the game pad and press
+\kbtn{Step} again and again. Watch player\_x: 152, 155, 158\dots
+
+\begin{prgconcept}
+\textbf{Step} runs one frame and stops. It lets you slow the computer down
+until you can see exactly what your blocks do.
+\end{prgconcept}
+
+\section{Mission 3: Lemon Catcher}
+
+Time for a real game. Lemons fall from the sky. You move a basket to catch
+them. A green bar grows when you catch one. A red bar grows when you miss.
+
+Start a \textbf{new project} called \textbf{Lemon Catcher}.
+
+\subsection*{The boxes we need}
+
+\begin{center}
+\begin{tabular}{@{}ll@{}}
+\toprule
+Variable & What it remembers \\
+\midrule
+basket\_x & where the basket is, left to right \\
+lemon\_x & where the lemon is, left to right \\
+lemon\_y & how far the lemon has fallen \\
+score & how many lemons you caught \\
+misses & how many lemons you missed \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{prgmission}[Mission 3, step 1: get ready]
+\kgame{when game starts}
+\kstate[6mm]{set basket\_x to 144}
+\kstate[6mm]{set lemon\_x to 150}
+\kstate[6mm]{set lemon\_y to 0}
+\kstate[6mm]{set score to 0}
+\kstate[6mm]{set misses to 0}
+\end{prgmission}
+
+\begin{prgmission}[Mission 3, step 2: draw everything]
+\kgame{every frame draw}
+\kdraw[6mm]{clear screen BLACK}
+\kdraw[6mm]{draw rectangle x lemon\_x y lemon\_y w 10 h 10 color YELLOW}
+\kdraw[6mm]{draw rectangle x basket\_x y 180 w 32 h 8 color ORANGE}
+\kdraw[6mm]{draw rectangle x 0 y 196 w 320 h 4 color BLUE}
+
+Press \kbtn{Play}. You see a lemon at the top, a basket, and a blue floor.
+Nothing moves yet. That is fine. We add one thing at a time.
+\end{prgmission}
+
+\begin{prgmission}[Mission 3, step 3: move the basket, drop the lemon]
+\kgame{every frame update}
+\kinput[6mm]{if button LEFT pressed}
+\kstate[12mm]{change basket\_x by -4}
+\kinput[6mm]{if button RIGHT pressed}
+\kstate[12mm]{change basket\_x by 4}
+\kstate[6mm]{keep basket\_x between 0 and 288}
+\kstate[6mm]{change lemon\_y by 2}
+
+Play. The basket moves. The lemon falls\dots and falls through the floor.
+\end{prgmission}
+
+\section{Touching}
+
+How does the game know the lemon is in the basket? With the other red block:
+
+\kinput{if rect \dots{} touches rect \dots}
+
+``Rect'' is short for \emph{rectangle}. The block has eight numbers: x, y, w
+and h for the first rectangle, then x, y, w and h for the second. If the two
+rectangles overlap, even a little, the blocks inside run.
+
+\begin{center}
+\begin{tikzpicture}[font=\sffamily\small]
+  \draw[fill=prgamber!70,draw=prgamber!60!black] (0,0.4) rectangle (0.8,1.2);
+  \draw[fill=prgred!50,draw=prgred] (1.6,0) rectangle (4.0,0.5);
+  \node at (2,-0.5){not touching};
+  \draw[fill=prgred!50,draw=prgred] (6.6,0) rectangle (9.0,0.5);
+  \draw[fill=prgamber!70,draw=prgamber!60!black] (7.2,0.3) rectangle (8.0,1.1);
+  \node at (7.8,-0.5){touching!};
+\end{tikzpicture}
+\captionof{figure}{Two rectangles touch when they overlap.}
+\end{center}
+
+When you catch a lemon, three things should happen: you get a point, and a new
+lemon appears at the top, somewhere new. For ``somewhere new'' there is a
+purple block that rolls a dice:
+
+\kstate{set lemon\_x to random from 0 to 310}
+
+\begin{prgmission}[Mission 3, step 4: catch!]
+Add this at the bottom of \emph{every frame update}. Type the eight values
+carefully: the lemon first, then the basket.
+
+\kinput[6mm]{if rect lemon\_x lemon\_y 10 10 touches rect basket\_x 180 32 8}
+\kstate[12mm]{change score by 1}
+\kstate[12mm]{set lemon\_y to 0}
+\kstate[12mm]{set lemon\_x to random from 0 to 310}
+\end{prgmission}
+
+\begin{prgmission}[Mission 3, step 5: miss!]
+The blue floor is a rectangle too. If the lemon touches the floor, you missed.
+
+\kinput[6mm]{if rect lemon\_x lemon\_y 10 10 touches rect 0 196 320 4}
+\kstate[12mm]{change misses by 1}
+\kstate[12mm]{set lemon\_y to 0}
+\kstate[12mm]{set lemon\_x to random from 0 to 310}
+\end{prgmission}
+
+\section{Showing the score}
+
+The player cannot see inside your variables. Let us draw the score as a bar
+that grows. The trick: a width does not have to be a plain number. It can be a
+little sum.
+
+\begin{prgmission}[Mission 3, step 6: score bars]
+Add these to \emph{every frame draw}, after \textbf{clear screen}:
+
+\kdraw[6mm]{draw text LEMONS at x 8 y 4 fg GREEN bg BLACK}
+\kdraw[6mm]{draw rectangle x 64 y 4 w score * 3 h 8 color GREEN}
+\kdraw[6mm]{draw text MISSED at x 8 y 16 fg RED bg BLACK}
+\kdraw[6mm]{draw rectangle x 64 y 16 w misses * 3 h 8 color RED}
+
+The star \textbf{*} means ``times''. With 5 lemons the bar is $5 \times 3 = 15$
+pixels wide. Play, and watch the bars race!
+\end{prgmission}
+
+\begin{prgtry}
+Make the game your own.
+\begin{enumerate}
+  \item Make the lemon fall faster. Which number is it?
+  \item Make the basket smaller. You must change it in \emph{two} places. Why?
+  \item Add a second fruit with its own variables: orange\_x and orange\_y.
+  \item Make a ``bad'' fruit that takes away a point when you catch it.
+\end{enumerate}
+\end{prgtry}
+
+\begin{prgwarn}
+If your basket catches nothing, check the \textbf{touches} block. The numbers
+there must be the same as the numbers in your \textbf{draw rectangle} blocks.
+The computer does not look at the picture. It only looks at the numbers.
+\end{prgwarn}
+
+\begin{prgcheck}
+You finished Missions~2 and~3 if you can:
+\begin{itemize}
+  \item explain what \textbf{if} does;
+  \item make something move with a button;
+  \item say why the fence stops at 304 and not at 320;
+  \item use \kbtn{Step} to watch a variable change;
+  \item explain how the game knows a lemon was caught.
+\end{itemize}
+\end{prgcheck}
+
+\begin{prggrownup}
+Reference projects: \fname{moving\_square.blocks.json} and
+\fname{lemon\_catcher.blocks.json} in \fname{examples/blocks\_first\_steps}.
+The Blocks language deliberately has no general comparison block; the ``floor
+is a rectangle'' idea in step~5 is how a threshold test is expressed with the
+collision block. A complete, playable C rewrite with a numeric score and a
+game-over state is in Appendix~\ref{app:worked}, for older siblings and for the
+C track.
+\end{prggrownup}

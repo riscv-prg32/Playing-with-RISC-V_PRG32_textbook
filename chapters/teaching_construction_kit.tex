@@ -1,0 +1,353 @@
+\chapter{Teaching with the PRG32 Construction Kit}
+\label{ch:kitteach}
+
+This chapter is for the adult in the room. It explains what the PRG32
+Construction Kit is, how to install and run it for a class, how the three
+pupil chapters before it are meant to be taught, how to assess what children
+learn, and how the Blocks track connects to the C and assembly tracks that
+older students follow on the same platform. No programming experience is
+assumed, although a teacher who has read Chapter~\ref{ch:platform} will
+recognise every idea.
+
+\section{What the Kit is, and what it is not}
+
+The PRG32 Construction Kit is a small web application: a server written in
+Python that a teacher runs on one computer, and a page that pupils open in a
+browser \citep{prg32kit}. Pupils build programs from blocks, in the manner made
+familiar by Scratch \citep{resnick2009}, using an editor built on the Blockly
+library \citep{blockly}. Five components matter in the classroom.
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+Component & What it gives the class \\
+\midrule
+Blocks editor & a 20-block vocabulary in five drawers: Game, State, Input \&
+  Logic, Drawing, Audio \\
+Simulator & a $320\times200$ game screen in the browser with an on-screen game
+  pad, Play/Pause, single-frame \emph{Step}, Reset, and a live read-out of the
+  variables \\
+Sprite Lab & a pixel editor that saves sprites and converts them to C arrays \\
+C generator & deterministic translation of a Blocks project into real \prg C
+  source, shown beside the blocks \\
+Packager and publisher & builds \fname{.prg32} cartridges when the \prg
+  toolchain is present and submits bundles to a Cartridge Store \\
+\bottomrule
+\end{tabularx}
+\captionof{table}{The parts of the Construction Kit \citep{prg32kit}.}
+\end{center}
+
+The design decision that distinguishes the Kit from a general-purpose blocks
+environment is that it is \emph{not a toy dialect}. The three top-level blocks
+are the \code{init}, \code{update}, and \code{draw} functions of
+Chapter~\ref{ch:platform}; the drawing blocks are the calls of
+Table~\ref{tab:gfxcore}; and the generated C compiles, unmodified, into a
+cartridge that runs on the ESP32\nobreakdash-C6. A child of eight and a
+first-year undergraduate are therefore programming the same machine through
+the same interface, at different altitudes.
+
+\begin{prgconcept}
+The Kit's pipeline is: blocks $\rightarrow$ an intermediate description of the
+game $\rightarrow$ the browser simulator \emph{and} generated C $\rightarrow$ a
+\fname{.prg32} cartridge $\rightarrow$ the Cartridge Store. Every stage is
+visible to the pupil, and none is magic.
+\end{prgconcept}
+
+It is equally important to know the limits. The simulator approximates the
+runtime: sound is a browser tone, and random sequences differ from the
+board's. The Blocks vocabulary covers one controller, integer variables,
+rectangle collision, rectangles, pixels, text, an indexed palette, random
+numbers, and simple notes. Tile maps, scrolling playfields, sprites, tracker
+music, scores, and multiplayer exist in the cartridge ABI but have no blocks
+yet; they are reached through the Kit's \emph{Advanced~C} editor, which builds
+real cartridges but is not simulated in the browser \citep{prg32kit}.
+
+\section{Why blocks, why games, why seven}
+
+The pedagogy rests on three well-supported claims. First, children learn
+powerful ideas best by building things they care about and can show to others;
+this is Papert's constructionism \citep{papert1980}, and a game on a screen is
+about as showable as an artefact gets. Second, block-based editors remove the
+syntax errors that dominate a novice's first hours with text, without removing
+the concepts; pupils who start with blocks reach comparable or better
+conceptual understanding and report more confidence \citep{weintrop2017}.
+Third, the habits the track practises (decomposing a problem, naming state,
+testing one change at a time, reading what the machine actually did rather
+than what one hoped) are the content of what \citet{wing2006} called
+computational thinking, and they transfer beyond programming.
+
+Seven is a pragmatic lower bound, not a theoretical one. The track asks a
+child to read short labels, to type small numbers, to reason about ``bigger''
+and ``smaller'', and to add within a few hundred. Negative numbers appear
+(``change by $-3$'') and are best introduced as ``going back'' on a number
+line taped to the floor. Multiplication appears once, in the score bar, and
+can be treated as a recipe by younger pupils.
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}lXX@{}}
+\toprule
+Age & Typical pace & Adaptations \\
+\midrule
+7--8 & one mission per two sessions; pairs & read aloud; pre-built starter
+  projects; floor number line; teacher types titles \\
+9--10 & one mission per session & pupils read the chapter; ask for a written
+  prediction before each Play \\
+11--13 & Missions 1--3 in two sessions & add the generated-C discussion and
+  the Advanced~C editor; publish to the Store \\
+14+ & one session as an on-ramp & move to Part~III (C) and compare with the
+  generated source \\
+\bottomrule
+\end{tabularx}
+\captionof{table}{Suggested pacing by age band.}
+\label{tab:kitages}
+\end{center}
+
+\section{Installing the Kit for a class}
+
+The Kit needs Python~3.11 or newer and a modern browser. The simplest
+arrangement is one teacher computer running the server and every pupil device
+opening its address over the classroom network; nothing is installed on pupil
+devices, and tablets work because the simulator has touch controls.
+
+\lstinputlisting[style=bash,
+  caption={Running the Construction Kit with Python.}
+]{scripts/construction_kit/run_python.sh}
+
+For a computer room that is used every week, a container is easier to keep
+alive. The supplied Compose file stores all projects in a \fname{data}
+directory beside it, so the class's work survives restarts.
+
+\lstinputlisting[style=bash,
+  caption={Running the Construction Kit with Docker Compose.}
+]{scripts/construction_kit/run_docker.sh}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}llX@{}}
+\toprule
+Variable & Default & Purpose \\
+\midrule
+\code{PRG32\_KIT\_DATA} & \fname{data} & where projects, sprites, and builds
+  are stored \\
+\code{PRG32\_KIT\_PORT} & 5090 & HTTP port \\
+\code{DATABASE\_URL} & unset & use PostgreSQL instead of the default SQLite
+  file \\
+\code{PRG32\_STORE\_URL} & \code{http://127.0.0.1:5080} & default Cartridge
+  Store \\
+\code{PRG32\_BUILD\_COMMAND} & \code{python3 -m prg32 cartridge build} & how
+  cartridges are compiled \\
+\code{PRG32\_CART\_RAM\_KIB} & 64 & cartridge RAM profile passed to the
+  builder \\
+\code{SECRET\_KEY} & development value & session secret; change it for any
+  shared deployment \\
+\bottomrule
+\end{tabularx}
+\captionof{table}{Construction Kit configuration \citep{prg32kit}.}
+\end{center}
+
+\subsection*{Real cartridges are optional}
+
+Without the \prg toolchain the Kit still does everything in
+Chapters~\ref{ch:kids1}--\ref{ch:kids2} and most of Chapter~\ref{ch:kids3}:
+\kbtn{Compile Cartridge} then produces a \emph{source-only} bundle containing
+the generated C, the Blocks project, and a note that a toolchain is required.
+To produce real \fname{.prg32} files, start the Kit from a shell in which the
+\prg build command works (Chapter~\ref{ch:firstbuild}).
+
+\lstinputlisting[style=bash,
+  caption={Starting the Kit with the cartridge toolchain available.}
+]{scripts/construction_kit/enable_cartridges.sh}
+
+\begin{prgwarn}
+The Kit has no pupil accounts: everyone who can reach the address sees every
+project. That is convenient in a primary classroom and inappropriate on the
+open Internet. Run it on the school network only. If you enable Advanced~C
+with a toolchain, remember that it compiles source typed by pupils on the
+teacher's machine; the Kit validates includes and entry points, but it is not
+a sandbox \citep{prg32kit}. Use it with classes you trust, on a machine that
+holds nothing sensitive.
+\end{prgwarn}
+
+\section{A term plan}
+
+The three pupil chapters contain five missions. Table~\ref{tab:kitplan}
+spreads them over ten 45-minute sessions, which fits a half-term club or a
+unit within a computing curriculum. Each session has the same shape: a short
+unplugged or whole-class start, a guided build, free modification, and a
+closing circle in which two or three pupils show what they changed.
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}clXl@{}}
+\toprule
+\# & Mission & Focus and outcome & Idea \\
+\midrule
+1 & 1 & Robot game unplugged; tour of the Kit; a square on screen & sequence \\
+2 & 1 & coordinates; draw a picture from rectangles & coordinates \\
+3 & 2 & buttons move the square & condition \\
+4 & 2 & the fence; Step and the variable read-out & variable, debugging \\
+5 & 3 & Lemon Catcher: draw, move, fall & loop, decomposition \\
+6 & 3 & touching, random, score bars & collision, randomness \\
+7 & 4 & beeps on events; Music Pad & event \\
+8 & 4 & Sprite Lab; pixels and pictures & representation \\
+9 & 5 & own game: plan on paper, then build & design \\
+10 & 5 & generated C; cartridge; class showcase and publishing & abstraction \\
+\bottomrule
+\end{tabularx}
+\captionof{table}{A ten-session plan for the Young Makers track.}
+\label{tab:kitplan}
+\end{center}
+
+\subsection*{The 45-minute session}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+Minutes & Activity \\
+\midrule
+0--5 & Hook: show the finished behaviour, or play an unplugged game \\
+5--20 & Guided build: the mission steps, teacher and pupils together \\
+20--35 & Make it yours: the ``Try It Yourself'' changes, in pairs \\
+35--40 & Look under the hood: Step, or Generate C, on one pupil's project \\
+40--45 & Circle: ``what did you change, and what happened?'' Save. \\
+\bottomrule
+\end{tabularx}
+\captionof{table}{The shape of one session.}
+\end{center}
+
+\section{Teaching moves that work}
+
+\paragraph{Predict, run, explain.} Before a pupil presses Play after a change,
+ask what will happen. A wrong prediction that is then explained teaches more
+than a right result that is merely observed.
+
+\paragraph{Pair programming.} Two pupils at one device, one ``driver'' on the
+mouse and one ``navigator'' reading the mission, swapping every ten minutes.
+It halves the hardware and doubles the talk.
+
+\paragraph{One change at a time.} This is the platform's own rule for
+undergraduates (Chapter~\ref{ch:platform}), and it is just as true at eight.
+When a project breaks after three simultaneous changes, undo two.
+
+\paragraph{Use Step as a slow-motion camera.} The \kbtn{Step} button advances
+one frame and the grey strip shows each variable. Project one pupil's screen
+and let the class call out the next value of \code{lemon\_y} before you click.
+
+\paragraph{Let bugs be public and normal.} Keep a ``bug of the day'' on the
+board, with the name of the pupil who \emph{found} it.
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}XX@{}}
+\toprule
+Misconception & A response \\
+\midrule
+``The computer knows what I meant.'' & The Robot game; then deliberately swap
+  two blocks and run it \\
+``y goes up.'' & Tape a grid to the wall with (0,0) at the top left; walk it \\
+``The lemon is in the basket because I can see it.'' & Change the drawn
+  basket without changing the \emph{touches} numbers; nothing is caught \\
+``A variable holds all its old values.'' & A physical box and one card: a new
+  card replaces the old \\
+``Update runs when I press a button.'' & Step with no button held; the lemon
+  still falls \\
+``More blocks means a better program.'' & Celebrate the shortest project that
+  meets the brief \\
+\bottomrule
+\end{tabularx}
+\captionof{table}{Common misconceptions and how to meet them.}
+\end{center}
+
+\section{From blocks to C to assembly: the vertical curriculum}
+
+The reason to teach young children on \prg rather than on a closed blocks
+environment is that nothing has to be unlearned later. The same Lemon Catcher
+exists at three altitudes in this book.
+
+\lstinputlisting[style=c,firstline=73,lastline=82,
+  caption={The start of what the Kit generates for the Lemon Catcher update blocks
+  (excerpt of \fname{examples/blocks\_first\_steps/lemon\_catcher.c}).}
+]{examples/blocks_first_steps/lemon_catcher.c}
+
+A pupil who has snapped ``if button LEFT pressed'' has met the conditional; the
+generated \code{if (input \& PRG32\_BTN\_LEFT)} adds the fact that buttons are
+bits; and Chapter~\ref{ch:asm2} shows the same test as an \code{andi} followed
+by a branch. In a school that runs all three tracks, older students can be
+given the younger pupils' generated C as a code-reading exercise, or asked to
+rewrite a Blocks game by hand, as Appendix~\ref{app:worked} does for Lemon
+Catcher, and to explain every difference.
+
+\begin{center}
+\begin{tikzpicture}[font=\sffamily\small,node distance=5mm,
+  s/.style={rounded corners=3pt,draw=prgsteel,fill=prgpanel,minimum height=10mm,minimum width=40mm,align=center},
+  ar/.style={-{Stealth[length=2.2mm]},draw=prgink!70,thick}]
+  \node[s,fill=prgviolet!12] (b) {Blocks (Part~IV)\\\scriptsize ages 7+};
+  \node[s,fill=prgamber!14,right=12mm of b] (c) {C (Part~III)\\\scriptsize ages 14+ and university};
+  \node[s,fill=prggreen!12,right=12mm of c] (a) {Assembly (Part~II)\\\scriptsize university};
+  \draw[ar] (b) -- node[above,font=\scriptsize]{Generate C} (c);
+  \draw[ar] (c) -- node[above,font=\scriptsize]{compile} (a);
+\end{tikzpicture}
+\captionof{figure}{One platform, three altitudes. Each arrow is something the
+tools let a learner actually look at.}
+\end{center}
+
+\section{Assessment}
+
+Assess the ideas, not the artefact. A beautiful game copied block for block
+shows less than a plain one whose author can explain it.
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}lXXX@{}}
+\toprule
+Idea & Beginning & Secure & Extending \\
+\midrule
+Sequence & builds from a model & explains why order matters & predicts the
+  effect of reordering \\
+Variables & changes a given value & names and uses own variables & uses an
+  expression such as \code{score * 3} \\
+Conditions & uses a button block & combines conditions for a rule & expresses
+  a threshold with the collision block \\
+Debugging & asks for help & uses Step and the read-out & forms and tests a
+  hypothesis \\
+Design & modifies a game & plans a game on paper first & reviews a peer's
+  game kindly and usefully \\
+\bottomrule
+\end{tabularx}
+\captionof{table}{A simple progression rubric.}
+\label{tab:kitrubric}
+\end{center}
+
+Three low-cost sources of evidence work well: the pupil's saved project
+(exported as JSON from the editor); a one-minute ``explain this block to me''
+conversation; and a prediction sheet on which pupils write what they expect
+before pressing Play.
+
+\section{Inclusion, safety, and data}
+
+The simulator's game pad works with touch, mouse, and keyboard, so pupils who
+cannot use one can use another. Colour is never the only carrier of meaning in
+the missions, but check any pupil-designed game for colour pairs that are hard
+to tell apart. Keep sessions short and screens shared.
+
+On data: the Kit stores project titles, an optional author field, and the
+projects themselves. Ask pupils to use first names or team names. Publishing
+to a Cartridge Store makes a title, summary, and author string public within
+that Store; publish from a teacher-held profile, to a school-run Store, after
+the review described in Chapter~\ref{ch:store}. Back up the Kit by copying its
+\fname{data} directory while the server is stopped.
+
+\section{Publishing a class's games}
+
+The Kit's \kbtn{Publish} page stores \emph{publish profiles}: a Store address
+and, optionally, a bearer token. \kbtn{Compile Cartridge} on a project creates
+a bundle, and \kbtn{Publish} on that bundle sends it to the Store, where it
+waits as a pending submission until an editor verifies it. In a school the
+natural arrangement is that the teacher holds both the Kit's publish token and
+the editor role on the school Store, so that a human decision always stands
+between a child's work and its publication.
+
+\begin{prgcheck}
+You are ready to teach the track when you have: run the Kit and opened it from
+a second device; imported the four reference projects from
+\fname{examples/blocks\_first\_steps}; played each in the simulator; used
+\kbtn{Step} with a button held; clicked \kbtn{Generate C} and matched three
+blocks to three lines; and decided whether your installation will build real
+cartridges or source-only bundles.
+\end{prgcheck}

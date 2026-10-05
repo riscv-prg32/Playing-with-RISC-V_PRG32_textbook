@@ -156,7 +156,7 @@ Constant & Button & Bit value \\
 \code{PRG32\_BTN\_DOWN}   & down  & \code{0x08} \\
 \code{PRG32\_BTN\_A}      & A     & \code{0x10} \\
 \code{PRG32\_BTN\_B}      & B     & \code{0x20} \\
-\code{PRG32\_BTN\_SELECT} & select & \code{0x40} \\
+\code{PRG32\_BTN\_START} & start / select & \code{0x40} \\
 \bottomrule
 \end{tabular}
 \captionof{table}{Player-one button bits. Player two uses the same layout shifted
@@ -164,7 +164,8 @@ into higher bits (\code{PRG32\_P2\_*}).}
 \label{tab:buttons}
 \end{center}
 
-The reason a bitmask is used, rather than seven separate variables, is that it
+The board has a single Start/Select button, so \code{PRG32\_BTN\_SELECT} is
+another name for the same bit. The reason a bitmask is used, rather than seven separate variables, is that it
 mirrors how the hardware actually presents the buttons: as bits in a register. A
 student who understands the input bitmask understands, in miniature, how a
 processor reads any memory-mapped peripheral. We will use this fact in both
@@ -209,22 +210,45 @@ rectangle. The collision call, \code{prg32\_sprite\_hitbox}, takes the position
 and size of two rectangles and returns a non-zero value when they overlap, which
 is exactly the test a beginner needs for ``did the ball hit the paddle?''
 
-\section{Sound: a beep when something happens}
+\section{Sound: a note when something happens}
 
-Audio in \prg starts as simply as it can: \code{prg32\_buzzer\_tone(hz, ms)} plays
-a tone of a given frequency for a given number of milliseconds \citep{prg32abi}.
-On the physical board this drives a small buzzer; on QEMU the call is accepted but
-silent, because the emulator does not model the buzzer. The framework's own
-advice, which this book repeats, is to play a beep only on an \emph{event}: a
-collision, a score, a button press. Don't play it on every frame, because a tone
-restarted sixty times a second is an unpleasant buzz rather than a sound effect.
+Audio in \prg starts as simply as it can. One call,
+\code{prg32\_audio\_note(channel, instrument, note, volume, ms)}, asks the
+runtime's mixer to play a musical note for a number of milliseconds and returns
+immediately, so the game loop is never held up \citep{prg32abi}. The note is a
+MIDI number (60 is middle~C, 69 is the A above it at 440\,Hz); the mixer has
+eight channels, so a sound effect on one channel does not cut off music on
+another. On the board the mixer drives a small I2S amplifier and loudspeaker; on
+QEMU and PRG32-QT the same samples are played through the host computer.
+
+Older examples, including several reproduced in this book, use the legacy helper
+\code{prg32\_buzzer\_tone(hz, ms, duty)}, which pulses a passive buzzer at a
+frequency. It still exists and still builds, but the current reference board has
+no buzzer fitted, so on that board it is silent. Read it when you meet it, and
+prefer \code{prg32\_audio\_note} in anything new.
+
+The framework's own advice, which this book repeats, is to play a sound only on
+an \emph{event}: a collision, a score, a button press. A note restarted thirty
+times a second is an unpleasant buzz, not a sound effect.
 
 \begin{prgwarn}
-Do not call \code{prg32\_buzzer\_tone} every frame. Trigger sound on events only.
-A beep in \code{update} that fires whenever the ball is in flight will play
-continuously; a beep that fires only in the frame where a collision is newly
-detected will sound like a game.
+Do not start a sound every frame. Trigger it on events only. A note in
+\code{update} that fires whenever the ball is in flight will play continuously;
+one that fires only in the frame where a collision is \emph{newly} detected will
+sound like a game.
 \end{prgwarn}
+
+\section{Two ways to name a colour}
+
+Besides direct RGB565 colours, the runtime offers a \emph{palette} of 256
+entries. The call \code{prg32\_palette\_set} assigns a colour to an index, and
+the indexed drawing calls, whose names end in \code{\_indexed}, draw with an
+index instead of a colour (Appendix~\ref{app:api} lists them). On the board the game framebuffer stores one byte per
+pixel, an index, and the palette turns indices into colours as the picture is
+sent to the display; that is why a full $320\times200$ screen fits in 64\,000
+bytes of a microcontroller's memory. For first games the two styles are
+interchangeable; palettes become interesting when you want to change many
+pixels' colour at once by changing a single palette entry.
 
 \section{Cartridges: how a game reaches the machine}
 
@@ -264,11 +288,40 @@ and Chapter~\ref{ch:firstbuild} shows the build workflow. For now the
 important idea is conceptual: a cartridge is your three functions, compiled to
 native code, wrapped in just enough metadata for the firmware to run them.
 
+Three properties of the current format are worth knowing from the start.
+
+\emph{Cartridges are portable.} A cartridge does not contain the addresses of
+the firmware functions it calls. It reaches them through a numbered table, the
+\emph{cartridge ABI} (version 1.6 at the time of writing, with 139 entries), and
+its header records a hash of the table it was built for. Any runtime that offers
+a compatible table can run it, and one that cannot refuses it with a clear
+message rather than crashing. This is why the same file runs on the board, on
+QEMU, and in PRG32-QT, and why you do not rebuild your games when the firmware
+is updated.
+
+\emph{Cartridges live in slots.} The firmware keeps four persistent slots,
+\code{cart0} to \code{cart3}. One cartridge is in executable memory at a time;
+the others wait in flash. With one stored cartridge the board starts it at
+power-on; with several it starts the default you chose, and holding A and B
+during boot opens the setup menu.
+
+\emph{Cartridges have a size budget.} The default profile gives a cartridge
+64\,KiB of executable memory for its code, data, and variables; a 32\,KiB
+classroom profile and a 128\,KiB extended profile exist, and the build tool
+checks your cartridge against the limit you name with \code{--cart-ram-kib}
+\citep{prg32profiles}. A complete Pong is about 3\,KiB. Constraints of this kind
+are the point of the exercise.
+
+A cartridge may also carry, after its code, an audio block of samples and
+music, and a metadata trailer with a title, an icon, and credits; these are what
+the Cartridge Store displays, and Chapter~\ref{ch:store} returns to them.
+
 \section{The two targets, concretely}
 
 Every game in this book is built for two targets: the physical ESP32\nobreakdash-C6
 board and the QEMU emulator. The source code is the same for both; only the build
-directory and profile differ \citep{prg32qemu}.
+directory and profile differ \citep{prg32qemu}. (Chapter~\ref{ch:qt} adds a third
+host, PRG32-QT, which needs no firmware build at all.)
 
 The physical board uses \fname{build-esp32c6} and the ESP32\nobreakdash-C6 configuration.
 QEMU uses \fname{build-qemu} and the ESP32\nobreakdash-C3 emulator target, because the
@@ -341,6 +394,8 @@ Example & What it teaches first \\
 \code{platformer} & tile flags, gravity, camera follow \\
 \code{raycaster} & fixed-point arithmetic, a pseudo-3D corridor \\
 \code{wing\_commander} & two layered playfields, a cockpit \\
+\code{frogger} & lanes of moving obstacles, timing a crossing \\
+\code{prg32\_bounce} & the smallest moving-object demo; a first read \\
 \bottomrule
 \end{tabularx}
 \captionof{table}{The example games, ordered by the concepts they introduce. This

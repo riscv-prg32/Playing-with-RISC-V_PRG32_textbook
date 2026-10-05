@@ -1,0 +1,20 @@
+{
+  "abi": "prg32-colophon-1.0",
+  "title": "Lemon Catcher",
+  "subtitle": "A Playing with RISC-V cartridge",
+  "version": "1.0.0",
+  "release_date": "2026-10-05",
+  "developer": {"name": "Your Name or Class"},
+  "authors": [
+    {"role": "game design", "name": "Your Name"},
+    {"role": "programming", "name": "Your Name"}
+  ],
+  "license": "MIT",
+  "copyright": "Copyright 2026 Your Name",
+  "acknowledgements": ["Thanks to the PRG32 community"],
+  "controls": [
+    {"input": "LEFT / RIGHT", "action": "Move the basket"},
+    {"input": "A", "action": "Restart after game over"}
+  ],
+  "start_prompt": "Press START to play"
+}

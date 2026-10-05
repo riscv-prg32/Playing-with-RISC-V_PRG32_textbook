@@ -3,7 +3,7 @@
 
 Everything in this book runs on the QEMU emulator, so a board is never strictly
 required. But the platform comes alive on real hardware: real buttons, a real
-display, a real buzzer. Building it is an instructive exercise in its own
+display, a real loudspeaker. Building it is an instructive exercise in its own
 right. This appendix is the classroom reference wiring for a breadboard PRG32,
 drawn from the platform's hardware notes \citep{prg32repo,prg32hardware}. Treat it
 as a parts list and a wiring map, not as a soldering course; the connections are
@@ -22,10 +22,10 @@ Qty & Item & Purpose \\
 1 & ESP32\nobreakdash-C6 development board & the \riscv host that runs everything \\
 1 & ILI9341 2.8" SPI TFT, 320$\times$240 & the video display \\
 1 & 5-way digital joystick module & player-one input \\
-1 & passive buzzer & sound \\
-1 & setup button (optional) & force setup mode without holding A+B \\
+2 & push buttons & A and B \\
+1 & MAX98357A I2S amplifier + 4--8\,$\Omega$ speaker & mono sound \\
+1 & second MAX98357A + speaker (optional) & stereo sound \\
 1 & second joystick (optional) & player-two games such as Pong \\
-1 & MAX98357A + 4--8\,$\Omega$ speaker (optional) & high-quality mono audio \\
 -- & breadboard and jumper wires & to connect it all \\
 \bottomrule
 \end{tabularx}
@@ -35,7 +35,7 @@ Qty & Item & Purpose \\
 \begin{prgconcept}
 The ESP32\nobreakdash-C6 is the \riscv microcontroller at the centre of the board: the same
 32-bit \riscv processor family your code targets on QEMU. Everything else, such as the
-display, the joystick, the buzzer, is a peripheral wired to its general-purpose
+display, the joystick, the amplifier, is a peripheral wired to its general-purpose
 pins. Building the board is, concretely, connecting peripherals to a \riscv
 processor.
 \end{prgconcept}
@@ -59,14 +59,17 @@ GPIO7 & MOSI & & GPIO3  & P1 UP \\
 GPIO2 & MISO & & GPIO13 & P1 DOWN \\
 GPIO6 & SCLK & & GPIO20 & P1 SELECT \\
 GPIO10 & CS  & & GPIO21 & P1 A \\
-GPIO8 & DC   & & GPIO22 & P1 B \\
-GPIO9 & RST  & & GPIO15 & passive buzzer \\
-GPIO5 & BL   & &        & \\
+GPIO1 & DC   & & GPIO22 & P1 B \\
+GPIO0 & RST  & & GPIO4  & audio BCLK \\
+GPIO5 & BL   & & GPIO11 & audio LRC / WS \\
+      &      & & GPIO23 & audio DIN \\
 \bottomrule
 \end{tabular}
-\captionof{table}{Reference display and player-one input wiring
-\citep{prg32hardware}. Each joystick direction connects as a normally-open switch
-to ground.}
+\captionof{table}{Reference display, player-one input, and audio wiring
+\citep{prg32hardware}. Each joystick direction and button connects as a
+normally-open switch to ground. GPIO20 is the single Start/Select button.
+Always confirm against the repository's hardware guide before wiring: pin
+assignments have changed between hardware revisions.}
 \label{tab:wiring}
 \end{center}
 
@@ -80,7 +83,7 @@ to ground.}
   \node[anchor=south,text=prgsteel,font=\scriptsize] at (mcu.south){RISC-V host};
   \node[dev] (lcd) at (4.2,1.6) {ILI9341 TFT\\\scriptsize SPI: MOSI/SCLK/CS/DC/RST};
   \node[dev] (joy) at (4.2,0) {Joystick P1\\\scriptsize 5 switches to GND};
-  \node[dev] (buz) at (4.2,-1.6) {Passive buzzer\\\scriptsize GPIO15};
+  \node[dev] (buz) at (4.2,-1.6) {MAX98357A + speaker\\\scriptsize I2S: BCLK/LRC/DIN};
   \draw[w] (mcu.east|-lcd) -- (lcd.west);
   \draw[w] (mcu.east|-joy) -- (joy.west);
   \draw[w] (mcu.east|-buz) -- (buz.west);
@@ -90,27 +93,30 @@ to ground.}
   \draw[draw=prgamber,thick,dashed] (mcu.west|-wifi) -- (wifi.east);
 \end{tikzpicture}
 \captionof{figure}{The reference PRG32 board: a \riscv ESP32\nobreakdash-C6 with a display, a
-joystick, and a buzzer on its GPIO pins, powered over USB and exposing a Wi-Fi
+joystick, and an audio amplifier on its GPIO pins, powered over USB and exposing a Wi-Fi
 access point for cartridge upload \citep{prg32hardware,prg32repo}.}
 \end{center}
 
 \begin{prgwarn}
-The default audio pins overlap the reference display wiring, and many ESP32\nobreakdash-C6
-boards wire their onboard RGB LED to GPIO8: the same pin used here for the
-display's data/command line. If you add the optional MAX98357A audio or enable the
-onboard LED, reassign the conflicting pins in \fname{main/prg32\_config.h} or
-\code{menuconfig} before flashing, or the firmware will skip the feature to protect
-the display \citep{prg32hardware}.
+Wire power before signals and keep the two rails apart: the display and the
+ESP32\nobreakdash-C6 logic run from 3V3, while the amplifiers take their supply
+from the 5V rail; all grounds must be joined. Disconnect USB while you wire.
+Many ESP32\nobreakdash-C6 boards carry an onboard RGB LED on GPIO8, which the
+firmware uses as a status light and audio level meter; the current display
+wiring leaves that pin free \citep{prg32hardware}.
 \end{prgwarn}
 
-\section{Optional high-quality audio}
+\section{Audio}
 
-The passive buzzer on GPIO15 is enough for the event beeps used throughout the
-book. For richer sound, the platform supports a MAX98357A I2S amplifier driving a
-small speaker, and even a stereo ``PRG32 Audio Plus'' configuration with two
-amplifiers on the same bus \citep{prg32hardware}. The platform's safety note is
-worth repeating: connect the amplifier only to a 4--8\,$\Omega$ speaker, never to
-headphones or a line input, and keep speaker wires short on the breadboard.
+Sound comes from a MAX98357A I2S amplifier driving a small loudspeaker: three
+signal wires (bit clock, word select, data) carry digital samples from the
+runtime's eight-voice mixer. A second amplifier on the same three wires gives
+stereo \citep{prg32hardware}. The platform's safety notes are worth repeating:
+connect an amplifier only to a 4--8\,$\Omega$ speaker, never to headphones or a
+line input; keep speaker wires short on the breadboard; and use a USB supply
+that can deliver the speaker current. Earlier revisions of the board used a
+passive buzzer instead; the legacy \code{prg32\_buzzer\_*} calls drive one only
+if it is fitted and configured.
 
 \section{Controllers over USB}
 
@@ -123,9 +129,9 @@ controller support: a clean example of an abstraction boundary doing its job.
 
 \section{From breadboard to board}
 
-The repository's \fname{hardware} directory contains starter design files for those
-who wish to go further than a breadboard: a KiCad project for a printed circuit
-board, an OpenSCAD enclosure, and a scaffold for a next hardware revision
+The repository's \fname{docs/pcb} directory contains a reference printed-circuit
+design for those who wish to go further than a breadboard, and
+\fname{docs/hardware} lists a bill of materials with purchasing links
 \citep{prg32repo}. These are beyond a first course, but they show the path from a
 classroom prototype to a finished device, and they are open for you to study and
 extend.
@@ -133,7 +139,7 @@ extend.
 \begin{prgcheck}
 With the parts above and the wiring of Table~\ref{tab:wiring}, you can assemble a
 working PRG32 on a breadboard, flash the resident firmware once
-(Appendix~\ref{ch:firstbuild}), and then upload cartridge after cartridge over the
+(Chapter~\ref{ch:firstbuild}), and then upload cartridge after cartridge over the
 board's Wi-Fi. Every game you built on QEMU in this book will then run on hardware
 you wired yourself.
 \end{prgcheck}

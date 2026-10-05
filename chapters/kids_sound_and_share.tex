@@ -1,0 +1,251 @@
+\chapter{Mission 4 and 5: Sound, Pictures, and Sharing}
+\label{ch:kids3}
+
+Your game works. Now make it \emph{feel} good: add sound, draw your own
+pictures, and then put your game on a cartridge so that other people can play
+it.
+
+\section{Beep!}
+
+The pink blocks in the \textbf{Audio} drawer make sound.
+
+\kaudio{play beep freq 880 ms 80}
+
+This block has two numbers.
+
+\begin{itemize}
+  \item \textbf{freq} is how \emph{high} the sound is. A big number is a high,
+        squeaky sound. A small number is a low, growly sound.
+  \item \textbf{ms} is how \emph{long} the sound lasts. 1000 is one second, so
+        80 is very short.
+\end{itemize}
+
+\begin{prgmission}[Mission 4, step 1: happy beep, sad beep]
+Open Lemon Catcher. Put a high beep inside the ``caught'' block and a low beep
+inside the ``missed'' block:
+
+\kinput{if rect lemon\_x lemon\_y 10 10 touches rect basket\_x 180 32 8}
+\kstate[6mm]{change score by 1}
+\kaudio[6mm]{play beep freq 880 ms 80}
+
+\kinput{if rect lemon\_x lemon\_y 10 10 touches rect 0 196 320 4}
+\kstate[6mm]{change misses by 1}
+\kaudio[6mm]{play beep freq 220 ms 150}
+
+Play with the sound on. Can you tell a catch from a miss with your eyes closed?
+\end{prgmission}
+
+\begin{prgwarn}
+Put sound blocks \emph{inside an if}, so they play only when something
+happens. A beep block sitting alone in \emph{every frame update} starts a new
+beep every frame, and that is just noise.
+\end{prgwarn}
+
+\section{Notes}
+
+The second pink block plays a musical note.
+
+\kaudio{play MIDI note 60 on channel 0 for 250 ms}
+
+Notes have numbers. Note 60 is the \emph{C} in the middle of a piano. Each step
+up is the next key.
+
+\begin{center}
+\begin{tabular}{@{}lcccccccc@{}}
+\toprule
+Note name & C & D & E & F & G & A & B & C \\
+Number & 60 & 62 & 64 & 65 & 67 & 69 & 71 & 72 \\
+\bottomrule
+\end{tabular}
+\captionof{table}{The white keys from middle C up to the next C.}
+\end{center}
+
+\begin{prgmission}[Mission 4, step 2: the Music Pad]
+Make a new project called \textbf{Music Pad}. Four buttons play four notes,
+and a white bar shows which pad is playing.
+
+\kgame{when game starts}
+\kstate[6mm]{set marker\_x to 400}
+
+\kgame{every frame update}
+\kstate[6mm]{set marker\_x to 400}
+\kinput[6mm]{if button LEFT pressed}
+\kstate[12mm]{set marker\_x to 40}
+\kaudio[12mm]{play MIDI note 60 on channel 0 for 120 ms}
+\kinput[6mm]{if button UP pressed}
+\kstate[12mm]{set marker\_x to 104}
+\kaudio[12mm]{play MIDI note 64 on channel 0 for 120 ms}
+
+Add two more: RIGHT plays note 67 with the marker at 168, and A plays note 72
+with the marker at 232.
+
+\kgame{every frame draw}
+\kdraw[6mm]{clear screen BLACK}
+\kdraw[6mm]{draw rectangle x 40 y 80 w 48 h 48 color BLUE}
+\kdraw[6mm]{draw rectangle x 104 y 80 w 48 h 48 color GREEN}
+\kdraw[6mm]{draw rectangle x 168 y 80 w 48 h 48 color RED}
+\kdraw[6mm]{draw rectangle x 232 y 80 w 48 h 48 color MAGENTA}
+\kdraw[6mm]{draw rectangle x marker\_x y 136 w 48 h 6 color WHITE}
+\end{prgmission}
+
+Why is marker\_x set to 400 at the start of every update? The screen is only
+320 wide, so 400 is \emph{off the screen}. The bar is hidden there until a
+button moves it under a pad. Hiding things off the screen is an old game
+maker's trick.
+
+\begin{prgtry}
+Play \emph{C, E, G, C}: left, up, right, A. That is a chord called C major.
+Change the note numbers to make your own four-note tune. Can a friend copy it
+by ear?
+\end{prgtry}
+
+\section{Sprite Lab: draw your own pictures}
+
+A small picture used in a game is called a \textbf{sprite}. Click
+\textbf{Sprite Lab} at the top of the Kit.
+
+\begin{prgmission}[Mission 4, step 3: a lemon with a face]
+\begin{enumerate}
+  \item Click \kbtn{New Sprite}. Name it \textbf{lemon}. Keep 16 by 16.
+  \item Pick yellow and paint a round lemon, one pixel at a time.
+  \item Pick black and give it two eyes and a smile.
+  \item Made a mistake? Use the eraser. Erased pixels are see-through.
+  \item Click \kbtn{Save}.
+\end{enumerate}
+\end{prgmission}
+
+A 16 by 16 sprite has $16 \times 16 = 256$ pixels. Every pixel is one colour.
+Up close you see squares. From far away you see a lemon. All pictures on all
+screens work like this.
+
+\section{What is under the blocks?}
+
+Here is a secret. The computer does not really understand blocks. It
+understands a language of words and symbols. One such language is called
+\textbf{C}. Grown-up programmers type it by hand.
+
+Click \kbtn{Generate C}. On the right you can see your game written in C.
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}XX@{}}
+\toprule
+Your block & The same thing in C \\
+\midrule
+set score to 0 & \code{score = 0;} \\
+change basket\_x by 4 & \code{basket\_x += 4;} \\
+if button LEFT pressed & \code{if (input \& PRG32\_BTN\_LEFT) \{ \}} \\
+clear screen BLACK & \code{prg32\_gfx\_clear(PRG32\_COLOR\_BLACK);} \\
+\bottomrule
+\end{tabularx}
+\captionof{table}{Each block becomes one line of C.}
+\end{center}
+
+\begin{prgtry}
+Find the line in the C that came from your \textbf{keep basket\_x between}
+block. How many \textbf{if}s did one block turn into?
+\end{prgtry}
+
+You do not have to understand all of it. Just notice: your blocks \emph{are} a
+real program. One day you may write the words yourself. The older students who
+use this book do exactly that.
+
+\section{Mission 5: your game on a cartridge}
+
+Long ago, video games came on \textbf{cartridges}: plastic boxes you pushed
+into the machine. \prg games come on cartridges too, but ours are files. A \prg
+cartridge file ends in \fname{.prg32}.
+
+\begin{prgmission}[Mission 5, step 1: make the cartridge]
+Open your best game. Click \kbtn{Compile Cartridge}.
+
+If your teacher has set up the cartridge tools, green download buttons appear.
+You have made a real cartridge!
+\end{prgmission}
+
+\begin{center}
+\begin{tikzpicture}[font=\sffamily\small,node distance=7mm,
+  s/.style={rounded corners=3pt,draw=prgsteel,fill=prgpanel,minimum height=11mm,minimum width=23mm,align=center},
+  ar/.style={-{Stealth[length=2.2mm]},draw=prgink!70,thick}]
+  \node[s,fill=prgamber!20] (b) {your\\blocks};
+  \node[s,right=of b] (c) {C\\program};
+  \node[s,right=of c] (k) {cartridge\\\fname{.prg32}};
+  \node[s,right=of k,fill=prggreen!15] (m) {a real\\\prg};
+  \draw[ar] (b) -- (c); \draw[ar] (c) -- (k); \draw[ar] (k) -- (m);
+\end{tikzpicture}
+\captionof{figure}{From blocks to a real machine.}
+\end{center}
+
+A cartridge can be played in three places:
+
+\begin{itemize}
+  \item on a real \textbf{\prg console}, a small computer with a screen and a
+        joystick;
+  \item in \textbf{PRG32-QT}, an app for computers, tablets, phones, and TVs;
+  \item by anyone who finds it in the \textbf{Cartridge Store}.
+\end{itemize}
+
+\section{The Cartridge Store}
+
+The Cartridge Store is a web site full of \prg games, like a library. Anyone
+can look and play. To \emph{add} a game, you send it in, and a person called an
+\textbf{editor} checks it first. In your class, the editor is probably your
+teacher.
+
+\begin{prgmission}[Mission 5, step 2: share, with your teacher]
+\begin{enumerate}
+  \item Give your game a good title and a short sentence that says what it is.
+  \item Ask your teacher to open the \kbtn{Publish} page with you.
+  \item Click \kbtn{Publish} next to your game.
+  \item Wait. Your teacher checks the game and says yes.
+  \item Find your game in the Store. Show a friend!
+\end{enumerate}
+\end{prgmission}
+
+\begin{prgconcept}
+Sharing has rules. Share only what \emph{you} made. Never put your full name,
+your address, or your photo in a game. Be kind in titles and words: real people
+will read them.
+\end{prgconcept}
+
+\section{What you have learned}
+
+Look how far you have come. You know the big ideas that every programmer
+uses, in every language:
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+Big idea & Where you used it \\
+\midrule
+sequence & blocks run from top to bottom \\
+loop & update and draw repeat every frame \\
+variable & player\_x, score, misses \\
+condition & if button pressed, if touching \\
+event & a beep when a lemon is caught \\
+coordinates & x across, y down \\
+randomness & a new lemon somewhere new \\
+debugging & Step, and watching the numbers \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{prgcheck}
+You finished the Young Makers track if you can:
+\begin{itemize}
+  \item add a sound that plays only when something happens;
+  \item draw and save a sprite;
+  \item find one of your blocks in the generated C;
+  \item explain what a cartridge is;
+  \item say two rules for sharing safely.
+\end{itemize}
+\end{prgcheck}
+
+\begin{prggrownup}
+\kbtn{Compile Cartridge} produces real \fname{.prg32} files only when the \prg
+toolchain is installed where the Kit runs; otherwise it produces a source-only
+bundle (Chapter~\ref{ch:kitteach}). Publication always goes through an editor's
+review (Chapter~\ref{ch:store}); pupils should never hold publication tokens.
+Sprite Lab converts drawings to C arrays; using a sprite inside a Blocks game
+requires the Advanced~C editor, which is a good extension for confident pupils
+aged eleven and over.
+\end{prggrownup}

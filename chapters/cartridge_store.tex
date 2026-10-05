@@ -1,0 +1,421 @@
+\chapter{Publishing Cartridges on the Cartridge Store}
+\label{ch:store}
+
+A game that only its author can run is an exercise. A game that a classmate
+can find, download onto their own board, and beat your high score on is a
+publication. The \textbf{PRG32 Cartridge Store} is the service that turns one
+into the other: a catalogue of \fname{.prg32} cartridges with an editorial
+review step, plus the score, metrics, and multiplayer services that games use
+at run time \citep{prg32store}. This chapter follows a cartridge from a source
+file to a catalogue page, and it tells the story four times, once for each kind
+of person who meets the Store: the visitor without an account, the registered
+user who publishes, the editor who reviews, and the administrator who runs the
+service.
+
+\section{The Store in one picture}
+
+\begin{center}
+\begin{tikzpicture}[font=\sffamily\scriptsize,node distance=5mm,
+  s/.style={rounded corners=2pt,draw=prgsteel,fill=prgpanel,minimum height=9mm,minimum width=25mm,align=center},
+  q/.style={rounded corners=2pt,draw=prgamber,fill=prgamber!10,minimum height=9mm,minimum width=25mm,align=center},
+  g/.style={rounded corners=2pt,draw=prggreen,fill=prggreen!10,minimum height=9mm,minimum width=25mm,align=center},
+  ar/.style={-{Stealth[length=2mm]},draw=prgink!70}]
+  \node[s] (dev) {registered user\\builds a bundle};
+  \node[q,right=9mm of dev] (pend) {pending\\submission};
+  \node[s,below=6mm of pend] (ed) {editor\\verifies or rejects};
+  \node[g,right=9mm of pend] (cat) {public\\catalogue};
+  \node[s,right=9mm of cat,yshift=8mm] (brd) {\prg board,\\QEMU, PRG32-QT};
+  \node[s,right=9mm of cat,yshift=-8mm] (web) {anyone with\\a browser};
+  \draw[ar] (dev) -- node[above]{upload} (pend);
+  \draw[ar] (ed) -- (pend);
+  \draw[ar] (pend) -- node[above]{verify} (cat);
+  \draw[ar] (cat) -- (brd);
+  \draw[ar] (cat) -- (web);
+\end{tikzpicture}
+\captionof{figure}{The life of a submission. Nothing reaches the public
+catalogue without an editor's decision \citep{prg32storeapi}.}
+\label{fig:storeflow}
+\end{center}
+
+\begin{prgconcept}
+Publishing is \emph{moderated}. An upload creates a pending submission; only
+when a member of the \code{editors} group verifies it does the cartridge appear
+in the catalogue. The Store never executes uploaded code: it validates the
+package, stores it, and serves it.
+\end{prgconcept}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}lXl@{}}
+\toprule
+Who & May & Needs \\
+\midrule
+Visitor & browse, search, read game pages and colophons, download cartridges,
+  view scoreboards and statistics & nothing \\
+Registered user & everything above, plus upload bundles for review, create
+  publication tokens, submit scores, own metrics runs & verified e-mail \\
+Editor & everything above, plus review the queue, edit descriptive metadata,
+  verify or reject, administer published cartridges & \code{editors} group \\
+Administrator & everything above, plus settings, users, groups, roles,
+  authentication providers, backup and restore & admin role \\
+\bottomrule
+\end{tabularx}
+\captionof{table}{The four points of view of this chapter
+\citep{prg32store,prg32storeapi}.}
+\label{tab:storeroles}
+\end{center}
+
+\section{What exactly gets published}
+
+Three nested things are involved, and beginners confuse them.
+
+A \textbf{cartridge} is one \fname{.prg32} file: the \code{PRG2} header, your
+linked code and data, an optional audio block, and an optional metadata
+trailer \citep{prg32cartfmt}. One cartridge file contains one linked image, so
+the Store keeps one file per \emph{architecture}: \code{esp32c6} for the
+physical board and \code{qemu} for the emulator.
+
+A \textbf{bundle} is a ZIP archive holding a \fname{manifest.json}, an icon,
+and one or more cartridge files. The bundle is the unit of submission.
+
+A \textbf{game} in the catalogue is identified by the manifest's \code{id};
+each \code{version} of that game holds its architecture variants.
+
+\lstinputlisting[style=json,
+  caption={A bundle manifest (\fname{examples/store\_publishing/manifest.json}).
+  Required fields are \code{abi}, \code{id}, \code{title}, \code{version},
+  \code{assets.icon}, and a non-empty \code{architectures} list.}
+]{examples/store_publishing/manifest.json}
+
+\begin{prgwarn}
+The \code{id} and the \code{version} are forever. Editors can correct a title
+or a tag during review, but the Store preserves the identifier, the version,
+and the authorship of the package as submitted. Choose a reverse-domain
+identifier you control (\code{it.myschool.class3b.lemons}), and raise the
+version for every new submission.
+\end{prgwarn}
+
+A cartridge may also carry a \textbf{colophon}: the credits and controls screen
+shown after a cartridge is activated and before play begins. It is the game's
+title page, and writing one is a small lesson in attribution.
+
+\lstinputlisting[style=json,
+  caption={A colophon (\fname{examples/store\_publishing/colophon.json}).
+  \code{abi}, \code{title}, \code{version}, and \code{developer.name} are
+  required.}
+]{examples/store_publishing/colophon.json}
+
+\section{The visitor: no account needed}
+
+Everything about \emph{getting} games is open. A visitor to the Store's web
+page sees the catalogue, can search by title, summary, author, or tag, and can
+open a game's page to read its description, authors, versions, download count,
+colophon, and leaderboard. The \kbtn{Scores} and \kbtn{Stats} pages are public
+too.
+
+Most visitors, however, are not people at a browser but \emph{devices}. A \prg
+board whose Wi\nobreakdash-Fi is configured finds the Store (by a saved address
+or by mDNS discovery on the classroom network), lists the catalogue from its
+Setup menu, and downloads a cartridge straight into one of its four slots. The
+PRG32-QT application of Chapter~\ref{ch:qt} does the same from its Store
+screen. Both ask for the variant that matches their architecture.
+
+\lstinputlisting[style=bash,
+  caption={The visitor's view from a terminal: discover, list, search, and
+  download, all without credentials.}
+]{scripts/store/client_download.sh}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+Endpoint & Returns \\
+\midrule
+\code{GET /.well-known/prg32-store.json} & the discovery document: where each
+  service lives \\
+\code{GET /api/games} & the catalogue; accepts \code{q}, \code{page},
+  \code{per\_page} \\
+\code{GET /api/games/<id>} & one game record with its versions \\
+\code{GET /api/games/<id>/icon}, \code{/screenshot}, \code{/colophon} & the
+  game's artwork and credits \\
+\code{GET /api/games/<id>/download} & a cartridge; accepts \code{version} and
+  \code{architecture} \\
+\code{GET /api/scores} & scores; accepts \code{game}, \code{player},
+  \code{limit} \\
+\code{GET /api/stats/downloads} & download time series and top games \\
+\bottomrule
+\end{tabularx}
+\captionof{table}{The public, read-only interface \citep{prg32storeapi}.}
+\end{center}
+
+\begin{prgaside}
+The firmware and the host tools check a downloaded cartridge before running
+it: the ABI major version, the ABI hash, and the features it requires must be
+ones the runtime provides. An incompatible cartridge is refused with a message
+rather than executed. Openness about downloading is safe because the consumer,
+not the catalogue, has the last word.
+\end{prgaside}
+
+\section{The registered user: publishing your game}
+
+\subsection{An account and a token}
+
+To register, enter an e\nobreakdash-mail address on the Store's
+\kbtn{Register} page; the Store sends a verification link, and following it
+lets you set a password. Your username is that verified address. A school
+Store may instead be connected to the institution's single sign-on, in which
+case you simply log in.
+
+Publishing from a command line, or from the Construction Kit, needs a
+\textbf{publication token}. Open \kbtn{Tokens}, type a label that says where
+the token will live (``lab laptop''), and create it. The token is displayed
+once: copy it then. You can rename or revoke any of your tokens later, and you
+can see when each was last used.
+
+\begin{prgwarn}
+A token \emph{is} your account, for anything a script can do. Keep it in an
+environment variable, never in a source file, and never commit it to Git
+(Appendix~\ref{app:github}). If one leaks, revoke it on the \kbtn{Tokens} page
+and create another.
+\end{prgwarn}
+
+\subsection{Build one cartridge per architecture}
+
+From a \prg checkout with ESP-IDF active, build the portable cartridge twice,
+once for each architecture label. The source here is the C Lemon Catcher of
+Appendix~\ref{app:worked}.
+
+\lstinputlisting[style=bash,
+  caption={Building the two architecture variants and inspecting one.}
+]{scripts/store/build_variants.sh}
+
+Before you submit, \emph{play} both variants: the \code{qemu} one in QEMU or
+PRG32-QT, the \code{esp32c6} one on a board if you have it. An editor will.
+
+\subsection{Describe it}
+
+Put \fname{manifest.json} and a square PNG icon beside the two cartridge files.
+Optionally embed the same metadata, the icon, and the colophon inside each
+cartridge as a metadata trailer, so that the file describes itself even when it
+travels outside a bundle.
+
+\lstinputlisting[style=bash,
+  caption={Optional: attaching a metadata trailer and reading it back.}
+]{scripts/store/attach_metadata.sh}
+
+\subsection{Pack and submit}
+
+\lstinputlisting[style=bash,
+  caption={Packing the bundle and submitting it for review.}
+]{scripts/store/pack_and_publish.sh}
+
+The same bundle can be submitted from a browser: log in, open \kbtn{Publish},
+choose the ZIP file, and press \kbtn{Upload for Review}. Either way the Store
+answers with a \emph{pending} submission and its number. Your game is not yet
+public. When an editor verifies it, it appears in the catalogue; if it is
+rejected, fix what the editor asked for, raise the version if required, and
+submit again.
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+Before submitting, check that\dots & Why \\
+\midrule
+both variants build and run & the editor will try them \\
+\code{cartridge summary} shows the portable import model & firmware-specific
+  cartridges are not accepted by current tools \\
+the \code{id} is yours and the \code{version} is new & both are permanent \\
+the title and summary say what the game is & they are the catalogue entry \\
+authors and licence are true & attribution is part of the record \\
+the colophon lists the controls & players read it before they play \\
+no personal data is in any text & publication is public \\
+all art and sound are your own or properly licensed & you are the publisher \\
+\bottomrule
+\end{tabularx}
+\captionof{table}{A submission checklist.}
+\label{tab:storechecklist}
+\end{center}
+
+\subsection{After publication: scores and runs}
+
+A published game can use the Store at run time. Scores posted with your session
+or token appear on the game's leaderboard and on the public scoreboard, and a
+cartridge can submit them itself with
+\code{prg32\_score\_submit\_current\_player}. Performance runs
+(Appendix~\ref{app:perf}) that are posted with your token are linked to your
+account and listed on your own runs page, which only you and the administrators
+can open.
+
+\section{The editor: reviewing submissions}
+
+Editors are ordinary users whom an administrator has added to the
+\code{editors} group. They see one more item in the navigation bar,
+\kbtn{Review}, which opens the queue of pending submissions.
+
+Opening a submission shows who submitted it, its identifier, version, authors,
+and architecture files, and an \emph{Editable Metadata} form. An editor may
+change exactly seven descriptive fields: title, summary, description, tags,
+licence, homepage, and repository. The identifier, the version, and the authors
+are shown but cannot be changed; an attempt to change them through the API is
+refused \citep{prg32storeapi}. Two buttons end the review: \kbtn{Verify and
+Publish}, and \kbtn{Reject}.
+
+\lstinputlisting[style=bash,
+  caption={The editor's review, scripted. The token belongs to a user in the
+  \code{editors} group.}
+]{scripts/store/editor_review.sh}
+
+\begin{prgconcept}
+The editor may improve how a game is \emph{described}, but may not alter what
+it \emph{is} or who made it. This is the same separation a journal observes
+between copy-editing a paper and changing its authors.
+\end{prgconcept}
+
+What should an editor actually check? The Store validates form: that the
+package is a ZIP, that the manifest and colophon are well-formed, that the icon
+is a real image, that identifiers are path-safe. Judgement is left to people.
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+Question & How to answer it \\
+\midrule
+Does it run? & obtain each variant of the submission and play it in
+  PRG32-QT or QEMU \\
+Is it what it says? & compare title, summary, and tags with the game \\
+Is the content suitable for this Store's audience? & play past the title
+  screen; read every string \\
+Is the attribution honest? & authors, licence, acknowledgements; borrowed art
+  and music \\
+Is anyone's privacy at risk? & names, photographs, contact details in text or
+  art \\
+Is it a new version or a duplicate? & search the catalogue for the identifier
+  and the title \\
+\bottomrule
+\end{tabularx}
+\captionof{table}{An editorial checklist.}
+\end{center}
+
+A rejection should always come with a reason and a way forward, sent by
+whatever channel the class uses; the Store records the decision, not the
+conversation. Editors can also correct or withdraw what is already published:
+the \kbtn{Cartridges} page lets them edit the title, summary, and tags of a
+published version, or delete a variant or a whole version.
+
+\begin{prgtry}
+Run a peer-review session. Each student submits a cartridge to the class Store;
+each is then made editor for \emph{someone else's} submission and must write
+three sentences before deciding: what the game does, one thing that works well,
+and one thing that must change before publication.
+\end{prgtry}
+
+\section{The administrator: running a Store}
+
+\subsection{Deployment}
+
+The Store is a small Python web service with an SQLite database and a data
+directory. The supported way to run it is a container.
+
+\lstinputlisting[style=bash,
+  caption={First deployment of a classroom Store.}
+]{scripts/store/admin_deploy.sh}
+
+\begin{prgwarn}
+A fresh Store has an administrator named \code{admin} whose password is
+\code{password}. Change it before the first pupil connects. A Store also
+refuses to start without a \code{SECRET\_KEY}; generate a long random one and
+keep it with the deployment's secrets, because it signs every login session.
+\end{prgwarn}
+
+\subsection{Settings}
+
+The \kbtn{Setup} page, visible to administrators only, holds everything that
+gives a Store its identity and policy: its name, tagline, logo, colours, and
+custom style; the default role of new users; publishing settings; whether and
+how the Store advertises itself by mDNS as \code{\_prg32store.\_tcp.local.};
+the SMTP server used to send registration links; and the optional external
+login providers (OpenID Connect and SAML~2.0 from the page, LDAP from the
+environment). Without SMTP, registration links are written to the server log,
+which is acceptable only for a demonstration.
+
+\subsection{People}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+Page & Purpose \\
+\midrule
+\kbtn{Users} & create, edit, and delete users; set a role; reset a password;
+  assign groups \\
+\kbtn{Groups} & create, rename, and delete groups; \code{editors} is the group
+  that grants review rights \\
+\code{/admin/roles} & the fixed roles and how many users hold each \\
+\kbtn{Cartridges} & edit descriptive metadata or delete versions (shared with
+  editors) \\
+\kbtn{Backup} & download a complete backup; restore one \\
+\bottomrule
+\end{tabularx}
+\captionof{table}{Administration pages \citep{prg32storeapi}.}
+\end{center}
+
+A sound arrangement for a course is: one or two administrators (the lecturer
+and a technician); the teaching assistants in the \code{editors} group;
+students as ordinary registered users. Do not make every editor an
+administrator: the right to approve a game should not include the right to
+read the user list or restore a backup.
+
+\subsection{Backup, restore, and the network}
+
+The \kbtn{Backup} page produces a single ZIP containing a snapshot of the
+database and the data directory: settings, users, groups, cartridges, pending
+submissions, scores, statistics, and metrics. The same page restores one.
+Alternatively, stop the service and archive the data directory.
+
+\lstinputlisting[style=bash,
+  caption={A cold backup of the Store's data directory.}
+]{scripts/store/admin_backup.sh}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+Check & Detail \\
+\midrule
+Reachability & the host firewall admits TCP 5080; boards and laptops share the
+  network \\
+Discovery & \code{/.well-known/prg32-store.json} returns addresses that are
+  reachable \emph{from the boards} \\
+Multiplayer & a reverse proxy, if any, forwards WebSocket traffic to
+  \code{/api/multiplayer} \\
+Transport & beyond a closed classroom network, serve the Store over HTTPS
+  behind a reverse proxy \\
+Tokens & rotate shared classroom tokens at the end of each term \\
+Backups & scheduled, stored elsewhere, and restored once as a test \\
+\bottomrule
+\end{tabularx}
+\captionof{table}{An operations checklist.}
+\end{center}
+
+\section{Publishing from the Construction Kit}
+
+Chapter~\ref{ch:kids3} ended with a child pressing \kbtn{Publish}. What
+happened is now easy to describe. The Kit generated C from the blocks, built
+the two architecture variants, wrote a manifest, zipped a bundle, and sent it
+to the Store with the token stored in the teacher's publish profile. The Store
+created a pending submission in that teacher's name, and the teacher, wearing
+the editor's hat, verified it. A seven-year-old's game travelled exactly the
+road of Figure~\ref{fig:storeflow}.
+
+\section{Publishing as a scholarly habit}
+
+It is worth saying why a first-year course should bother with any of this. A
+catalogue entry with an identifier, a version, named authors, a licence, and a
+review record is, in miniature, a publication in the sense the rest of a degree
+will use the word. Students who publish a cartridge have practised versioning,
+attribution, licensing, peer review, and the difference between a private
+artefact and a public one, on an object they care about.
+
+\begin{prgcheck}
+You have understood this chapter if you can: name the four roles and one thing
+only each can do; explain the difference between a cartridge, a bundle, and a
+game; say which manifest fields can never be changed after submission; create
+and revoke a publication token; submit a bundle and find it in the pending
+queue; and state the first two things an administrator must do on a new Store.
+\end{prgcheck}

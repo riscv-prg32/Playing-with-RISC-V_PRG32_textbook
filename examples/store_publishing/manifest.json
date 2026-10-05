@@ -1,0 +1,16 @@
+{
+  "abi": "prg32-metadata-1.0",
+  "id": "org.example.lemon-catcher",
+  "title": "Lemon Catcher",
+  "version": "1.0.0",
+  "summary": "Catch the falling lemons with your basket.",
+  "description": "A first cartridge from the Playing with RISC-V textbook. Move the basket with LEFT and RIGHT; five misses end the round.",
+  "authors": [{"name": "Your Name"}],
+  "license": "MIT",
+  "tags": ["arcade", "education", "textbook"],
+  "assets": {"icon": "icon.png"},
+  "architectures": [
+    {"id": "esp32c6", "file": "lemon-catcher-esp32c6.prg32"},
+    {"id": "qemu", "file": "lemon-catcher-qemu.prg32"}
+  ]
+}

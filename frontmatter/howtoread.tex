@@ -5,34 +5,55 @@
 \addcontentsline{toc}{chapter}{How to Read This Book}
 \markboth{How to Read This Book}{How to Read This Book}
 
-\section*{Two tracks, one runtime}
+\section*{Three tracks, one runtime}
 
-This book contains two courses that share a single platform. Part~II is the
+This book contains three courses that share a single platform. Part~II is the
 \textbf{Computer Architecture track}, written entirely in \riscv assembly.
-Part~III is the \textbf{Computer Programming track}, written entirely in C. The
-two parts are independent: neither requires you to have read the other, and they
-deliberately solve some of the same problems so that they can be compared. If you
-are following only one course, read the shared foundation in Part~I, then your
-own track, and consult the appendices as needed. Part~IV is a short closing
-chapter that brings the two languages into contact; it rewards readers who have
-seen both, but it is optional.
+Part~III is the \textbf{Computer Programming track}, written entirely in C.
+Part~IV is the \textbf{Young Makers track}, for children from about seven years
+old, in which games are built from blocks in the PRG32 Construction Kit; its
+last chapter is addressed to their teachers. The tracks are independent: none
+requires you to have read another, and they deliberately solve some of the same
+problems so that they can be compared. If you are following only one course,
+read the shared foundation in Part~I, then your own track, and consult the
+appendices as needed. Part~V brings the paths together: a short chapter that
+puts assembly and C side by side, and a chapter on publishing a finished
+cartridge on the Cartridge Store, which every track eventually reaches.
 
 \begin{center}
-\begin{tikzpicture}[node distance=8mm and 12mm,
+\begin{tikzpicture}[node distance=8mm and 6mm,
   every node/.style={font=\sffamily\small},
-  box/.style={rounded corners=2pt,draw=prgsteel,fill=prgpanel,minimum height=9mm,minimum width=34mm,align=center},
-  acc/.style={rounded corners=2pt,draw=prggreen,fill=prggreen!8,minimum height=9mm,minimum width=34mm,align=center},
-  cbox/.style={rounded corners=2pt,draw=prgamber,fill=prgamber!8,minimum height=9mm,minimum width=34mm,align=center},
+  box/.style={rounded corners=2pt,draw=prgsteel,fill=prgpanel,minimum height=9mm,minimum width=32mm,align=center},
+  acc/.style={rounded corners=2pt,draw=prggreen,fill=prggreen!8,minimum height=9mm,minimum width=32mm,align=center},
+  cbox/.style={rounded corners=2pt,draw=prgamber,fill=prgamber!8,minimum height=9mm,minimum width=32mm,align=center},
+  kbox/.style={rounded corners=2pt,draw=prgviolet,fill=prgviolet!8,minimum height=9mm,minimum width=32mm,align=center},
   ar/.style={-{Stealth[length=2mm]},draw=prgink!60}]
   \node[box] (found) {Part~I\\Foundations};
-  \node[acc,below left=of found] (asm) {Part~II\\Assembly track};
-  \node[cbox,below right=of found] (c) {Part~III\\C track};
-  \node[box,below=18mm of found] (join) {Part~IV\\Assembly meets C};
+  \node[cbox,below=of found] (c) {Part~III\\C track};
+  \node[acc,left=of c] (asm) {Part~II\\Assembly track};
+  \node[kbox,right=of c] (k) {Part~IV\\Young Makers (Blocks)};
+  \node[box,below=of c] (join) {Part~V\\Together; publishing};
   \draw[ar] (found) -- (asm);
   \draw[ar] (found) -- (c);
+  \draw[ar] (found) -- (k);
   \draw[ar] (asm) -- (join);
   \draw[ar] (c) -- (join);
+  \draw[ar] (k) -- (join);
 \end{tikzpicture}
+\end{center}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+If you are\dots & Read \\
+\midrule
+a computer architecture student & Part~I, Part~II, Chapters~\ref{ch:join} and \ref{ch:store} \\
+a programming student & Part~I, Part~III, Chapters~\ref{ch:join} and \ref{ch:store} \\
+a young maker (7+) & Chapters~\ref{ch:kids1}--\ref{ch:kids3}, with a grown-up \\
+a school teacher & Chapters~\ref{ch:platform}, \ref{ch:kitteach}, and \ref{ch:store}; then the pupil chapters \\
+a lecturer or lab assistant & everything; the slide decks in \fname{presentations/} follow the chapters \\
+\bottomrule
+\end{tabularx}
 \end{center}
 
 \section*{The recurring boxes}
@@ -63,6 +84,16 @@ A \textbf{Watch Out} box flags a mistake that beginners reliably make. Reading
 these will save you hours of confusion at the workbench.
 \end{prgwarn}
 
+\begin{prgmission}
+A \textbf{Mission} box, in the Young Makers track, is a set of numbered steps to
+do at the computer, with the blocks to build drawn in colour.
+\end{prgmission}
+
+\begin{prgteacher}
+A \textbf{For the Teacher} box (and its sibling, \textbf{With a Grown-Up})
+speaks over the pupil's shoulder to the adult in the room.
+\end{prgteacher}
+
 \begin{prgaside}
 A \textbf{Historical Note} box steps back to place an idea in its context: why a
 convention exists, where a technique came from, or what an old machine did. These
@@ -78,13 +109,25 @@ gives them for both. The QEMU target uses an ESP32\nobreakdash-C3 emulator profi
 that is the \riscv graphics path Espressif maintains, while the hardware target
 is the ESP32\nobreakdash-C6; the \riscv calling convention and the \prg interface are
 identical across the two \citep{prg32qemu}. Wherever a feature exists only on real
-hardware: physical buttons, the buzzer, Wi\nobreakdash-Fi cartridge upload, the text says
-so plainly.
+hardware (physical buttons, the RGB status light, Wi\nobreakdash-Fi cartridge
+upload) the text says so plainly. A third host, the PRG32-QT application of
+Chapter~\ref{ch:qt}, runs the very same portable cartridges on desktops, tablets,
+phones, and televisions, and adds an instruction-level debugger.
 
 \section*{What you need}
 
 To follow the book you need a computer running Windows, Linux, or macOS, and the
-free, open-source toolchain described in Appendix~F. To follow the optional
-hardware exercises you also need an ESP32\nobreakdash-C6 development board and a small
-collection of inexpensive parts listed in Appendix~E. Nothing else in this book
-is proprietary or paid.
+free, open-source toolchain described in Chapter~\ref{ch:firstbuild}. To follow
+the optional hardware exercises you also need an ESP32\nobreakdash-C6 development
+board and a small collection of inexpensive parts listed in
+Appendix~\ref{app:hw}. The Young Makers track needs only a web browser and one
+computer running the Construction Kit. Nothing in this book is proprietary or
+paid.
+
+\section*{Slides for teaching}
+
+The \fname{presentations/} folder of the book's repository contains two slide
+decks for every chapter: a \emph{lecture} deck for about forty-five minutes of
+front teaching, and a \emph{lab} deck that leads a class through forty-five
+minutes of practical, step-by-step work. Each deck is pitched at the audience of
+its chapter.

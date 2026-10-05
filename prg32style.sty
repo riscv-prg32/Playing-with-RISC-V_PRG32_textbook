@@ -2,7 +2,7 @@
 %  prg32style.sty  --  Shared style package for
 %  "Playing with RISC-V: Assembly, C, and Retro Games on the PRG32 Platform"
 % ============================================================================
-\ProvidesPackage{prg32style}[2026/05/25 PRG32 textbook style]
+\ProvidesPackage{prg32style}[2026/10/05 PRG32 textbook style]
 
 % ---- Encoding & fonts ------------------------------------------------------
 \RequirePackage[T1]{fontenc}
@@ -30,6 +30,8 @@
 \definecolor{prgcomment}{HTML}{6A7B6F}  % code comment
 \definecolor{prgkeyword}{HTML}{1F5673}  % code keyword
 \definecolor{prgstring}{HTML}{8A5A28}   % code string
+\definecolor{prgviolet}{HTML}{6B4FA0}   % Blocks: state
+\definecolor{prgplum}{HTML}{A03A8A}     % Blocks: audio
 
 % ---- Graphics, tables, math ------------------------------------------------
 \RequirePackage{graphicx}
@@ -123,7 +125,10 @@
 \lstdefinestyle{asm}{style=prgbase,language=riscv}
 \lstdefinestyle{c}{style=prgbase,language=C,
   morekeywords={uint32_t,uint16_t,uint8_t,int8_t,int16_t,int32_t,size_t,
-    bool,void,prg32_platform_actor_t,prg32_anim_sprite_t,prg32_note_t}}
+    bool,void,prg32_platform_actor_t,prg32_anim_sprite_t,prg32_note_t,
+    prg32_score_t,prg32_indexed_sprite_t,prg32_keyboard_t}}
+\lstdefinestyle{json}{style=prgbase,numbers=none,morestring=[b]",
+  literate={:}{{{\color{prgkeyword}:}}}{1}}
 \lstdefinestyle{bash}{style=prgbase,language=bash,numbers=none}
 \lstdefinestyle{plain}{style=prgbase,numbers=none}
 \lstset{style=prgbase}
@@ -154,6 +159,27 @@
 
 \newtcolorbox{prgaside}{prgbox, colback=prgpaper, colframe=prgink!45,
   colbacktitle=prgink!70, title={Historical Note}}
+
+\newtcolorbox{prgmission}[1][Mission]{prgbox, colback=prgviolet!6,
+  colframe=prgviolet, colbacktitle=prgviolet, title={#1}}
+
+\newtcolorbox{prgteacher}{prgbox, colback=prgsteel!5, colframe=prgsteel!80,
+  colbacktitle=prgsteel!80, title={For the Teacher}}
+
+\newtcolorbox{prggrownup}{prgbox, colback=prgamber!6, colframe=prgamber!85!black,
+  colbacktitle=prgamber!85!black, title={With a Grown-Up}}
+
+% Construction Kit blocks, drawn as coloured pills.  \kblock[indent]{colour}{text}
+\newcommand{\kblock}[3][0mm]{\par\noindent\hspace*{#1}%
+  \tcbox[on line,colback=#2,colframe=#2!70!black,coltext=white,
+    fontupper=\sffamily\bfseries\small,boxsep=1.5pt,left=5pt,right=5pt,
+    top=2pt,bottom=2pt,arc=3pt,boxrule=0.6pt]{#3}\par\vspace{-0.6\parskip}}
+\newcommand{\kgame}[2][0mm]{\kblock[#1]{prgamber!90!black}{#2}}
+\newcommand{\kstate}[2][0mm]{\kblock[#1]{prgviolet}{#2}}
+\newcommand{\kinput}[2][0mm]{\kblock[#1]{prgred}{#2}}
+\newcommand{\kdraw}[2][0mm]{\kblock[#1]{prgaccent}{#2}}
+\newcommand{\kaudio}[2][0mm]{\kblock[#1]{prgplum}{#2}}
+\newcommand{\kbtn}[1]{\textsf{\textbf{#1}}}
 
 % Both-targets badge used throughout
 \newtcolorbox{prgtargets}{

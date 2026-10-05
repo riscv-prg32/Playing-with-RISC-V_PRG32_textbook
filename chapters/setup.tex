@@ -11,11 +11,12 @@ commands.
 
 \section{The one idea behind every setup}
 
-Whatever your operating system, the toolchain is ESP-IDF version 5.3 or newer,
+Whatever your operating system, the toolchain is ESP-IDF version 5.4 or newer,
 configured for the \code{esp32c3} and \code{esp32c6} targets: the first for the
 QEMU emulator, the second for the physical board \citep{prg32repo,prg32qemu}. Once
-ESP-IDF is installed and "sourced" (made active in your shell), the command
-\code{idf.py} builds, flashes, and runs everything. Almost every setup problem
+ESP-IDF is installed and ``sourced'' (made active in your shell), the platform's
+own tool, \code{python3 -m prg32}, builds, flashes, packages, and runs everything
+by driving ESP-IDF's \code{idf.py} for you. Almost every setup problem
 reduces to ESP-IDF not being active in the current shell.
 
 \begin{prgwarn}
@@ -189,10 +190,17 @@ For the \textbf{physical ESP32\nobreakdash-C6 board}, the build uses a directory
 ]{scripts/setup/building_and_flashing_esp32c6.sh}
 
 For the \textbf{QEMU emulator}, the build uses \fname{build-qemu} and the QEMU
-profile, and targets the ESP32\nobreakdash-C3 emulator. On \textbf{QEMU}, there is no Wi-Fi to upload over, so you build the cartridge
-against the QEMU firmware ELF and stage it directly into the emulator's flash
-image. If the flash image does not yet exist, run QEMU once so ESP-IDF creates it,
-quit, then stage \citep{prg32qemu}.
+profile, and targets the ESP32\nobreakdash-C3 emulator. On \textbf{QEMU} there is
+no Wi-Fi to upload over, so you \emph{stage} a cartridge directly into the
+emulator's flash image with \code{python3 -m prg32 qemu upload}, then start the
+emulator. Close QEMU before staging \citep{prg32qemu}.
+
+\begin{prgwarn}
+QEMU reads the keyboard from the \emph{terminal that launched it}, not from the
+window that shows the screen. Click the terminal, then use the arrow keys (or
+\kbtn{W}\,\kbtn{A}\,\kbtn{S}\,\kbtn{D}), \kbtn{Z} or \kbtn{J} for A, \kbtn{X} or
+\kbtn{K} for B, and \kbtn{Enter} or \kbtn{Space} for Start/Select.
+\end{prgwarn}
 
 \subsection{Windows}
 
@@ -236,19 +244,40 @@ interface are identical.
 
 A healthy board boot logs the firmware entering \code{app\_main}, the configured
 display pins, and finally "PRG32 runtime initialized," then shows the splash
-\citep{prg32tutorial}. The platform also ships a smoke test that exercises the whole
-workflow: environment, firmware build, cartridge build, and QEMU staging, and
-prints \code{=== SMOKE TEST PASSED ===} when all is well \citep{prg32repo}.
+\citep{prg32tutorial}. The tooling includes a \code{doctor} command that checks
+that ESP-IDF is active, that the \riscv compiler is on the path, and that the
+partition table with its four cartridge slots can be read. The sequence below
+uses it and then exercises the whole workflow: firmware build, cartridge build,
+inspection, QEMU staging, and run \citep{prg32repo}.
 
 \lstinputlisting[
     style=bash,
     caption={%\fname{smoke\_test.sh} \protect\
-       Running the end-to-end smoke test.}
+       An end-to-end check of the environment.}
 ]{scripts/setup/smoke_test.sh}
 
+\section{Cartridge memory profiles}
+
+The firmware reserves a fixed window of executable memory for the cartridge it
+is running. The default, \emph{extended} profile is 64\,KiB, for both the board
+and QEMU; an optional \emph{classroom} profile is 32\,KiB and leaves more heap
+to the runtime; an optional 128\,KiB profile exists for large games on the
+physical board \citep{prg32profiles}. The host tools refuse to build or stage a
+cartridge that would not fit: \code{cartridge build} assumes 64\,KiB unless you
+pass \code{--cart-ram-kib}, and \code{esp32c6 upload} asks the board itself.
+Nothing in this book comes near the limit, but the error message is worth
+recognising when one of your own games eventually does.
+
+\section{Running without a toolchain}
+
+A student who only needs to \emph{run} cartridges (to play a classmate's game,
+or to step through one in a debugger) can skip this chapter entirely and install
+PRG32-QT (Chapter~\ref{ch:qt}). A child or teacher following the Young Makers
+track needs only a browser (Chapter~\ref{ch:kitteach}).
+
 \begin{prgcheck}
-Your environment is ready when, on your operating system, \code{idf.py} runs in an
-ESP-IDF shell, the QEMU build opens a virtual screen reaching "PRG32 runtime
+Your environment is ready when, on your operating system, \code{python3 -m prg32
+doctor} passes in an ESP-IDF shell, the QEMU build opens a virtual screen reaching "PRG32 runtime
 initialized," and, if you have a board, the firmware flashes and shows its
 splash. With that in place, every chapter and every example in this book is
 buildable on your machine.

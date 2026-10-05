@@ -1,0 +1,189 @@
+{
+  "abi": "prg32-construction-kit-project-1.0",
+  "title": "Moving Square",
+  "description": "Mission 2: move the square with the arrows and keep it on the screen.",
+  "author": "Playing with RISC-V",
+  "tags": [
+    "blocks",
+    "mission-2"
+  ],
+  "blocks_json": {
+    "blocks": {
+      "languageVersion": 0,
+      "blocks": [
+        {
+          "type": "prg32_on_start",
+          "id": "moving_square-on_start",
+          "x": 20,
+          "y": 20,
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "prg32_set_state",
+                "id": "moving_square-9",
+                "fields": {
+                  "VAR": "player_x",
+                  "VALUE": "152"
+                },
+                "next": {
+                  "block": {
+                    "type": "prg32_set_state",
+                    "id": "moving_square-8",
+                    "fields": {
+                      "VAR": "player_y",
+                      "VALUE": "92"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "prg32_update",
+          "id": "moving_square-update",
+          "x": 330,
+          "y": 20,
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "prg32_if_button",
+                "id": "moving_square-18",
+                "fields": {
+                  "BUTTON": "LEFT"
+                },
+                "inputs": {
+                  "DO": {
+                    "block": {
+                      "type": "prg32_change_state",
+                      "id": "moving_square-19",
+                      "fields": {
+                        "VAR": "player_x",
+                        "DELTA": "-3"
+                      }
+                    }
+                  }
+                },
+                "next": {
+                  "block": {
+                    "type": "prg32_if_button",
+                    "id": "moving_square-16",
+                    "fields": {
+                      "BUTTON": "RIGHT"
+                    },
+                    "inputs": {
+                      "DO": {
+                        "block": {
+                          "type": "prg32_change_state",
+                          "id": "moving_square-17",
+                          "fields": {
+                            "VAR": "player_x",
+                            "DELTA": "3"
+                          }
+                        }
+                      }
+                    },
+                    "next": {
+                      "block": {
+                        "type": "prg32_if_button",
+                        "id": "moving_square-14",
+                        "fields": {
+                          "BUTTON": "UP"
+                        },
+                        "inputs": {
+                          "DO": {
+                            "block": {
+                              "type": "prg32_change_state",
+                              "id": "moving_square-15",
+                              "fields": {
+                                "VAR": "player_y",
+                                "DELTA": "-3"
+                              }
+                            }
+                          }
+                        },
+                        "next": {
+                          "block": {
+                            "type": "prg32_if_button",
+                            "id": "moving_square-12",
+                            "fields": {
+                              "BUTTON": "DOWN"
+                            },
+                            "inputs": {
+                              "DO": {
+                                "block": {
+                                  "type": "prg32_change_state",
+                                  "id": "moving_square-13",
+                                  "fields": {
+                                    "VAR": "player_y",
+                                    "DELTA": "3"
+                                  }
+                                }
+                              }
+                            },
+                            "next": {
+                              "block": {
+                                "type": "prg32_clamp_state",
+                                "id": "moving_square-11",
+                                "fields": {
+                                  "VAR": "player_x",
+                                  "LOW": "0",
+                                  "HIGH": "304"
+                                },
+                                "next": {
+                                  "block": {
+                                    "type": "prg32_clamp_state",
+                                    "id": "moving_square-10",
+                                    "fields": {
+                                      "VAR": "player_y",
+                                      "LOW": "0",
+                                      "HIGH": "184"
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "prg32_draw",
+          "id": "moving_square-draw",
+          "x": 680,
+          "y": 20,
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "prg32_clear_screen",
+                "id": "moving_square-21",
+                "fields": {
+                  "COLOR": "BLACK"
+                },
+                "next": {
+                  "block": {
+                    "type": "prg32_draw_rect",
+                    "id": "moving_square-20",
+                    "fields": {
+                      "X": "player_x",
+                      "Y": "player_y",
+                      "W": "16",
+                      "H": "16",
+                      "COLOR": "YELLOW"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

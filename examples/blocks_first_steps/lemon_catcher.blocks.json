@@ -1,0 +1,422 @@
+{
+  "abi": "prg32-construction-kit-project-1.0",
+  "title": "Lemon Catcher",
+  "description": "Mission 3: catch falling lemons with the basket. The bar at the top shows the score.",
+  "author": "Playing with RISC-V",
+  "tags": [
+    "blocks",
+    "mission-3",
+    "game"
+  ],
+  "blocks_json": {
+    "blocks": {
+      "languageVersion": 0,
+      "blocks": [
+        {
+          "type": "prg32_on_start",
+          "id": "lemon_catcher-on_start",
+          "x": 20,
+          "y": 20,
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "prg32_set_state",
+                "id": "lemon_catcher-26",
+                "fields": {
+                  "VAR": "basket_x",
+                  "VALUE": "144"
+                },
+                "next": {
+                  "block": {
+                    "type": "prg32_set_state",
+                    "id": "lemon_catcher-25",
+                    "fields": {
+                      "VAR": "lemon_x",
+                      "VALUE": "150"
+                    },
+                    "next": {
+                      "block": {
+                        "type": "prg32_set_state",
+                        "id": "lemon_catcher-24",
+                        "fields": {
+                          "VAR": "lemon_y",
+                          "VALUE": "0"
+                        },
+                        "next": {
+                          "block": {
+                            "type": "prg32_set_state",
+                            "id": "lemon_catcher-23",
+                            "fields": {
+                              "VAR": "score",
+                              "VALUE": "0"
+                            },
+                            "next": {
+                              "block": {
+                                "type": "prg32_set_state",
+                                "id": "lemon_catcher-22",
+                                "fields": {
+                                  "VAR": "misses",
+                                  "VALUE": "0"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "prg32_update",
+          "id": "lemon_catcher-update",
+          "x": 330,
+          "y": 20,
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "prg32_if_button",
+                "id": "lemon_catcher-46",
+                "fields": {
+                  "BUTTON": "LEFT"
+                },
+                "inputs": {
+                  "DO": {
+                    "block": {
+                      "type": "prg32_change_state",
+                      "id": "lemon_catcher-47",
+                      "fields": {
+                        "VAR": "basket_x",
+                        "DELTA": "-4"
+                      }
+                    }
+                  }
+                },
+                "next": {
+                  "block": {
+                    "type": "prg32_if_button",
+                    "id": "lemon_catcher-44",
+                    "fields": {
+                      "BUTTON": "RIGHT"
+                    },
+                    "inputs": {
+                      "DO": {
+                        "block": {
+                          "type": "prg32_change_state",
+                          "id": "lemon_catcher-45",
+                          "fields": {
+                            "VAR": "basket_x",
+                            "DELTA": "4"
+                          }
+                        }
+                      }
+                    },
+                    "next": {
+                      "block": {
+                        "type": "prg32_clamp_state",
+                        "id": "lemon_catcher-43",
+                        "fields": {
+                          "VAR": "basket_x",
+                          "LOW": "0",
+                          "HIGH": "288"
+                        },
+                        "next": {
+                          "block": {
+                            "type": "prg32_comment",
+                            "id": "lemon_catcher-42",
+                            "fields": {
+                              "TEXT": "The lemon falls a little every frame"
+                            },
+                            "next": {
+                              "block": {
+                                "type": "prg32_change_state",
+                                "id": "lemon_catcher-41",
+                                "fields": {
+                                  "VAR": "lemon_y",
+                                  "DELTA": "2"
+                                },
+                                "next": {
+                                  "block": {
+                                    "type": "prg32_comment",
+                                    "id": "lemon_catcher-40",
+                                    "fields": {
+                                      "TEXT": "Caught: one point, a happy beep, a new lemon"
+                                    },
+                                    "next": {
+                                      "block": {
+                                        "type": "prg32_if_touching",
+                                        "id": "lemon_catcher-35",
+                                        "fields": {
+                                          "AX": "lemon_x",
+                                          "AY": "lemon_y",
+                                          "AW": "10",
+                                          "AH": "10",
+                                          "BX": "basket_x",
+                                          "BY": "180",
+                                          "BW": "32",
+                                          "BH": "8"
+                                        },
+                                        "inputs": {
+                                          "DO": {
+                                            "block": {
+                                              "type": "prg32_change_state",
+                                              "id": "lemon_catcher-39",
+                                              "fields": {
+                                                "VAR": "score",
+                                                "DELTA": "1"
+                                              },
+                                              "next": {
+                                                "block": {
+                                                  "type": "prg32_play_beep",
+                                                  "id": "lemon_catcher-38",
+                                                  "fields": {
+                                                    "FREQ": "880",
+                                                    "MS": "80"
+                                                  },
+                                                  "next": {
+                                                    "block": {
+                                                      "type": "prg32_set_state",
+                                                      "id": "lemon_catcher-37",
+                                                      "fields": {
+                                                        "VAR": "lemon_y",
+                                                        "VALUE": "0"
+                                                      },
+                                                      "next": {
+                                                        "block": {
+                                                          "type": "prg32_random_state",
+                                                          "id": "lemon_catcher-36",
+                                                          "fields": {
+                                                            "VAR": "lemon_x",
+                                                            "LOW": "0",
+                                                            "HIGH": "310"
+                                                          }
+                                                        }
+                                                      }
+                                                    }
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          }
+                                        },
+                                        "next": {
+                                          "block": {
+                                            "type": "prg32_comment",
+                                            "id": "lemon_catcher-34",
+                                            "fields": {
+                                              "TEXT": "Missed: the lemon touched the floor"
+                                            },
+                                            "next": {
+                                              "block": {
+                                                "type": "prg32_if_touching",
+                                                "id": "lemon_catcher-29",
+                                                "fields": {
+                                                  "AX": "lemon_x",
+                                                  "AY": "lemon_y",
+                                                  "AW": "10",
+                                                  "AH": "10",
+                                                  "BX": "0",
+                                                  "BY": "196",
+                                                  "BW": "320",
+                                                  "BH": "4"
+                                                },
+                                                "inputs": {
+                                                  "DO": {
+                                                    "block": {
+                                                      "type": "prg32_change_state",
+                                                      "id": "lemon_catcher-33",
+                                                      "fields": {
+                                                        "VAR": "misses",
+                                                        "DELTA": "1"
+                                                      },
+                                                      "next": {
+                                                        "block": {
+                                                          "type": "prg32_play_beep",
+                                                          "id": "lemon_catcher-32",
+                                                          "fields": {
+                                                            "FREQ": "220",
+                                                            "MS": "150"
+                                                          },
+                                                          "next": {
+                                                            "block": {
+                                                              "type": "prg32_set_state",
+                                                              "id": "lemon_catcher-31",
+                                                              "fields": {
+                                                                "VAR": "lemon_y",
+                                                                "VALUE": "0"
+                                                              },
+                                                              "next": {
+                                                                "block": {
+                                                                  "type": "prg32_random_state",
+                                                                  "id": "lemon_catcher-30",
+                                                                  "fields": {
+                                                                    "VAR": "lemon_x",
+                                                                    "LOW": "0",
+                                                                    "HIGH": "310"
+                                                                  }
+                                                                }
+                                                              }
+                                                            }
+                                                          }
+                                                        }
+                                                      }
+                                                    }
+                                                  }
+                                                },
+                                                "next": {
+                                                  "block": {
+                                                    "type": "prg32_clamp_state",
+                                                    "id": "lemon_catcher-28",
+                                                    "fields": {
+                                                      "VAR": "score",
+                                                      "LOW": "0",
+                                                      "HIGH": "75"
+                                                    },
+                                                    "next": {
+                                                      "block": {
+                                                        "type": "prg32_clamp_state",
+                                                        "id": "lemon_catcher-27",
+                                                        "fields": {
+                                                          "VAR": "misses",
+                                                          "LOW": "0",
+                                                          "HIGH": "75"
+                                                        }
+                                                      }
+                                                    }
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "prg32_draw",
+          "id": "lemon_catcher-draw",
+          "x": 680,
+          "y": 20,
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "prg32_clear_screen",
+                "id": "lemon_catcher-55",
+                "fields": {
+                  "COLOR": "BLACK"
+                },
+                "next": {
+                  "block": {
+                    "type": "prg32_draw_text",
+                    "id": "lemon_catcher-54",
+                    "fields": {
+                      "TEXT": "LEMONS",
+                      "X": "8",
+                      "Y": "4",
+                      "FG": "GREEN",
+                      "BG": "BLACK"
+                    },
+                    "next": {
+                      "block": {
+                        "type": "prg32_draw_rect",
+                        "id": "lemon_catcher-53",
+                        "fields": {
+                          "X": "64",
+                          "Y": "4",
+                          "W": "score * 3",
+                          "H": "8",
+                          "COLOR": "GREEN"
+                        },
+                        "next": {
+                          "block": {
+                            "type": "prg32_draw_text",
+                            "id": "lemon_catcher-52",
+                            "fields": {
+                              "TEXT": "MISSED",
+                              "X": "8",
+                              "Y": "16",
+                              "FG": "RED",
+                              "BG": "BLACK"
+                            },
+                            "next": {
+                              "block": {
+                                "type": "prg32_draw_rect",
+                                "id": "lemon_catcher-51",
+                                "fields": {
+                                  "X": "64",
+                                  "Y": "16",
+                                  "W": "misses * 3",
+                                  "H": "8",
+                                  "COLOR": "RED"
+                                },
+                                "next": {
+                                  "block": {
+                                    "type": "prg32_draw_rect",
+                                    "id": "lemon_catcher-50",
+                                    "fields": {
+                                      "X": "lemon_x",
+                                      "Y": "lemon_y",
+                                      "W": "10",
+                                      "H": "10",
+                                      "COLOR": "YELLOW"
+                                    },
+                                    "next": {
+                                      "block": {
+                                        "type": "prg32_draw_rect",
+                                        "id": "lemon_catcher-49",
+                                        "fields": {
+                                          "X": "basket_x",
+                                          "Y": "180",
+                                          "W": "32",
+                                          "H": "8",
+                                          "COLOR": "ORANGE"
+                                        },
+                                        "next": {
+                                          "block": {
+                                            "type": "prg32_draw_rect",
+                                            "id": "lemon_catcher-48",
+                                            "fields": {
+                                              "X": "0",
+                                              "Y": "196",
+                                              "W": "320",
+                                              "H": "4",
+                                              "COLOR": "BLUE"
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

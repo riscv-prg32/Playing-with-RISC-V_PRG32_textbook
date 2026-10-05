@@ -87,17 +87,64 @@ no floating-point hardware at all. Learning it here is learning a genuine piece 
 computing history that remains useful.
 \end{prgaside}
 
+\section{Sound, chance, and a scoreboard}
+
+Three small runtime services turn a demonstration into a game people replay.
+
+\emph{Sound.} The mixer call \code{prg32\_audio\_note} plays a MIDI note on one
+of eight channels and returns at once. The listing below plays it on the
+\emph{edge} of a button press, computed by masking this frame's input with the
+complement of the previous frame's.
+
+\lstinputlisting[style=c,
+  caption={\fname{examples/c\_capstone/audio\_note\_event.c}: one note per new
+  press of A.}
+]{examples/c_capstone/audio_note_event.c}
+
+\emph{Chance and scores.} \code{prg32\_random\_number(min, max)} returns a
+uniformly distributed value in an inclusive range. The score calls store a
+result under the player name saved in the setup menu, show the local
+leaderboard, and, when the board is connected to a Cartridge Store, send the
+score there too (Chapter~\ref{ch:store}).
+
+\lstinputlisting[style=c,
+  caption={\fname{examples/c\_capstone/score\_and\_random.c}: a random spawn and
+  a persistent score.}
+]{examples/c_capstone/score_and_random.c}
+
+\begin{prgwarn}
+A cartridge is a freestanding program: there is no C standard library behind it.
+\code{printf}, \code{malloc}, and \code{rand} are not available. Use the helpers
+in \fname{prg32.h}, and write the few small utilities you need, such as the
+number-to-digits function in the Lemon Catcher of Appendix~\ref{app:worked},
+yourself.
+\end{prgwarn}
+
 \section{Building and shipping a C cartridge}
 
-For updated instructions on building and uploading cartridges (both for QEMU and
-for the physical board), see Chapter~\ref{ch:firstbuild}.
+The command is the one the assembly track uses; the builder recognises the
+\fname{.c} extension and compiles the file as a small freestanding module.
+
+\begin{lstlisting}[style=bash,caption={Building, inspecting, and running a C cartridge.}]
+python3 -m prg32 cartridge build work/mygame/game.c \
+  --portable --entry-prefix mygame --name mygame \
+  --out work/mygame/mygame.prg32
+python3 -m prg32 cartridge summary work/mygame/mygame.prg32
+python3 -m prg32 qemu upload work/mygame/mygame.prg32   # emulator
+python3 -m prg32 esp32c6 upload work/mygame/mygame.prg32 \
+  --url http://192.168.4.1                               # board
+\end{lstlisting}
+
+Chapter~\ref{ch:firstbuild} has the environment details, and
+Chapter~\ref{ch:store} takes the finished file to the Cartridge Store.
 
 \begin{prgtargets}
 \textbf{Both targets.} A C cartridge and an assembly cartridge are the same kind of
 file and run through the same loader; the framework neither knows nor cares which
 language produced the three functions inside \citep{prg32teaching}. This is the
-deepest demonstration of the platform's design: two courses, two languages, one
-runtime, two targets, one cartridge format.
+deepest demonstration of the platform's design: several courses, several
+languages (the Construction Kit of Part~IV generates C from blocks), one
+runtime, one cartridge format.
 \end{prgtargets}
 
 \begin{prgtry}
