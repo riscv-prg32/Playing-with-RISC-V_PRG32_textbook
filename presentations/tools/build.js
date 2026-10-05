@@ -31,7 +31,7 @@ const SCREEN = { BLACK: "000000", WHITE: "FFFFFF", RED: "F80000", GREEN: "00FC00
   BLUE: "0000F8", YELLOW: "F8FC00", CYAN: "00FCF8", MAGENTA: "F800F8",
   ORANGE: "F8A400", GREY: "808080" };
 const HEAD = "Cambria", BODY = "Calibri", MONO = "Courier New";
-const MONOCOL = /^(Instruction|Command|Call|Constant|Example|You write|The assembler emits|Endpoint|Path|Option|Register|Mask|Assembly|C|Hex|RGB565|Variable|Function|The same thing in C|Assembly offset)$/;
+const MONOCOL = /^(Instruction|Command|Call|Constant|Example|You write|The assembler emits|Endpoint|Path|Option|Register|Mask|Assembly|C|Hex|RGB565|Variable|Function|The same thing in C|In C|Assembly offset|Istruzione|Blocco|Il vostro blocco)$/;
 const W = 13.333, H = 7.5, MX = 0.6, TOP = 1.6, BOT = 6.8, CW = W - 2 * MX;
 
 // ---- slide constructors used by the deck files -----------------------------
@@ -51,10 +51,42 @@ const api = {
   F: mk("flow"),      // F(title, ["Head|sub", ...], caption?, note?)
   L: mk("blocks"),    // L(title, [[kind, text, indent?], ...], [bullets], note?)
   N: mk("checklist"), // N(title, [items], note?)
-  SC: mk("screen"),   // SC(title, [[x,y,w,h,COLOR,label?], ...], [bullets], note?)
+  SC: mk("screen"),
+  W: mk("walk"),      // W(title, file, range, screenshotPng, text, note?)  code + real screenshot
+  M: mk("layout"),    // M(title, [[name, bytes, description], ...], caption?, note?, baseOffset?)
+  E: mk("encoding"),  // E(title, [[bits, name, value], ...], caption, note?)   32-bit instruction fields   // SC(title, [[x,y,w,h,COLOR,label?], ...], [bullets], note?)
+};
+const TXT = {
+  en: { lecture: "LECTURE", lab: "LABORATORY", workshop: "WORKSHOP", minutes: "MINUTES", chapter: "CHAPTER", audience: "Audience",
+    goals: "Learning objectives", goalsKids: "Today you will learn to", agenda: "Agenda", plan: "Plan of the session", step: "Step", about: "about", min: "min",
+    expected: "Expected result", expectedKids: "You should see", quiz: "Check your understanding", quizKids: "Quick question",
+    closing: "Next steps and reading", closingKids: "Next time, and for grown-ups", next: "Before the next session", nextKids: "Next time",
+    refs: "Reading and sources", refsKids: "For the grown-ups", book: "Playing with RISC-V: Assembly, C, and Retro Games on the PRG32 Platform",
+    footLecture: "Lecture", footLab: "Lab", ran: "Screenshot: this step, built and run", offset: "offset", bytes: "bytes" },
+  it: { lecture: "LEZIONE", lab: "LABORATORIO", workshop: "LABORATORIO", minutes: "MINUTI", chapter: "", audience: "Per chi",
+    goals: "Cosa impareremo", goalsKids: "Oggi impariamo a", agenda: "Programma", plan: "Programma", step: "Passo", about: "circa", min: "min",
+    expected: "Risultato atteso", expectedKids: "Dovresti vedere", quiz: "Domanda", quizKids: "Domanda veloce",
+    closing: "E adesso?", closingKids: "E adesso?", next: "Per continuare", nextKids: "Per continuare",
+    refs: "Dove trovare tutto", refsKids: "Per gli adulti", book: "Playing with RISC-V: Assembly, C, and Retro Games on the PRG32 Platform",
+    footLecture: "Lezione", footLab: "Laboratorio", ran: "Schermata vera: questo passo, compilato ed eseguito", offset: "offset", bytes: "byte" },
 };
 const decks = [];
-api.Deck = (d) => { decks.push(d); return d; };
+// A later Deck with the same chapter, kind and file replaces an earlier one, so
+// reworked decks can live in their own files.  Extend() inserts slides into an
+// existing deck after the slide with the given title.
+const keyOf = (d) => `${d.n}|${d.kind}|${d.file || ""}`;
+api.Deck = (d) => {
+  const i = decks.findIndex((x) => keyOf(x) === keyOf(d));
+  if (i >= 0) decks[i] = d; else decks.push(d);
+  return d;
+};
+api.Extend = (n, kind, afterTitle, slides) => {
+  const d = decks.find((x) => String(x.n) === String(n) && x.kind === kind);
+  if (!d) throw new Error(`Extend: no deck ${n} ${kind}`);
+  const i = d.slides.findIndex((sl) => sl.a[0] === afterTitle);
+  if (i < 0) throw new Error(`Extend: no slide titled "${afterTitle}" in ch${n} ${kind}`);
+  d.slides.splice(i + 1, 0, ...slides);
+};
 Object.assign(global, api);
 
 // ---- text measurement ------------------------------------------------------
@@ -90,10 +122,11 @@ function pngSize(file) {
 }
 function readListing(src, range) {
   let text = src;
-  if (!src.includes("\n") && /\.(S|c|h|sh|ps1|json|py)$/.test(src)) {
+  if (!src.includes("\n") && /\.(S|s|c|h|sh|ps1|json|py)$/.test(src)) {
     text = fs.readFileSync(path.join(ROOT, src), "utf8");
   }
   let lines = text.replace(/\t/g, "    ").replace(/\s+$/, "").split("\n");
+  lines = lines.map((l) => l.replace(/\s*-{6,}\s*(\*\/)?\s*$/, (m, close) => (close ? " */" : "")));   // drop decorative dashes
   if (range) {
     let start = 0;
     if (typeof range[0] === "number") start = range[0] - 1;
@@ -119,13 +152,14 @@ function build(deck) {
   pres.layout = "LAYOUT_WIDE";
   pres.author = "Playing with RISC-V (PRG32 textbook)";
   pres.title = `${deck.title} - ${deck.kind}`;
-  pres.subject = `Chapter ${deck.n}`;
+  pres.subject = deck.footer || `Chapter ${deck.n}`;
   pres.theme = { headFontFace: HEAD, bodyFontFace: BODY };
   const kids = !!deck.kids;
   const ACC = kids ? P.violet : deck.kind === "lab" ? P.green : P.teal;
   const BASE = kids ? 22 : 19, MIN = kids ? 17 : 14;
-  const kindLabel = deck.kind === "lab" ? "Lab" : "Lecture";
-  const footer = `Playing with RISC-V  |  Chapter ${deck.n}: ${deck.short || deck.title}  |  ${kindLabel}`;
+  const T_ = TXT[deck.lang || "en"];
+  const kindLabel = deck.kind === "lab" ? T_.footLab : T_.footLecture;
+  const footer = deck.footer || `Playing with RISC-V  |  Chapter ${deck.n}: ${deck.short || deck.title}  |  ${kindLabel}`;
 
   pres.defineSlideMaster({
     title: "LIGHT", background: { color: P.white },
@@ -215,9 +249,9 @@ function build(deck) {
     },
     code([title, src, range, callouts, note]) {
       const s = light(title); let lines = readListing(src, range);
-      const lang = /\.S$/.test(src) ? "asm" : /\.(sh|ps1)$/.test(src) || /^\$|python3 -m|^#!/m.test(src) ? "sh" : "c";
+      const lang = /\.[Ss]$/.test(src) ? "asm" : /\.(sh|ps1)$/.test(src) || /^\$|python3 -m|^#!/m.test(src) ? "sh" : "c";
       const side = callouts && callouts.length, cwid = side ? 8.1 : CW, ch = BOT - TOP;
-      const maxCols = Math.floor((cwid - 0.55) * 72 / (10 * 0.61));
+      const maxCols = Math.floor((cwid - 0.55) * 72 / (10 * 0.635));
       for (let i = 0; i < lines.length; i++) {       // soft-wrap over-long lines at a space
         if (lines[i].length > maxCols) {
           const indent = (lines[i].match(/^\s*/) || [""])[0] + "    ";
@@ -227,8 +261,8 @@ function build(deck) {
       }
       const longest = Math.max(...lines.map((l) => l.length));
       let fsz = 18;
-      while (fsz > 10 && (lines.length * fsz * 1.2 / 72 > ch - 0.4 || longest * fsz * 0.61 / 72 > cwid - 0.55)) fsz -= 0.5;
-      if (lines.length * fsz * 1.2 / 72 > ch - 0.4 || longest * fsz * 0.61 / 72 > cwid - 0.55)
+      while (fsz > 10 && (lines.length * fsz * 1.2 / 72 > ch - 0.4 || longest * fsz * 0.635 / 72 > cwid - 0.55)) fsz -= 0.5;
+      if (lines.length * fsz * 1.2 / 72 > ch - 0.4 || longest * fsz * 0.635 / 72 > cwid - 0.55)
         throw new Error(`${WHERE}: listing too large (${lines.length} lines, ${longest} cols)`);
       card(s, MX, TOP, cwid, ch, P.code);
       const runs = [];
@@ -294,7 +328,7 @@ function build(deck) {
       tx(s, title, { x: MX, y: 3.1, w: CW, h: 1.5, fontFace: HEAD, fontSize: fit(title, CW, 1.5, 42, 28, false, true), bold: true, color: P.white, valign: "middle" });
       if (sub) tx(s, sub, { x: MX, y: 4.8, w: CW, h: 1.2, fontSize: fit(sub, CW, 1.2, 22, 15), color: P.ice });
     },
-    exercise([title, tasks, minutes, expected, note]) {
+    exercise([title, tasks, minutes, expected, note, shot]) {
       stepNo++;
       const s = light(title), lw = 7.9, x2 = MX + lw + 0.35, w2 = W - MX - x2;
       const n = tasks.length, g = 0.16, rh = (BOT - TOP - g * (n - 1)) / n;
@@ -309,16 +343,27 @@ function build(deck) {
           tx(s, c, { x: MX + 0.95, y: y + 0.12, w: lw - 1.15, h: rh - 0.2, fontFace: MONO, fontSize: cf, color: P.codeText });
         } else tx(s, t, { x: MX + 0.75, y, w: lw - 0.85, h: rh, fontSize: tf, valign: heightFor(t, lw - 0.85, tf) < 0.5 ? "middle" : "top", ...(heightFor(t, lw - 0.85, tf) < 0.5 ? { h: 0.52 } : {}) });
       });
-      card(s, x2, TOP, w2, 1.25, P.ink);
-      tx(s, `Step ${stepNo}`, { x: x2 + 0.25, y: TOP + 0.15, w: w2 - 0.5, h: 0.5, fontFace: HEAD, fontSize: 22, bold: true, color: P.white });
-      tx(s, `about ${minutes} min`, { x: x2 + 0.25, y: TOP + 0.68, w: w2 - 0.5, h: 0.4, fontSize: 16, color: P.ice });
-      card(s, x2, TOP + 1.5, w2, BOT - TOP - 1.5);
-      tx(s, kids ? "You should see" : "Expected result", { x: x2 + 0.25, y: TOP + 1.65, w: w2 - 0.5, h: 0.4, fontSize: 15, bold: true, color: P.green });
-      tx(s, expected, { x: x2 + 0.25, y: TOP + 2.15, w: w2 - 0.5, h: BOT - TOP - 2.35, fontSize: fit(expected, w2 - 0.5, BOT - TOP - 2.35, BASE, 13) });
-      notes(s, note);
+      const top2 = shot ? 0.8 : 1.25;
+      card(s, x2, TOP, w2, top2, P.ink);
+      if (shot) tx(s, `${T_.step} ${stepNo}  |  ${T_.about} ${minutes} ${T_.min}`, { x: x2 + 0.25, y: TOP, w: w2 - 0.5, h: top2, fontFace: HEAD, fontSize: 18, bold: true, color: P.white, valign: "middle" });
+      else {
+        tx(s, `${T_.step} ${stepNo}`, { x: x2 + 0.25, y: TOP + 0.15, w: w2 - 0.5, h: 0.5, fontFace: HEAD, fontSize: 22, bold: true, color: P.white });
+        tx(s, `${T_.about} ${minutes} ${T_.min}`, { x: x2 + 0.25, y: TOP + 0.68, w: w2 - 0.5, h: 0.4, fontSize: 16, color: P.ice });
+      }
+      const py = TOP + top2 + 0.2;
+      card(s, x2, py, w2, BOT - py);
+      tx(s, kids ? T_.expectedKids : T_.expected, { x: x2 + 0.25, y: py + 0.1, w: w2 - 0.5, h: 0.34, fontSize: 14, bold: true, color: P.green });
+      let ey = py + 0.5;
+      if (shot) {
+        const iw = w2 - 0.5, ih = iw * 200 / 320;
+        s.addImage({ path: path.join(ROOT, shot), x: x2 + 0.25, y: ey, w: iw, h: ih, altText: expected });
+        ey += ih + 0.1;
+      }
+      tx(s, expected, { x: x2 + 0.25, y: ey, w: w2 - 0.5, h: BOT - ey - 0.12, fontSize: fit(expected, w2 - 0.5, BOT - ey - 0.12, shot ? 15 : BASE, 11) });
+      notes(s, (note ? note + "\n" : "") + (shot ? `${T_.ran}: ${shot}` : ""));
     },
     quiz([question, options, answer, explain]) {
-      const s = light(kids ? "Quick question" : "Check your understanding");
+      const s = light(kids ? T_.quizKids : T_.quiz);
       tx(s, question, { x: MX, y: TOP, w: CW, h: 1.3, fontFace: HEAD, fontSize: fit(question, CW, 1.3, 26, 17, false, true), bold: true, color: P.ink, valign: "middle" });
       const n = options.length, g = 0.25, y0 = TOP + 1.55, cols = n > 3 ? 2 : 1, rws = Math.ceil(n / cols);
       const cw = (CW - g * (cols - 1)) / cols, ch = (BOT - y0 - g * (rws - 1)) / rws;
@@ -364,6 +409,71 @@ function build(deck) {
       rows(s, items, MX + lw + 0.4, TOP, CW - lw - 0.4, BOT - TOP);
       notes(s, note);
     },
+    walk([title, src, range, shot, text, note]) {
+      const s = light(title); let lines = readListing(src, range);
+      const lang = /\.[Ss]$/.test(src) ? "asm" : /\.(sh|ps1)$/.test(src) ? "sh" : "c";
+      const cwid = 7.75, ch = BOT - TOP, x2 = MX + cwid + 0.3, w2 = W - MX - x2;
+      const maxCols = Math.floor((cwid - 0.55) * 72 / (10 * 0.635));
+      for (let i = 0; i < lines.length; i++) if (lines[i].length > maxCols) {
+        const indent = (lines[i].match(/^\s*/) || [""])[0] + "    ", cut = lines[i].lastIndexOf(" ", maxCols);
+        if (cut > indent.length) lines.splice(i, 1, lines[i].slice(0, cut), indent + lines[i].slice(cut + 1));
+      }
+      const longest = Math.max(...lines.map((l) => l.length));
+      let fsz = 20;
+      while (fsz > 9.5 && (lines.length * fsz * 1.2 / 72 > ch - 0.4 || longest * fsz * 0.635 / 72 > cwid - 0.55)) fsz -= 0.5;
+      if (lines.length * fsz * 1.2 / 72 > ch - 0.4 || longest * fsz * 0.635 / 72 > cwid - 0.55)
+        throw new Error(`${WHERE}: listing too large (${lines.length} lines, ${longest} cols)`);
+      card(s, MX, TOP, cwid, ch, P.code);
+      const runs = [];
+      lines.forEach((l, i) => {
+        const c = commentAt(l, lang), last = i === lines.length - 1, a = c < 0 ? l : l.slice(0, c), b = c < 0 ? "" : l.slice(c);
+        if (b) { if (a) runs.push({ text: a, options: { color: P.codeText } }); runs.push({ text: b, options: { color: P.codeComment, breakLine: !last } }); }
+        else runs.push({ text: a || " ", options: { color: P.codeText, breakLine: !last } });
+      });
+      s.addText(runs, { isTextBox: true, x: MX + 0.25, y: TOP + 0.2, w: cwid - 0.5, h: ch - 0.4, fontFace: MONO, fontSize: fsz, margin: 0, valign: "top", paraSpaceAfter: 0 });
+      const ih = w2 * 200 / 320;
+      s.addShape(pres.ShapeType.rect, { x: x2 - 0.05, y: TOP - 0.05, w: w2 + 0.1, h: ih + 0.1, fill: { color: P.steel }, line: { color: P.steel, width: 0 } });
+      s.addImage({ path: path.join(ROOT, shot), x: x2, y: TOP, w: w2, h: ih, altText: text });
+      tx(s, T_.ran, { x: x2, y: TOP + ih + 0.1, w: w2, h: 0.28, fontSize: 10.5, italic: true, color: P.mute });
+      const cy = TOP + ih + 0.45;
+      card(s, x2, cy, w2, BOT - cy);
+      tx(s, text, { x: x2 + 0.2, y: cy + 0.12, w: w2 - 0.4, h: BOT - cy - 0.24, fontSize: fit(text, w2 - 0.4, BOT - cy - 0.24, 17, 11), valign: "middle" });
+      notes(s, (note ? note + "\n" : "") + `Source: ${src}`);
+    },
+    layout([title, fields, caption, note, base]) {
+      const s = light(title), n = fields.length, capH = caption ? 0.95 : 0, g = 0.07;
+      const rh = Math.min(0.62, (BOT - TOP - capH - g * (n - 1)) / n), cols = [P.steel, P.teal, P.violet, P.amber, P.green, P.red];
+      let off = base || 0;
+      const fz = Math.min(16, rh * 26);
+      fields.forEach(([name, size, desc], i) => {
+        const y = TOP + i * (rh + g), c = cols[i % 6];
+        tx(s, typeof size === "number" ? `+${off}` : "", { x: MX, y, w: 0.9, h: rh, fontFace: MONO, fontSize: fz - 2, color: P.mute, align: "right", valign: "middle" });
+        s.addText(name, { isTextBox: true, shape: pres.ShapeType.rect, x: MX + 1.05, y, w: 3.6, h: rh, fill: { color: c }, line: { color: P.white, width: 1 },
+          color: P.white, bold: true, fontFace: MONO, fontSize: fit(name, 3.4, rh, fz, 9, true), align: "center", valign: "middle", margin: 0 });
+        tx(s, typeof size === "number" ? `${size} ${T_.bytes}` : String(size), { x: MX + 4.8, y, w: 1.25, h: rh, fontSize: fz - 2, color: P.mute, valign: "middle" });
+        tx(s, desc, { x: MX + 6.1, y, w: CW - 6.1, h: rh, fontSize: fit(desc, CW - 6.1, rh, fz, 10), valign: "middle" });
+        if (typeof size === "number") off += size;
+      });
+      if (caption) { const y = BOT - capH + 0.12; card(s, MX, y, CW, capH - 0.12);
+        tx(s, caption, { x: MX + 0.3, y: y + 0.08, w: CW - 0.6, h: capH - 0.28, fontSize: fit(caption, CW - 0.6, capH - 0.28, 17, 11), valign: "middle" }); }
+      notes(s, note);
+    },
+    encoding([title, fields, caption, note]) {
+      const s = light(title), total = fields.reduce((a, [b]) => a + b, 0), y = TOP + 0.75, bh = 1.15, cols = [P.steel, P.teal, P.violet, P.amber, P.green, P.red];
+      const minW = 1.05, flex = CW - minW * fields.length; let x = MX, hi = total - 1;
+      fields.forEach(([bits, name, value], i) => {
+        const w = minW + flex * bits / total, c = cols[i % 6];
+        tx(s, bits === 1 ? `${hi}` : `${hi}..${hi - bits + 1}`, { x, y: y - 0.42, w, h: 0.36, fontFace: MONO, fontSize: 12, color: P.mute, align: "center", valign: "bottom" });
+        s.addText(name, { isTextBox: true, shape: pres.ShapeType.rect, x, y, w, h: bh, fill: { color: c }, line: { color: P.white, width: 1.5 },
+          color: P.white, bold: true, fontFace: BODY, fontSize: fit(name, w - 0.1, bh, 18, 10, false, true), align: "center", valign: "middle", margin: 0 });
+        if (value !== undefined) tx(s, String(value), { x, y: y + bh + 0.1, w, h: 0.72, fontFace: MONO, fontSize: fit(String(value), w, 0.72, 14, 9, true), color: P.ink, align: "center" });
+        tx(s, `${bits} bit`, { x, y: y + bh + 0.85, w, h: 0.3, fontSize: 11, color: P.mute, align: "center" });
+        x += w; hi -= bits;
+      });
+      const cy = y + bh + 1.4; card(s, MX, cy, CW, BOT - cy);
+      tx(s, caption, { x: MX + 0.3, y: cy + 0.12, w: CW - 0.6, h: BOT - cy - 0.24, fontSize: fit(caption, CW - 0.6, BOT - cy - 0.24, 19, 12), valign: "middle" });
+      notes(s, note);
+    },
     screen([title, shapes, items, note]) {
       const s = light(title), sw = 6.4, sc = sw / 320, sh = 200 * sc, y0 = TOP + (BOT - TOP - sh) / 2;
       s.addShape(pres.ShapeType.rect, { x: MX - 0.08, y: y0 - 0.08, w: sw + 0.16, h: sh + 0.16, fill: { color: P.steel }, line: { color: P.steel, width: 0 } });
@@ -383,18 +493,18 @@ function build(deck) {
   {
     const s = dark();
     pixels(s, MX, 0.8, 0.26, [ACC, P.amber, null, null, ACC, P.amber, ACC, null, null]);
-    tx(s, `CHAPTER ${deck.n}  |  ${deck.kind === "lab" ? "LABORATORY" : "LECTURE"}  |  45 MINUTES`, { x: MX, y: 2.1, w: CW, h: 0.4, fontSize: 15, bold: true, color: P.ice, charSpacing: 3 });
+    tx(s, deck.kicker || `${T_.chapter} ${deck.n}  |  ${deck.kind === "lab" ? T_.lab : T_.lecture}  |  ${deck.duration || 45} ${T_.minutes}`, { x: MX, y: 2.1, w: CW, h: 0.4, fontSize: 15, bold: true, color: P.ice, charSpacing: 3 });
     tx(s, deck.title, { x: MX, y: 2.6, w: CW, h: 1.9, fontFace: HEAD, fontSize: fit(deck.title, CW, 1.9, 44, 30, false, true), bold: true, color: P.white, valign: "middle" });
     tx(s, deck.subtitle, { x: MX, y: 4.65, w: CW, h: 0.9, fontSize: fit(deck.subtitle, CW, 0.9, 22, 15), color: P.ice });
-    tx(s, `Audience: ${deck.audience}`, { x: MX, y: 6.1, w: CW, h: 0.35, fontSize: 14, color: P.ice });
-    tx(s, "Playing with RISC-V: Assembly, C, and Retro Games on the PRG32 Platform", { x: MX, y: 6.5, w: CW, h: 0.35, fontSize: 13, italic: true, color: "8FA3B3" });
-    s.addNotes(`Teaching support for Chapter ${deck.n} of the textbook. ${deck.kind === "lab" ? "Practical, step-by-step session: learners work at their machines; keep each step to its time box." : "Front lecture: about 45 minutes including the questions."} ${deck.prep ? "Preparation: " + deck.prep : ""}`);
+    tx(s, `${T_.audience}: ${deck.audience}`, { x: MX, y: 6.1, w: CW, h: 0.35, fontSize: 14, color: P.ice });
+    tx(s, deck.byline || T_.book, { x: MX, y: 6.5, w: CW, h: 0.35, fontSize: 13, italic: true, color: "8FA3B3" });
+    s.addNotes(deck.titleNote || `Teaching support for Chapter ${deck.n} of the textbook. ${deck.kind === "lab" ? "Practical, step-by-step session: learners work at their machines; keep each step to its time box." : "Front lecture: about 45 minutes including the questions."} ${deck.prep ? "Preparation: " + deck.prep : ""}`);
   }
   WHERE = `ch${deck.n} ${deck.kind} [goals]`;
-  R.checklist([kids ? "Today you will learn to" : "Learning objectives", deck.goals, "State the objectives; return to this slide at the end."]);
+  R.checklist([kids ? T_.goalsKids : T_.goals, deck.goals, "State the objectives; return to this slide at the end."]);
   WHERE = `ch${deck.n} ${deck.kind} [agenda]`;
   {
-    const s = light(deck.kind === "lab" ? "Plan of the session" : "Agenda"), total = deck.agenda.reduce((a, [, m]) => a + m, 0);
+    const s = light(deck.kind === "lab" ? T_.plan : T_.agenda), total = deck.agenda.reduce((a, [, m]) => a + m, 0);
     const cols = [P.steel, P.teal, P.violet, P.amber, P.green, P.red]; let x = MX;
     deck.agenda.forEach(([label, m], i) => {
       const w = CW * m / total;
@@ -415,13 +525,13 @@ function build(deck) {
   // ---- closing -------------------------------------------------------------
   section = "Closing"; pres.addSection({ title: section });
   WHERE = `ch${deck.n} ${deck.kind} [closing]`;
-  R.versus([kids ? "Next time, and for grown-ups" : "Next steps and reading",
-    [kids ? "Next time" : "Before the next session", deck.next],
-    [kids ? "For the grown-ups" : "Reading and sources", deck.refs]]);
+  R.versus([kids ? T_.closingKids : T_.closing,
+    [kids ? T_.nextKids : T_.next, deck.next],
+    [kids ? T_.refsKids : T_.refs, deck.refs]]);
 
-  const dir = path.join(OUT, `${String(deck.n).padStart(2, "0")}-${deck.slug}`);
+  const dir = deck.outDir ? path.join(ROOT, deck.outDir) : path.join(OUT, `${String(deck.n).padStart(2, "0")}-${deck.slug}`);
   fs.mkdirSync(dir, { recursive: true });
-  const file = path.join(dir, `${String(deck.n).padStart(2, "0")}-${deck.slug}-${deck.kind}.pptx`);
+  const file = path.join(dir, deck.file || `${String(deck.n).padStart(2, "0")}-${deck.slug}-${deck.kind}.pptx`);
   // pptxgenjs stores parts uncompressed; repack with DEFLATE (about 8x smaller).
   return pres.write({ outputType: "nodebuffer" })
     .then((buf) => JSZip.loadAsync(buf))
@@ -432,10 +542,15 @@ function build(deck) {
 (async () => {
   const only = process.argv[2];
   for (const f of fs.readdirSync(path.join(__dirname, "decks")).sort()) require(path.join(__dirname, "decks", f));
+  const ws = path.join(ROOT, "workshops");                      // workshop decks live beside their sources
+  if (fs.existsSync(ws)) for (const d of fs.readdirSync(ws).sort()) {
+    const spec = path.join(ws, d, "slides.js");
+    if (fs.existsSync(spec)) require(spec);
+  }
   let failed = 0;
   for (const d of decks) {
     if (only && String(d.n) !== only) continue;
-    try { const r = await build(d); console.log(`${String(r.count).padStart(3)} slides  ${path.relative(OUT, r.file)}`); }
+    try { const r = await build(d); console.log(`${String(r.count).padStart(3)} slides  ${path.relative(ROOT, r.file)}`); }
     catch (e) { failed++; console.error("FAILED " + e.message); }
   }
   if (failed) process.exit(1);

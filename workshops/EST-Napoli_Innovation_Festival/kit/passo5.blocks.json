@@ -1,0 +1,387 @@
+{
+  "abi": "prg32-construction-kit-project-1.0",
+  "title": "Breakout",
+  "description": "Laboratorio EST Napoli: Breakout, passo 5 di 8.",
+  "author": "PRG32 workshop",
+  "tags": [
+    "workshop",
+    "breakout",
+    "passo5"
+  ],
+  "blocks_json": {
+    "blocks": {
+      "languageVersion": 0,
+      "blocks": [
+        {
+          "type": "prg32_on_start",
+          "id": "passo5-on_start",
+          "x": 20,
+          "y": 20,
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "prg32_set_state",
+                "id": "passo5-47",
+                "fields": {
+                  "VAR": "paddle_x",
+                  "VALUE": "136"
+                },
+                "next": {
+                  "block": {
+                    "type": "prg32_set_state",
+                    "id": "passo5-46",
+                    "fields": {
+                      "VAR": "ball_x",
+                      "VALUE": "157"
+                    },
+                    "next": {
+                      "block": {
+                        "type": "prg32_set_state",
+                        "id": "passo5-45",
+                        "fields": {
+                          "VAR": "ball_y",
+                          "VALUE": "120"
+                        },
+                        "next": {
+                          "block": {
+                            "type": "prg32_set_state",
+                            "id": "passo5-44",
+                            "fields": {
+                              "VAR": "ball_dx",
+                              "VALUE": "2"
+                            },
+                            "next": {
+                              "block": {
+                                "type": "prg32_set_state",
+                                "id": "passo5-43",
+                                "fields": {
+                                  "VAR": "ball_dy",
+                                  "VALUE": "-2"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "prg32_update",
+          "id": "passo5-update",
+          "x": 340,
+          "y": 20,
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "prg32_if_button",
+                "id": "passo5-68",
+                "fields": {
+                  "BUTTON": "LEFT"
+                },
+                "inputs": {
+                  "DO": {
+                    "block": {
+                      "type": "prg32_change_state",
+                      "id": "passo5-69",
+                      "fields": {
+                        "VAR": "paddle_x",
+                        "DELTA": "-4"
+                      }
+                    }
+                  }
+                },
+                "next": {
+                  "block": {
+                    "type": "prg32_if_button",
+                    "id": "passo5-66",
+                    "fields": {
+                      "BUTTON": "RIGHT"
+                    },
+                    "inputs": {
+                      "DO": {
+                        "block": {
+                          "type": "prg32_change_state",
+                          "id": "passo5-67",
+                          "fields": {
+                            "VAR": "paddle_x",
+                            "DELTA": "4"
+                          }
+                        }
+                      }
+                    },
+                    "next": {
+                      "block": {
+                        "type": "prg32_clamp_state",
+                        "id": "passo5-65",
+                        "fields": {
+                          "VAR": "paddle_x",
+                          "LOW": "0",
+                          "HIGH": "272"
+                        },
+                        "next": {
+                          "block": {
+                            "type": "prg32_comment",
+                            "id": "passo5-64",
+                            "fields": {
+                              "TEXT": "La pallina si muove: posizione + velocita"
+                            },
+                            "next": {
+                              "block": {
+                                "type": "prg32_change_state",
+                                "id": "passo5-63",
+                                "fields": {
+                                  "VAR": "ball_x",
+                                  "DELTA": "ball_dx"
+                                },
+                                "next": {
+                                  "block": {
+                                    "type": "prg32_change_state",
+                                    "id": "passo5-62",
+                                    "fields": {
+                                      "VAR": "ball_y",
+                                      "DELTA": "ball_dy"
+                                    },
+                                    "next": {
+                                      "block": {
+                                        "type": "prg32_comment",
+                                        "id": "passo5-61",
+                                        "fields": {
+                                          "TEXT": "I muri sono rettangoli appena fuori dallo schermo"
+                                        },
+                                        "next": {
+                                          "block": {
+                                            "type": "prg32_if_touching",
+                                            "id": "passo5-59",
+                                            "fields": {
+                                              "AX": "ball_x",
+                                              "AY": "ball_y",
+                                              "AW": "6",
+                                              "AH": "6",
+                                              "BX": "-10",
+                                              "BY": "0",
+                                              "BW": "10",
+                                              "BH": "200"
+                                            },
+                                            "inputs": {
+                                              "DO": {
+                                                "block": {
+                                                  "type": "prg32_set_state",
+                                                  "id": "passo5-60",
+                                                  "fields": {
+                                                    "VAR": "ball_dx",
+                                                    "VALUE": "2"
+                                                  }
+                                                }
+                                              }
+                                            },
+                                            "next": {
+                                              "block": {
+                                                "type": "prg32_if_touching",
+                                                "id": "passo5-57",
+                                                "fields": {
+                                                  "AX": "ball_x",
+                                                  "AY": "ball_y",
+                                                  "AW": "6",
+                                                  "AH": "6",
+                                                  "BX": "320",
+                                                  "BY": "0",
+                                                  "BW": "10",
+                                                  "BH": "200"
+                                                },
+                                                "inputs": {
+                                                  "DO": {
+                                                    "block": {
+                                                      "type": "prg32_set_state",
+                                                      "id": "passo5-58",
+                                                      "fields": {
+                                                        "VAR": "ball_dx",
+                                                        "VALUE": "-2"
+                                                      }
+                                                    }
+                                                  }
+                                                },
+                                                "next": {
+                                                  "block": {
+                                                    "type": "prg32_if_touching",
+                                                    "id": "passo5-55",
+                                                    "fields": {
+                                                      "AX": "ball_x",
+                                                      "AY": "ball_y",
+                                                      "AW": "6",
+                                                      "AH": "6",
+                                                      "BX": "0",
+                                                      "BY": "-10",
+                                                      "BW": "320",
+                                                      "BH": "10"
+                                                    },
+                                                    "inputs": {
+                                                      "DO": {
+                                                        "block": {
+                                                          "type": "prg32_set_state",
+                                                          "id": "passo5-56",
+                                                          "fields": {
+                                                            "VAR": "ball_dy",
+                                                            "VALUE": "2"
+                                                          }
+                                                        }
+                                                      }
+                                                    },
+                                                    "next": {
+                                                      "block": {
+                                                        "type": "prg32_if_touching",
+                                                        "id": "passo5-51",
+                                                        "fields": {
+                                                          "AX": "ball_x",
+                                                          "AY": "ball_y",
+                                                          "AW": "6",
+                                                          "AH": "6",
+                                                          "BX": "0",
+                                                          "BY": "200",
+                                                          "BW": "320",
+                                                          "BH": "10"
+                                                        },
+                                                        "inputs": {
+                                                          "DO": {
+                                                            "block": {
+                                                              "type": "prg32_set_state",
+                                                              "id": "passo5-54",
+                                                              "fields": {
+                                                                "VAR": "ball_x",
+                                                                "VALUE": "157"
+                                                              },
+                                                              "next": {
+                                                                "block": {
+                                                                  "type": "prg32_set_state",
+                                                                  "id": "passo5-53",
+                                                                  "fields": {
+                                                                    "VAR": "ball_y",
+                                                                    "VALUE": "120"
+                                                                  },
+                                                                  "next": {
+                                                                    "block": {
+                                                                      "type": "prg32_set_state",
+                                                                      "id": "passo5-52",
+                                                                      "fields": {
+                                                                        "VAR": "ball_dy",
+                                                                        "VALUE": "-2"
+                                                                      }
+                                                                    }
+                                                                  }
+                                                                }
+                                                              }
+                                                            }
+                                                          }
+                                                        },
+                                                        "next": {
+                                                          "block": {
+                                                            "type": "prg32_comment",
+                                                            "id": "passo5-50",
+                                                            "fields": {
+                                                              "TEXT": "La racchetta rimanda la pallina in alto"
+                                                            },
+                                                            "next": {
+                                                              "block": {
+                                                                "type": "prg32_if_touching",
+                                                                "id": "passo5-48",
+                                                                "fields": {
+                                                                  "AX": "ball_x",
+                                                                  "AY": "ball_y",
+                                                                  "AW": "6",
+                                                                  "AH": "6",
+                                                                  "BX": "paddle_x",
+                                                                  "BY": "188",
+                                                                  "BW": "48",
+                                                                  "BH": "6"
+                                                                },
+                                                                "inputs": {
+                                                                  "DO": {
+                                                                    "block": {
+                                                                      "type": "prg32_set_state",
+                                                                      "id": "passo5-49",
+                                                                      "fields": {
+                                                                        "VAR": "ball_dy",
+                                                                        "VALUE": "-2"
+                                                                      }
+                                                                    }
+                                                                  }
+                                                                }
+                                                              }
+                                                            }
+                                                          }
+                                                        }
+                                                      }
+                                                    }
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "prg32_draw",
+          "id": "passo5-draw",
+          "x": 760,
+          "y": 20,
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "prg32_clear_screen",
+                "id": "passo5-72",
+                "fields": {
+                  "COLOR": "BLACK"
+                },
+                "next": {
+                  "block": {
+                    "type": "prg32_draw_rect",
+                    "id": "passo5-71",
+                    "fields": {
+                      "X": "paddle_x",
+                      "Y": "188",
+                      "W": "48",
+                      "H": "6",
+                      "COLOR": "CYAN"
+                    },
+                    "next": {
+                      "block": {
+                        "type": "prg32_draw_rect",
+                        "id": "passo5-70",
+                        "fields": {
+                          "X": "ball_x",
+                          "Y": "ball_y",
+                          "W": "6",
+                          "H": "6",
+                          "COLOR": "WHITE"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

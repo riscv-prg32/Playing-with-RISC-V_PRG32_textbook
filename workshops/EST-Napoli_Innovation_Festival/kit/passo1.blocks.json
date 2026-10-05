@@ -1,0 +1,69 @@
+{
+  "abi": "prg32-construction-kit-project-1.0",
+  "title": "Breakout",
+  "description": "Laboratorio EST Napoli: Breakout, passo 1 di 8.",
+  "author": "PRG32 workshop",
+  "tags": [
+    "workshop",
+    "breakout",
+    "passo1"
+  ],
+  "blocks_json": {
+    "blocks": {
+      "languageVersion": 0,
+      "blocks": [
+        {
+          "type": "prg32_on_start",
+          "id": "passo1-on_start",
+          "x": 20,
+          "y": 20,
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "prg32_comment",
+                "id": "passo1-1",
+                "fields": {
+                  "TEXT": "Qui prepareremo il gioco"
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "prg32_update",
+          "id": "passo1-update",
+          "x": 340,
+          "y": 20,
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "prg32_comment",
+                "id": "passo1-2",
+                "fields": {
+                  "TEXT": "Per ora non cambia nulla"
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "prg32_draw",
+          "id": "passo1-draw",
+          "x": 760,
+          "y": 20,
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "prg32_clear_screen",
+                "id": "passo1-3",
+                "fields": {
+                  "COLOR": "BLACK"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

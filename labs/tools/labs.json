@@ -1,0 +1,906 @@
+[
+ {
+  "id": "workshop-breakout-asm",
+  "dir": "workshops/EST-Napoli_Innovation_Festival/asm",
+  "master": "workshops/EST-Napoli_Innovation_Festival/sorgenti/breakout_asm.master.S",
+  "prefix": "breakout",
+  "steps": [
+   {
+    "n": 1,
+    "file": "passo1_scheletro.S",
+    "frames": 5
+   },
+   {
+    "n": 2,
+    "file": "passo2_racchetta.S",
+    "frames": 5
+   },
+   {
+    "n": 3,
+    "file": "passo3_input.S",
+    "frames": 40,
+    "input": [
+     [
+      0,
+      40,
+      2
+     ]
+    ]
+   },
+   {
+    "n": 4,
+    "file": "passo4_pallina.S",
+    "frames": 50
+   },
+   {
+    "n": 5,
+    "file": "passo5_rimbalzo.S",
+    "frames": 100
+   },
+   {
+    "n": 6,
+    "file": "passo6_mattoncini.S",
+    "frames": 20
+   },
+   {
+    "n": 7,
+    "file": "passo7_punti.S",
+    "frames": 300,
+    "input": [
+     [
+      0,
+      30,
+      2
+     ],
+     [
+      60,
+      90,
+      1
+     ],
+     [
+      150,
+      190,
+      2
+     ],
+     [
+      230,
+      270,
+      1
+     ]
+    ]
+   },
+   {
+    "n": 8,
+    "file": "passo8_vittoria.S",
+    "frames": 420,
+    "input": [
+     [
+      0,
+      30,
+      2
+     ],
+     [
+      60,
+      90,
+      1
+     ],
+     [
+      150,
+      190,
+      2
+     ],
+     [
+      230,
+      270,
+      1
+     ]
+    ]
+   }
+  ],
+  "keep": "workshops/EST-Napoli_Innovation_Festival/cartucce",
+  "keep_prefix": "breakout-asm-"
+ },
+ {
+  "id": "workshop-breakout-c",
+  "dir": "workshops/EST-Napoli_Innovation_Festival/c",
+  "master": "workshops/EST-Napoli_Innovation_Festival/sorgenti/breakout_c.master.c",
+  "prefix": "breakout_c",
+  "steps": [
+   {
+    "n": 1,
+    "file": "passo1_scheletro.c",
+    "frames": 5
+   },
+   {
+    "n": 2,
+    "file": "passo2_racchetta.c",
+    "frames": 5
+   },
+   {
+    "n": 3,
+    "file": "passo3_input.c",
+    "frames": 40,
+    "input": [
+     [
+      0,
+      40,
+      2
+     ]
+    ]
+   },
+   {
+    "n": 4,
+    "file": "passo4_pallina.c",
+    "frames": 50
+   },
+   {
+    "n": 5,
+    "file": "passo5_rimbalzo.c",
+    "frames": 100
+   },
+   {
+    "n": 6,
+    "file": "passo6_mattoncini.c",
+    "frames": 20
+   },
+   {
+    "n": 7,
+    "file": "passo7_punti.c",
+    "frames": 300,
+    "input": [
+     [
+      0,
+      30,
+      2
+     ],
+     [
+      60,
+      90,
+      1
+     ],
+     [
+      150,
+      190,
+      2
+     ],
+     [
+      230,
+      270,
+      1
+     ]
+    ]
+   },
+   {
+    "n": 8,
+    "file": "passo8_vittoria.c",
+    "frames": 420,
+    "input": [
+     [
+      0,
+      30,
+      2
+     ],
+     [
+      60,
+      90,
+      1
+     ],
+     [
+      150,
+      190,
+      2
+     ],
+     [
+      230,
+      270,
+      1
+     ]
+    ]
+   }
+  ],
+  "keep": "workshops/EST-Napoli_Innovation_Festival/cartucce",
+  "keep_prefix": "breakout-c-"
+ },
+ {
+  "id": "workshop-breakout-kit",
+  "dir": "workshops/EST-Napoli_Innovation_Festival/kit",
+  "prefix": "breakout",
+  "steps": [
+   {
+    "n": 1,
+    "file": "passo1.c",
+    "frames": 5
+   },
+   {
+    "n": 2,
+    "file": "passo2.c",
+    "frames": 5
+   },
+   {
+    "n": 3,
+    "file": "passo3.c",
+    "frames": 40,
+    "input": [
+     [
+      0,
+      40,
+      2
+     ]
+    ]
+   },
+   {
+    "n": 4,
+    "file": "passo4.c",
+    "frames": 50
+   },
+   {
+    "n": 5,
+    "file": "passo5.c",
+    "frames": 100
+   },
+   {
+    "n": 6,
+    "file": "passo6.c",
+    "frames": 20
+   },
+   {
+    "n": 7,
+    "file": "passo7.c",
+    "frames": 300,
+    "input": [
+     [
+      0,
+      30,
+      2
+     ],
+     [
+      60,
+      90,
+      1
+     ],
+     [
+      150,
+      190,
+      2
+     ],
+     [
+      230,
+      270,
+      1
+     ]
+    ]
+   },
+   {
+    "n": 8,
+    "file": "passo8.c",
+    "frames": 420,
+    "input": [
+     [
+      0,
+      30,
+      2
+     ],
+     [
+      60,
+      90,
+      1
+     ],
+     [
+      150,
+      190,
+      2
+     ],
+     [
+      230,
+      270,
+      1
+     ]
+    ]
+   }
+  ],
+  "keep": "workshops/EST-Napoli_Innovation_Festival/cartucce",
+  "keep_prefix": "breakout-kit-"
+ },
+ {
+  "id": "lab03-hello",
+  "dir": "labs/03-setup",
+  "prefix": "hello_world",
+  "steps": [
+   {
+    "n": 1,
+    "file": "step1_skeleton.S",
+    "frames": 5
+   },
+   {
+    "n": 2,
+    "file": "step2_text.S",
+    "frames": 5
+   },
+   {
+    "n": 3,
+    "file": "step3_two_lines.S",
+    "frames": 5
+   }
+  ],
+  "master": "labs/masters/hello.master.S"
+ },
+ {
+  "id": "lab04-probe",
+  "dir": "labs/04-prg32qt",
+  "prefix": "probe",
+  "steps": [
+   {
+    "n": 1,
+    "file": "probe.S",
+    "frames": 90,
+    "input": [
+     [
+      0,
+      40,
+      2
+     ]
+    ]
+   }
+  ]
+ },
+ {
+  "id": "lab05-first",
+  "dir": "labs/05-asm-first-contact",
+  "prefix": "first",
+  "steps": [
+   {
+    "n": 1,
+    "file": "step1_skeleton.S",
+    "frames": 5
+   },
+   {
+    "n": 2,
+    "file": "step2_hello.S",
+    "frames": 5
+   },
+   {
+    "n": 3,
+    "file": "step3_counter.S",
+    "frames": 100
+   },
+   {
+    "n": 4,
+    "file": "step4_bar.S",
+    "frames": 100
+   }
+  ],
+  "master": "labs/masters/first.master.S"
+ },
+ {
+  "id": "lab06-steer",
+  "dir": "labs/06-asm-state-and-input",
+  "prefix": "steer",
+  "steps": [
+   {
+    "n": 1,
+    "file": "step1_lamps.S",
+    "frames": 10,
+    "input": [
+     [
+      0,
+      10,
+      18
+     ]
+    ]
+   },
+   {
+    "n": 2,
+    "file": "step2_move.S",
+    "frames": 40,
+    "input": [
+     [
+      0,
+      40,
+      2
+     ]
+    ]
+   },
+   {
+    "n": 3,
+    "file": "step3_clamp.S",
+    "frames": 120,
+    "input": [
+     [
+      0,
+      120,
+      2
+     ]
+    ]
+   },
+   {
+    "n": 4,
+    "file": "step4_two_axes.S",
+    "frames": 80,
+    "input": [
+     [
+      0,
+      80,
+      10
+     ]
+    ]
+   }
+  ],
+  "master": "labs/masters/steer.master.S"
+ },
+ {
+  "id": "lab07-pong",
+  "dir": "labs/07-asm-graphics-game",
+  "prefix": "pong",
+  "steps": [
+   {
+    "n": 1,
+    "file": "step1_blank.S",
+    "frames": 5
+   },
+   {
+    "n": 2,
+    "file": "step2_paddle.S",
+    "frames": 5
+   },
+   {
+    "n": 3,
+    "file": "step3_move.S",
+    "frames": 30,
+    "input": [
+     [
+      0,
+      30,
+      2
+     ]
+    ]
+   },
+   {
+    "n": 4,
+    "file": "step4_ball_x.S",
+    "frames": 60
+   },
+   {
+    "n": 5,
+    "file": "step5_ball_y.S",
+    "frames": 40
+   },
+   {
+    "n": 6,
+    "file": "step6_collision.S",
+    "frames": 150
+   }
+  ],
+  "master": "labs/masters/pong.master.S"
+ },
+ {
+  "id": "lab08-pong",
+  "dir": "labs/08-asm-capstone",
+  "prefix": "pong",
+  "steps": [
+   {
+    "n": 7,
+    "file": "step7_score.S",
+    "frames": 600,
+    "input": [
+     [
+      150,
+      170,
+      2
+     ],
+     [
+      300,
+      330,
+      1
+     ],
+     [
+      430,
+      470,
+      2
+     ]
+    ]
+   },
+   {
+    "n": 8,
+    "file": "step8_sound.S",
+    "frames": 600,
+    "input": [
+     [
+      150,
+      170,
+      2
+     ],
+     [
+      300,
+      330,
+      1
+     ],
+     [
+      430,
+      470,
+      2
+     ]
+    ]
+   },
+   {
+    "n": 9,
+    "file": "step9_pause.S",
+    "frames": 200,
+    "input": [
+     [
+      100,
+      101,
+      16
+     ]
+    ]
+   }
+  ],
+  "master": "labs/masters/pong.master.S"
+ },
+ {
+  "id": "lab09-pong-c",
+  "dir": "labs/09-c-first-contact",
+  "prefix": "pong_c",
+  "steps": [
+   {
+    "n": 1,
+    "file": "step1_skeleton.c",
+    "frames": 5
+   },
+   {
+    "n": 2,
+    "file": "step2_state_draw.c",
+    "frames": 5
+   },
+   {
+    "n": 3,
+    "file": "step3_paddle.c",
+    "frames": 30,
+    "input": [
+     [
+      0,
+      30,
+      2
+     ]
+    ]
+   },
+   {
+    "n": 4,
+    "file": "step4_ball.c",
+    "frames": 150
+   },
+   {
+    "n": 5,
+    "file": "step5_collision.c",
+    "frames": 120
+   },
+   {
+    "n": 6,
+    "file": "step6_score.c",
+    "frames": 400
+   }
+  ],
+  "master": "labs/masters/pong_c.master.c"
+ },
+ {
+  "id": "lab10-bricks",
+  "dir": "labs/10-c-structs-and-tiles",
+  "prefix": "bricks_c",
+  "steps": [
+   {
+    "n": 1,
+    "file": "bricks_draw_step1.c",
+    "frames": 5
+   },
+   {
+    "n": 2,
+    "file": "bricks_hit_step2.c",
+    "frames": 120
+   },
+   {
+    "n": 3,
+    "file": "bricks_win_step3.c",
+    "frames": 300
+   }
+  ],
+  "master": "labs/masters/bricks_c.master.c"
+ },
+ {
+  "id": "lab10-plat",
+  "dir": "labs/10-c-structs-and-tiles",
+  "prefix": "plat",
+  "steps": [
+   {
+    "n": 1,
+    "file": "plat_world_step1.c",
+    "frames": 5
+   },
+   {
+    "n": 2,
+    "file": "plat_actor_step2.c",
+    "frames": 80,
+    "input": [
+     [
+      20,
+      70,
+      2
+     ],
+     [
+      40,
+      42,
+      16
+     ]
+    ]
+   },
+   {
+    "n": 3,
+    "file": "plat_hazard_step3.c",
+    "frames": 60,
+    "input": [
+     [
+      10,
+      60,
+      2
+     ]
+    ]
+   }
+  ],
+  "master": "labs/masters/plat_c.master.c"
+ },
+ {
+  "id": "lab11-refine",
+  "dir": "labs/11-c-capstone",
+  "prefix": "refine_c",
+  "steps": [
+   {
+    "n": 1,
+    "file": "step1_refactor.c",
+    "frames": 120
+   },
+   {
+    "n": 2,
+    "file": "step2_fixed_point.c",
+    "frames": 120
+   },
+   {
+    "n": 3,
+    "file": "step3_lives.c",
+    "frames": 700
+   },
+   {
+    "n": 4,
+    "file": "step4_score_submit.c",
+    "frames": 700
+   }
+  ],
+  "master": "labs/masters/refine_c.master.c"
+ },
+ {
+  "id": "kids-blocks",
+  "dir": "examples/blocks_first_steps",
+  "prefix": "",
+  "steps": [
+   {
+    "n": 1,
+    "file": "first_square.c",
+    "frames": 5,
+    "prefix": "first_square"
+   },
+   {
+    "n": 2,
+    "file": "moving_square.c",
+    "frames": 30,
+    "input": [
+     [
+      0,
+      30,
+      10
+     ]
+    ],
+    "prefix": "moving_square"
+   },
+   {
+    "n": 3,
+    "file": "lemon_catcher.c",
+    "frames": 260,
+    "input": [
+     [
+      0,
+      3,
+      2
+     ]
+    ],
+    "prefix": "lemon_catcher"
+   },
+   {
+    "n": 4,
+    "file": "music_pad.c",
+    "frames": 10,
+    "input": [
+     [
+      0,
+      10,
+      4
+     ]
+    ],
+    "prefix": "music_pad"
+   }
+  ]
+ },
+ {
+  "id": "mf-part1",
+  "dir": "workshops/Maker_Faire/part1",
+  "master": "labs/masters/hello.master.S",
+  "prefix": "hello_world",
+  "keep": "workshops/Maker_Faire/cartridges",
+  "keep_prefix": "part1-",
+  "steps": [
+   {
+    "n": 1,
+    "file": "step1_skeleton.S",
+    "frames": 5
+   },
+   {
+    "n": 2,
+    "file": "step2_text.S",
+    "frames": 5
+   },
+   {
+    "n": 3,
+    "file": "step3_two_lines.S",
+    "frames": 5
+   },
+   {
+    "n": 4,
+    "file": "step4_sprite_button.S",
+    "frames": 10,
+    "input": [
+     [
+      0,
+      10,
+      16
+     ]
+    ]
+   }
+  ]
+ },
+ {
+  "id": "mf-part2",
+  "dir": "workshops/Maker_Faire/part2",
+  "master": "labs/masters/pong.master.S",
+  "prefix": "pong",
+  "keep": "workshops/Maker_Faire/cartridges",
+  "keep_prefix": "part2-",
+  "steps": [
+   {
+    "n": 2,
+    "file": "step1_paddle.S",
+    "frames": 5
+   },
+   {
+    "n": 3,
+    "file": "step2_move.S",
+    "frames": 30,
+    "input": [
+     [
+      0,
+      30,
+      2
+     ]
+    ]
+   },
+   {
+    "n": 5,
+    "file": "step3_ball.S",
+    "frames": 40
+   },
+   {
+    "n": 6,
+    "file": "step4_collision.S",
+    "frames": 150
+   },
+   {
+    "n": 7,
+    "file": "step5_score.S",
+    "frames": 600,
+    "input": [
+     [
+      150,
+      170,
+      2
+     ],
+     [
+      300,
+      330,
+      1
+     ],
+     [
+      430,
+      470,
+      2
+     ]
+    ]
+   },
+   {
+    "n": 8,
+    "file": "step6_sound.S",
+    "frames": 600,
+    "input": [
+     [
+      150,
+      170,
+      2
+     ],
+     [
+      300,
+      330,
+      1
+     ],
+     [
+      430,
+      470,
+      2
+     ]
+    ]
+   }
+  ]
+ },
+ {
+  "id": "mf-part3",
+  "dir": "workshops/Maker_Faire/part3",
+  "master": "workshops/Maker_Faire/src/mixed.master.c",
+  "prefix": "mixed",
+  "keep": "workshops/Maker_Faire/cartridges",
+  "keep_prefix": "part3-",
+  "steps": [
+   {
+    "n": 1,
+    "file": "step1_c_calls_asm.c",
+    "frames": 60
+   },
+   {
+    "n": 2,
+    "file": "step2_bricks.c",
+    "frames": 200,
+    "input": [
+     [
+      0,
+      20,
+      2
+     ],
+     [
+      60,
+      90,
+      1
+     ]
+    ]
+   },
+   {
+    "n": 3,
+    "file": "step3_complete.c",
+    "frames": 420,
+    "input": [
+     [
+      0,
+      30,
+      2
+     ],
+     [
+      60,
+      90,
+      1
+     ],
+     [
+      150,
+      190,
+      2
+     ],
+     [
+      230,
+      270,
+      1
+     ]
+    ]
+   }
+  ]
+ }
+]

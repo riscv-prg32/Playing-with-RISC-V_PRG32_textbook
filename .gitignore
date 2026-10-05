@@ -333,3 +333,9 @@ TSWLatexianTemp*
 
 # Slide generator dependencies
 presentations/tools/node_modules/
+
+# Tutorial build output
+labs/build/
+workshops/*/build/
+
+.DS_Store

@@ -1,0 +1,127 @@
+{
+  "abi": "prg32-construction-kit-project-1.0",
+  "title": "Breakout",
+  "description": "Laboratorio EST Napoli: Breakout, passo 3 di 8.",
+  "author": "PRG32 workshop",
+  "tags": [
+    "workshop",
+    "breakout",
+    "passo3"
+  ],
+  "blocks_json": {
+    "blocks": {
+      "languageVersion": 0,
+      "blocks": [
+        {
+          "type": "prg32_on_start",
+          "id": "passo3-on_start",
+          "x": 20,
+          "y": 20,
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "prg32_set_state",
+                "id": "passo3-8",
+                "fields": {
+                  "VAR": "paddle_x",
+                  "VALUE": "136"
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "prg32_update",
+          "id": "passo3-update",
+          "x": 340,
+          "y": 20,
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "prg32_if_button",
+                "id": "passo3-12",
+                "fields": {
+                  "BUTTON": "LEFT"
+                },
+                "inputs": {
+                  "DO": {
+                    "block": {
+                      "type": "prg32_change_state",
+                      "id": "passo3-13",
+                      "fields": {
+                        "VAR": "paddle_x",
+                        "DELTA": "-4"
+                      }
+                    }
+                  }
+                },
+                "next": {
+                  "block": {
+                    "type": "prg32_if_button",
+                    "id": "passo3-10",
+                    "fields": {
+                      "BUTTON": "RIGHT"
+                    },
+                    "inputs": {
+                      "DO": {
+                        "block": {
+                          "type": "prg32_change_state",
+                          "id": "passo3-11",
+                          "fields": {
+                            "VAR": "paddle_x",
+                            "DELTA": "4"
+                          }
+                        }
+                      }
+                    },
+                    "next": {
+                      "block": {
+                        "type": "prg32_clamp_state",
+                        "id": "passo3-9",
+                        "fields": {
+                          "VAR": "paddle_x",
+                          "LOW": "0",
+                          "HIGH": "272"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "prg32_draw",
+          "id": "passo3-draw",
+          "x": 760,
+          "y": 20,
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "prg32_clear_screen",
+                "id": "passo3-15",
+                "fields": {
+                  "COLOR": "BLACK"
+                },
+                "next": {
+                  "block": {
+                    "type": "prg32_draw_rect",
+                    "id": "passo3-14",
+                    "fields": {
+                      "X": "paddle_x",
+                      "Y": "188",
+                      "W": "48",
+                      "H": "6",
+                      "COLOR": "CYAN"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

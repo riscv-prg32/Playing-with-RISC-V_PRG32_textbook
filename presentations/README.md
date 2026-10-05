@@ -23,6 +23,22 @@ Speaker notes carry the answers to the quiz slides, teaching tips, and the
 source file of every listing. Every lab deck's title-slide notes list the
 preparation the room needs.
 
+## Labs are verified tutorials
+
+The lab decks of the code chapters are step-by-step tutorials over the files in
+[`labs/`](../labs/README.md). Each step is a complete program that was built
+and executed while the decks were prepared; the screenshot beside the code is
+the frame that run produced, and the sizes, logs and tool replies quoted on the
+slides are the real ones. A learner who types `labs/run.sh STEP PREFIX` gets
+what the slide shows.
+
+The lecture decks carry the technical detail behind those steps: instruction
+encodings bit by bit, the cartridge header and the stack frame byte by byte,
+the generated ABI stubs, memory maps, and real compiler and tool output.
+
+Workshop decks built with the same engine live in
+[`workshops/`](../workshops/).
+
 ## Rebuilding
 
 The decks are generated, so slides and book cannot drift apart: code slides read
@@ -33,12 +49,16 @@ cd presentations/tools
 npm install
 node build.js        # all decks
 node build.js 12     # only chapter 12
+node build.js ws     # the EST Napoli workshop decks
+node build.js mf     # the Maker Faire decks
 ```
 
 - `tools/build.js` is the layout engine (pptxgenjs). It measures text before
   placing it and **fails the build** if a slide's text cannot fit at a readable
   size, instead of shipping an overflowing slide.
-- `tools/decks/*.js` hold the content, one compact specification per deck.
+- `tools/decks/*.js` hold the content, one compact specification per deck;
+  `zz-labs-*.js` are the verified lab tutorials and `zz-technical.js` the
+  technical slides inserted into the lectures.
 
 To change a slide, edit its line in `tools/decks/`, rebuild, and commit both the
 specification and the regenerated `.pptx`.

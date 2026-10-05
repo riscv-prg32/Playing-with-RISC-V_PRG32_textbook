@@ -59,6 +59,8 @@ examples/                Source files listed in the book
 scripts/                 Shell listings (setup, Store, Construction Kit, PRG32-QT, ...)
 figures/                 Screenshots
 presentations/           Two slide decks per chapter (lecture + lab) and their generator
+labs/                    Verified step-by-step tutorial sources and screenshots for the lab decks
+workshops/               Workshop decks and material (EST Napoli Innovation Festival, Maker Faire)
 ```
 
 ## About the platform
@@ -92,7 +94,16 @@ and [PRG32-QT](https://github.com/riscv-prg32/PRG32-QT). If you use PRG32 in cou
 ## Slide decks
 
 `presentations/` holds a lecture deck and a lab deck for every chapter; see
-[presentations/README.md](presentations/README.md).
+[presentations/README.md](presentations/README.md). The lab decks are
+step-by-step tutorials over the verified sources in [labs/](labs/README.md).
+
+## Workshops
+
+- [workshops/EST-Napoli_Innovation_Festival](workshops/EST-Napoli_Innovation_Festival/README.md):
+  three alternative 90-minute decks in Italian (Breakout in assembly, in C,
+  and with the Construction Kit).
+- [workshops/Maker_Faire](workshops/Maker_Faire/README.md): a 2.5-hour
+  workshop in Italian and English, from assembly to mixed assembly/C.
 
 ## Staying aligned with PRG32
 
